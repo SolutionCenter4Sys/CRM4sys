@@ -1,0 +1,2667 @@
+// CRM B2B Tech Foursys - Mock Data
+// Data: 14/02/2026
+// PostgreSQL/Supabase UUIDs format
+
+import type {
+  Contact,
+  Account,
+  Deal,
+  User,
+  Pipeline,
+  Stage,
+  Activity,
+  Lead,
+  LeadScoreDetails,
+  LifecycleFunnel,
+  NurtureSequence,
+  ReportDefinition,
+  ReportSchedule,
+  ReportExecutionLog,
+  ExportJob,
+  BiConnectorStatus,
+  Invoice,
+  ConnectorViewModel,
+  CollectionRule,
+  TemplateModel,
+  CollectionJob,
+  AllocationEntry,
+  InvoiceHistoryEvent,
+  AuditEvent,
+  RolePermissionMatrixModel,
+  ComplianceExportJob,
+  AccessPermissionCatalogItem,
+  AccessGroup,
+  AccessUserGroupMembership,
+  DirectUserPermissionGrant,
+  EffectiveUserPermission,
+  EffectiveAccessSummary,
+  AccessPermissionConflict,
+  AccessElevationRequest,
+  AccessAuditEvent,
+  AccessExportRecord,
+} from '../types';
+
+// ============================================================================
+// MOCK USERS
+// ============================================================================
+
+export const mockUsers: User[] = [
+  {
+    id: '550e8400-e29b-41d4-a716-446655440001',
+    firstName: 'Maria',
+    lastName: 'Santos',
+    fullName: 'Maria Santos',
+    email: 'maria.santos@foursys.com.br',
+    avatar: 'https://i.pravatar.cc/150?img=1',
+    role: 'manager',
+    isActive: true,
+    createdAt: '2026-01-01T10:00:00Z',
+    updatedAt: '2026-01-01T10:00:00Z',
+  },
+  {
+    id: '550e8400-e29b-41d4-a716-446655440002',
+    firstName: 'Pedro',
+    lastName: 'Oliveira',
+    fullName: 'Pedro Oliveira',
+    email: 'pedro.oliveira@foursys.com.br',
+    avatar: 'https://i.pravatar.cc/150?img=12',
+    role: 'sales',
+    isActive: true,
+    createdAt: '2026-01-01T10:00:00Z',
+    updatedAt: '2026-01-01T10:00:00Z',
+  },
+  {
+    id: '550e8400-e29b-41d4-a716-446655440003',
+    firstName: 'Ana',
+    lastName: 'Silva',
+    fullName: 'Ana Silva',
+    email: 'ana.silva@foursys.com.br',
+    avatar: 'https://i.pravatar.cc/150?img=5',
+    role: 'sales',
+    isActive: true,
+    createdAt: '2026-01-01T10:00:00Z',
+    updatedAt: '2026-01-01T10:00:00Z',
+  },
+  {
+    id: '550e8400-e29b-41d4-a716-446655440004',
+    firstName: 'João',
+    lastName: 'Costa',
+    fullName: 'João Costa',
+    email: 'joao.costa@foursys.com.br',
+    avatar: 'https://i.pravatar.cc/150?img=8',
+    role: 'marketing',
+    isActive: true,
+    createdAt: '2026-01-01T10:00:00Z',
+    updatedAt: '2026-01-01T10:00:00Z',
+  },
+];
+
+// ============================================================================
+// MOCK ACCOUNTS
+// ============================================================================
+
+export const mockAccounts: Account[] = [
+  {
+    id: '660e8400-e29b-41d4-a716-446655440001',
+    name: 'Foursys Tecnologia',
+    legalName: 'FOURSYS TECNOLOGIA LTDA',
+    tradeName: 'Foursys',
+    cnpj: '12.345.678/0001-90',
+    domain: 'foursys.com.br',
+    website: 'https://www.foursys.com.br',
+    phone: '+55 (11) 3000-4000',
+    industry: 'Tecnologia',
+    numberOfEmployees: 500,
+    annualRevenue: 25000000,
+    address: {
+      street: 'Av. Paulista, 1000',
+      complement: '10º andar',
+      neighborhood: 'Bela Vista',
+      city: 'São Paulo',
+      state: 'SP',
+      zipCode: '01310-100',
+      country: 'Brasil',
+    },
+    branches: [
+      {
+        id: 'branch-001',
+        name: 'Foursys Tecnologia — Filial Rio de Janeiro',
+        cnpj: '12.345.678/0002-71',
+        type: 'filial',
+        address: {
+          street: 'Av. Rio Branco, 181',
+          complement: 'Sala 1200',
+          neighborhood: 'Centro',
+          city: 'Rio de Janeiro',
+          state: 'RJ',
+          zipCode: '20040-007',
+          country: 'Brasil',
+        },
+        phone: '+55 (21) 3200-5000',
+        email: 'rj@foursys.com.br',
+        isActive: true,
+      },
+      {
+        id: 'branch-002',
+        name: 'Foursys Tecnologia — Filial Campinas',
+        cnpj: '12.345.678/0003-52',
+        type: 'filial',
+        address: {
+          street: 'Rua José de Alencar, 500',
+          complement: '4º andar',
+          neighborhood: 'Cambuí',
+          city: 'Campinas',
+          state: 'SP',
+          zipCode: '13025-130',
+          country: 'Brasil',
+        },
+        phone: '+55 (19) 3100-2000',
+        email: 'campinas@foursys.com.br',
+        isActive: true,
+      },
+    ],
+    billingConditions: {
+      paymentTerms: '30 dias',
+      billingCycle: 'monthly',
+      paymentMethod: 'Boleto',
+      creditLimit: 500000,
+      currency: 'BRL',
+      billingEmail: 'financeiro@foursys.com.br',
+      billingContact: 'Carla Mendes',
+      invoiceFormat: 'nfse',
+      taxRegime: 'Lucro Presumido',
+      notes: 'Emissão NFS-e até o 5º dia útil do mês. Aprovação interna necessária para faturas acima de R$ 100.000.',
+    },
+    tier: 'Enterprise',
+    icpScore: 90,
+    targetAccount: true,
+    ownerId: '550e8400-e29b-41d4-a716-446655440001',
+    owner: mockUsers[0],
+    techStack: ['.NET', 'Azure', 'React', 'SQL Server'],
+    enrichedAt: '2026-02-10T10:00:00Z',
+    enrichmentSource: 'BrasilAPI',
+    createdAt: '2026-01-05T10:00:00Z',
+    updatedAt: '2026-02-10T10:00:00Z',
+    contactCount: 12,
+    openDealsCount: 3,
+    totalDealsValue: 1500000,
+  },
+  {
+    id: '660e8400-e29b-41d4-a716-446655440002',
+    name: 'Tech Corp Solutions',
+    legalName: 'TECH CORP SOLUTIONS LTDA',
+    cnpj: '23.456.789/0001-01',
+    domain: 'techcorp.com.br',
+    website: 'https://techcorp.com.br',
+    phone: '+55 (11) 4000-5000',
+    industry: 'Consultoria',
+    numberOfEmployees: 250,
+    annualRevenue: 12000000,
+    address: {
+      street: 'Rua Augusta, 500',
+      neighborhood: 'Consolação',
+      city: 'São Paulo',
+      state: 'SP',
+      zipCode: '01304-000',
+      country: 'Brasil',
+    },
+    billingConditions: {
+      paymentTerms: '45 dias',
+      billingCycle: 'monthly',
+      paymentMethod: 'PIX',
+      creditLimit: 200000,
+      currency: 'BRL',
+      billingEmail: 'ap@techcorp.com.br',
+      billingContact: 'Ricardo Alves',
+      invoiceFormat: 'nfe',
+      taxRegime: 'Lucro Presumido',
+    },
+    tier: 'MidMarket',
+    icpScore: 75,
+    targetAccount: true,
+    ownerId: '550e8400-e29b-41d4-a716-446655440002',
+    owner: mockUsers[1],
+    techStack: ['Java', 'AWS', 'Angular'],
+    createdAt: '2026-01-10T10:00:00Z',
+    updatedAt: '2026-02-10T10:00:00Z',
+    contactCount: 8,
+    openDealsCount: 2,
+    totalDealsValue: 800000,
+  },
+  {
+    id: '660e8400-e29b-41d4-a716-446655440003',
+    name: 'StartupX Inovação',
+    legalName: 'STARTUPX INOVACAO LTDA',
+    cnpj: '34.567.890/0001-12',
+    domain: 'startupx.com.br',
+    website: 'https://startupx.com.br',
+    phone: '+55 (11) 9800-1234',
+    industry: 'SaaS',
+    numberOfEmployees: 50,
+    annualRevenue: 3000000,
+    address: {
+      street: 'Av. Faria Lima, 1200',
+      complement: 'Sala 300',
+      neighborhood: 'Itaim Bibi',
+      city: 'São Paulo',
+      state: 'SP',
+      zipCode: '01451-000',
+      country: 'Brasil',
+    },
+    billingConditions: {
+      paymentTerms: 'À vista',
+      billingCycle: 'monthly',
+      paymentMethod: 'Cartão de Crédito',
+      creditLimit: 50000,
+      currency: 'BRL',
+      billingEmail: 'finance@startupx.com.br',
+      billingContact: 'Ana Lima',
+      invoiceFormat: 'nfse',
+      taxRegime: 'Simples Nacional',
+    },
+    tier: 'SMB',
+    icpScore: 60,
+    targetAccount: false,
+    ownerId: '550e8400-e29b-41d4-a716-446655440003',
+    owner: mockUsers[2],
+    techStack: ['Node.js', 'React', 'MongoDB'],
+    createdAt: '2026-01-15T10:00:00Z',
+    updatedAt: '2026-02-10T10:00:00Z',
+    contactCount: 5,
+    openDealsCount: 1,
+    totalDealsValue: 150000,
+  },
+  {
+    id: '660e8400-e29b-41d4-a716-446655440004',
+    name: 'BigCo Enterprises',
+    legalName: 'BIGCO ENTERPRISES SA',
+    cnpj: '45.678.901/0001-23',
+    domain: 'bigco.com.br',
+    website: 'https://bigco.com.br',
+    phone: '+55 (21) 2000-8000',
+    industry: 'Telecomunicações',
+    numberOfEmployees: 2000,
+    annualRevenue: 150000000,
+    address: {
+      street: 'Av. Brasil, 3000',
+      complement: 'Torre A, 5º andar',
+      neighborhood: 'Centro',
+      city: 'Rio de Janeiro',
+      state: 'RJ',
+      zipCode: '20040-000',
+      country: 'Brasil',
+    },
+    branches: [
+      {
+        id: 'branch-bigco-001',
+        name: 'BigCo Enterprises — Unidade São Paulo',
+        cnpj: '45.678.901/0002-04',
+        type: 'filial',
+        address: {
+          street: 'Av. das Nações Unidas, 12901',
+          complement: '18º andar',
+          neighborhood: 'Brooklin',
+          city: 'São Paulo',
+          state: 'SP',
+          zipCode: '04578-000',
+          country: 'Brasil',
+        },
+        phone: '+55 (11) 5000-9000',
+        email: 'sp@bigco.com.br',
+        isActive: true,
+      },
+      {
+        id: 'branch-bigco-002',
+        name: 'BigCo Enterprises — Unidade Belo Horizonte',
+        cnpj: '45.678.901/0003-85',
+        type: 'filial',
+        address: {
+          street: 'Av. Afonso Pena, 4000',
+          complement: 'Sala 800',
+          neighborhood: 'Serra',
+          city: 'Belo Horizonte',
+          state: 'MG',
+          zipCode: '30130-009',
+          country: 'Brasil',
+        },
+        phone: '+55 (31) 3400-6000',
+        email: 'bh@bigco.com.br',
+        isActive: true,
+      },
+      {
+        id: 'branch-bigco-003',
+        name: 'BigCo Enterprises — Unidade Brasília (inativa)',
+        cnpj: '45.678.901/0004-66',
+        type: 'filial',
+        address: {
+          street: 'SHN Quadra 2, Bl. F',
+          neighborhood: 'Asa Norte',
+          city: 'Brasília',
+          state: 'DF',
+          zipCode: '70702-905',
+          country: 'Brasil',
+        },
+        isActive: false,
+      },
+    ],
+    billingConditions: {
+      paymentTerms: '60 dias',
+      billingCycle: 'quarterly',
+      paymentMethod: 'Transferência Bancária',
+      creditLimit: 2000000,
+      currency: 'BRL',
+      billingEmail: 'contas-pagar@bigco.com.br',
+      billingContact: 'Fernanda Costa',
+      invoiceFormat: 'nfe',
+      taxRegime: 'Lucro Real',
+      notes: 'Pedido de compra (PO) obrigatório antes da emissão. Faturamento consolidado por trimestre.',
+    },
+    tier: 'Enterprise',
+    icpScore: 85,
+    targetAccount: true,
+    ownerId: '550e8400-e29b-41d4-a716-446655440001',
+    owner: mockUsers[0],
+    techStack: ['.NET', 'Oracle', 'SAP'],
+    createdAt: '2026-01-20T10:00:00Z',
+    updatedAt: '2026-02-10T10:00:00Z',
+    contactCount: 20,
+    openDealsCount: 5,
+    totalDealsValue: 5000000,
+  },
+];
+
+// ============================================================================
+// MOCK CONTACTS
+// ============================================================================
+
+export const mockContacts: Contact[] = [
+  {
+    id: '770e8400-e29b-41d4-a716-446655440001',
+    firstName: 'João',
+    lastName: 'Silva',
+    fullName: 'João Silva',
+    email: 'joao.silva@foursys.com.br',
+    phone: '+55 11 3333-3333',
+    mobilePhone: '+55 11 99999-9999',
+    jobTitle: 'CTO - Chief Technology Officer',
+    department: 'Tecnologia',
+    accountId: '660e8400-e29b-41d4-a716-446655440001',
+    account: mockAccounts[0],
+    ownerId: '550e8400-e29b-41d4-a716-446655440001',
+    owner: mockUsers[0],
+    lifecycleStage: 'customer',
+    leadScore: 90,
+    leadSource: 'LinkedIn Outreach',
+    tags: ['Enterprise', 'Hot Lead', 'Tech Decision Maker'],
+    buyingCommitteeRole: 'DecisionMaker',
+    customFields: {
+      empresa_size: '500-1000',
+      tech_stack: ['.NET', 'Azure', 'React'],
+      budget_authority: true,
+      hobbies: 'Corrida, cinema e viagens',
+      preferencias: 'Prefere contato por e-mail no periodo da manha',
+      lugaresQueFrequenta: 'Eventos de tecnologia e comunidade .NET',
+      escolasQuePassou: 'USP e MBA FIA',
+      estadoCivil: 'Casado',
+      nomesFilhos: 'Marina e Pedro',
+      nomeConjuge: 'Patricia Silva',
+      nomeNamorado: '',
+      outrosTemasSocialSelling: 'Interesse em IA generativa aplicada a engenharia de software e produtividade de squads.',
+    },
+    lastContactedAt: '2026-02-13T14:30:00Z',
+    lastActivityAt: '2026-02-13T16:45:00Z',
+    createdAt: '2026-01-05T10:00:00Z',
+    updatedAt: '2026-02-13T16:45:00Z',
+  },
+  {
+    id: '770e8400-e29b-41d4-a716-446655440002',
+    firstName: 'Ana',
+    lastName: 'Costa',
+    fullName: 'Ana Costa',
+    email: 'ana.costa@techcorp.com.br',
+    phone: '+55 11 4444-4444',
+    mobilePhone: '+55 11 98888-8888',
+    jobTitle: 'CFO - Chief Financial Officer',
+    department: 'Financeiro',
+    accountId: '660e8400-e29b-41d4-a716-446655440002',
+    account: mockAccounts[1],
+    ownerId: '550e8400-e29b-41d4-a716-446655440002',
+    owner: mockUsers[1],
+    lifecycleStage: 'opportunity',
+    leadScore: 75,
+    leadSource: 'Website Form',
+    tags: ['Mid-Market', 'Warm Lead', 'Budget Holder'],
+    buyingCommitteeRole: 'DecisionMaker',
+    lastContactedAt: '2026-02-12T10:00:00Z',
+    lastActivityAt: '2026-02-12T15:00:00Z',
+    createdAt: '2026-01-10T10:00:00Z',
+    updatedAt: '2026-02-12T15:00:00Z',
+  },
+  {
+    id: '770e8400-e29b-41d4-a716-446655440003',
+    firstName: 'Carlos',
+    lastName: 'Mota',
+    fullName: 'Carlos Mota',
+    email: 'carlos.mota@startupx.com.br',
+    phone: '+55 11 5555-5555',
+    mobilePhone: '+55 11 97777-7777',
+    jobTitle: 'Product Manager',
+    department: 'Produto',
+    accountId: '660e8400-e29b-41d4-a716-446655440003',
+    account: mockAccounts[2],
+    ownerId: '550e8400-e29b-41d4-a716-446655440003',
+    owner: mockUsers[2],
+    lifecycleStage: 'mql',
+    leadScore: 55,
+    leadSource: 'Webinar',
+    tags: ['SMB', 'SaaS', 'Influencer'],
+    buyingCommitteeRole: 'Influencer',
+    lastContactedAt: '2026-02-11T09:00:00Z',
+    lastActivityAt: '2026-02-11T11:30:00Z',
+    createdAt: '2026-01-15T10:00:00Z',
+    updatedAt: '2026-02-11T11:30:00Z',
+  },
+  {
+    id: '770e8400-e29b-41d4-a716-446655440004',
+    firstName: 'Paula',
+    lastName: 'Lima',
+    fullName: 'Paula Lima',
+    email: 'paula.lima@bigco.com.br',
+    phone: '+55 21 6666-6666',
+    mobilePhone: '+55 21 96666-6666',
+    jobTitle: 'IT Director',
+    department: 'Tecnologia da Informação',
+    accountId: '660e8400-e29b-41d4-a716-446655440004',
+    account: mockAccounts[3],
+    ownerId: '550e8400-e29b-41d4-a716-446655440001',
+    owner: mockUsers[0],
+    lifecycleStage: 'sql',
+    leadScore: 80,
+    leadSource: 'Referral',
+    tags: ['Enterprise', 'Hot Lead', 'Champion'],
+    buyingCommitteeRole: 'Champion',
+    lastContactedAt: '2026-02-10T14:00:00Z',
+    lastActivityAt: '2026-02-10T18:00:00Z',
+    createdAt: '2026-01-20T10:00:00Z',
+    updatedAt: '2026-02-10T18:00:00Z',
+  },
+  {
+    id: '770e8400-e29b-41d4-a716-446655440005',
+    firstName: 'Roberto',
+    lastName: 'Mendes',
+    fullName: 'Roberto Mendes',
+    email: 'roberto.mendes@foursys.com.br',
+    phone: '+55 11 2222-2222',
+    mobilePhone: '+55 11 95555-5555',
+    jobTitle: 'VP of Engineering',
+    department: 'Engenharia',
+    accountId: '660e8400-e29b-41d4-a716-446655440001',
+    account: mockAccounts[0],
+    ownerId: '550e8400-e29b-41d4-a716-446655440001',
+    owner: mockUsers[0],
+    lifecycleStage: 'customer',
+    leadScore: 85,
+    leadSource: 'Cold Email',
+    tags: ['Enterprise', 'Tech Leader', 'Influencer'],
+    buyingCommitteeRole: 'Influencer',
+    customFields: {
+      hobbies: ['Ciclismo', 'Fotografia', 'Leitura de biografias'],
+      preferencias: ['Eventos de tecnologia', 'Conteudos sobre IA aplicada', 'Contato via WhatsApp'],
+      lugaresQueFrequenta: ['Campus Foursys', 'Coworking Vila Olimpia', 'Eventos da comunidade React'],
+      escolasQuePassou: ['USP', 'FIAP'],
+      estadoCivil: 'Casado',
+      nomesFilhos: ['Lucas Mendes', 'Beatriz Mendes'],
+      nomeConjuge: 'Fernanda Mendes',
+      nomeNamorada: '',
+      outrosTemasSocialSelling: 'Valoriza networking tecnico, participa de meetups e prefere conversas objetivas com benchmark de mercado.',
+    },
+    lastContactedAt: '2026-02-09T11:00:00Z',
+    lastActivityAt: '2026-02-09T16:00:00Z',
+    createdAt: '2026-01-05T11:00:00Z',
+    updatedAt: '2026-02-09T16:00:00Z',
+  },
+];
+
+// ============================================================================
+// MOCK PIPELINES & STAGES
+// ============================================================================
+
+export const mockPipelines: Pipeline[] = [
+  {
+    id: '880e8400-e29b-41d4-a716-446655440001',
+    name: 'Pipeline de Vendas B2B',
+    description: 'Pipeline padrão para vendas B2B complexas',
+    isDefault: true,
+    stages: [],
+    createdAt: '2026-01-01T10:00:00Z',
+    updatedAt: '2026-01-01T10:00:00Z',
+  },
+];
+
+export const mockStages: Stage[] = [
+  {
+    id: '990e8400-e29b-41d4-a716-446655440001',
+    pipelineId: '880e8400-e29b-41d4-a716-446655440001',
+    name: 'Prospecção',
+    description: 'Identificação de oportunidades',
+    probability: 10,
+    displayOrder: 1,
+    color: '#4C8BF5',
+    rotAfterDays: 30,
+    createdAt: '2026-01-01T10:00:00Z',
+    updatedAt: '2026-01-01T10:00:00Z',
+  },
+  {
+    id: '990e8400-e29b-41d4-a716-446655440002',
+    pipelineId: '880e8400-e29b-41d4-a716-446655440001',
+    name: 'Qualificação',
+    description: 'Qualificação de fit e interest',
+    probability: 25,
+    displayOrder: 2,
+    color: '#00B4D8',
+    rotAfterDays: 20,
+    createdAt: '2026-01-01T10:00:00Z',
+    updatedAt: '2026-01-01T10:00:00Z',
+  },
+  {
+    id: '990e8400-e29b-41d4-a716-446655440006',
+    pipelineId: '880e8400-e29b-41d4-a716-446655440001',
+    name: 'Viabilidade',
+    description: 'Validação técnica e financeira da oportunidade',
+    probability: 40,
+    displayOrder: 3,
+    color: '#7C5CFF',
+    rotAfterDays: 18,
+    createdAt: '2026-01-01T10:00:00Z',
+    updatedAt: '2026-01-01T10:00:00Z',
+  },
+  {
+    id: '990e8400-e29b-41d4-a716-446655440003',
+    pipelineId: '880e8400-e29b-41d4-a716-446655440001',
+    name: 'Proposta',
+    description: 'Envio de proposta comercial',
+    probability: 50,
+    displayOrder: 4,
+    color: '#FFB800',
+    rotAfterDays: 15,
+    createdAt: '2026-01-01T10:00:00Z',
+    updatedAt: '2026-01-01T10:00:00Z',
+  },
+  {
+    id: '990e8400-e29b-41d4-a716-446655440004',
+    pipelineId: '880e8400-e29b-41d4-a716-446655440001',
+    name: 'FUP',
+    description: 'Follow-up e negociação de termos e condições',
+    probability: 75,
+    displayOrder: 5,
+    color: '#FF8C00',
+    rotAfterDays: 10,
+    createdAt: '2026-01-01T10:00:00Z',
+    updatedAt: '2026-01-01T10:00:00Z',
+  },
+  {
+    id: '990e8400-e29b-41d4-a716-446655440005',
+    pipelineId: '880e8400-e29b-41d4-a716-446655440001',
+    name: 'Fechamento',
+    description: 'Assinatura de contrato',
+    probability: 90,
+    displayOrder: 6,
+    color: '#00B341',
+    rotAfterDays: 7,
+    createdAt: '2026-01-01T10:00:00Z',
+    updatedAt: '2026-01-01T10:00:00Z',
+  },
+];
+
+// Add stages to pipeline
+mockPipelines[0].stages = mockStages;
+
+// ============================================================================
+// MOCK DEALS
+// ============================================================================
+
+// ── Deal generator para simular 120 oportunidades simultâneas ────────────────
+const _PIPELINE_ID = '880e8400-e29b-41d4-a716-446655440001';
+const _STAGES = [
+  { id: '990e8400-e29b-41d4-a716-446655440001', prob: 10, name: 'Prospecção' },
+  { id: '990e8400-e29b-41d4-a716-446655440002', prob: 25, name: 'Qualificação' },
+  { id: '990e8400-e29b-41d4-a716-446655440006', prob: 40, name: 'Viabilidade' },
+  { id: '990e8400-e29b-41d4-a716-446655440003', prob: 50, name: 'Proposta' },
+  { id: '990e8400-e29b-41d4-a716-446655440004', prob: 75, name: 'FUP' },
+  { id: '990e8400-e29b-41d4-a716-446655440005', prob: 90, name: 'Fechamento' },
+];
+const _COMPANIES = [
+  'Foursys Tecnologia','BigCo Enterprises','StartupX Inovação','Tech Corp Solutions',
+  'Vinci Automação','Ágora Digital','Nexus IT','Plataforma B','DataSphere',
+  'CloudNative Co.','FinTech Hub','Logística 4.0','MedTech Partners','RetailMax',
+  'EduSoft','GovTech SP','Indústria 5.0','SmartCity Solutions','BioData AI','SeguraBank',
+];
+const _TITLES = [
+  'CRM Enterprise', 'Cloud Migration', 'DevOps Platform', 'Análise de Dados',
+  'ERP Integration', 'Cybersecurity Suite', 'Data Warehouse', 'BI Dashboard',
+  'Microserviços', 'App Mobile B2B', 'API Gateway', 'AI/ML Platform',
+  'Infra Modernização', 'Transformação Digital', 'SaaS Licenças', 'IoT Platform',
+  'RPA Automação', 'LGPD Compliance', 'HR Tech Suite', 'Supply Chain AI',
+];
+const _TAGS_POOL = [
+  ['Enterprise','High Value'],['Cloud','AWS'],['Cloud','Azure'],['SaaS','Recorrente'],
+  ['Custom Dev','Backend'],['BI','Analytics'],['Mobile','iOS/Android'],['AI','ML'],
+  ['DevOps','CI/CD'],['Security','Compliance'],['ERP','SAP'],['Integration','API'],
+];
+const _OWNERS = mockUsers.slice(0, 4);
+const _ACCOUNTS = mockAccounts.slice(0, 4);
+
+// Valores reais por estágio: early stages têm deals menores, late stages têm deals maiores
+const _AMOUNTS_BY_STAGE = [
+  [30000, 45000, 60000, 80000, 50000, 75000, 40000, 90000, 35000, 55000],   // Prospecção
+  [80000, 120000, 150000, 200000, 100000, 180000, 90000, 250000, 130000, 160000], // Qualificação
+  [200000, 300000, 400000, 500000, 250000, 450000, 320000, 380000, 280000, 420000], // Viabilidade
+  [350000, 500000, 650000, 800000, 420000, 600000, 750000, 550000, 700000, 480000], // Proposta
+  [600000, 900000, 1200000, 1500000, 800000, 1100000, 700000, 1300000, 950000, 1050000], // Negociação
+  [1000000, 1500000, 1800000, 2000000, 1200000, 1600000, 900000, 2200000, 1400000, 1700000], // Fechamento
+];
+// Rotting realista: deals novos têm baixo rotting, deals parados têm alto
+const _ROTTING_BY_STAGE = [
+  [1, 3, 5, 8, 2, 12, 4, 6, 9, 1],   // Prospecção: mistura (alguns parados)
+  [2, 5, 8, 11, 3, 7, 14, 4, 6, 9],  // Qualificação
+  [1, 4, 6, 9, 2, 8, 5, 11, 3, 7],   // Viabilidade
+  [2, 5, 7, 10, 3, 6, 8, 4, 9, 5],   // Proposta
+  [1, 3, 5, 7, 2, 4, 6, 3, 8, 5],    // Negociação: urgência, rotting mais baixo
+  [0, 1, 2, 3, 1, 2, 0, 4, 1, 2],    // Fechamento: quase fechando, rotting baixo
+];
+
+function _genDeal(idx: number): Deal {
+  const stageIdx = idx < 25 ? 0 : idx < 48 ? 1 : idx < 68 ? 2 : idx < 85 ? 3 : idx < 100 ? 4 : 5;
+  const stage = _STAGES[stageIdx];
+  const stageRef = mockStages.find((s) => s.id === stage.id)!;
+  const amountPool = _AMOUNTS_BY_STAGE[stageIdx];
+  const amount = amountPool[idx % 10];
+  const rottingPool = _ROTTING_BY_STAGE[stageIdx];
+  const rotting = rottingPool[idx % 10];
+  // Apenas 10% dos deals têm rotting crítico (realista)
+  const finalRotting = (idx % 10 === 3) ? rotting + 8 : rotting;
+  const isWon = idx >= 110 && idx < 116;
+  const isLost = idx >= 116;
+  const account = _ACCOUNTS[idx % 4];
+  const owner = _OWNERS[idx % 4];
+  const monthsAhead = stageIdx <= 1 ? 3 + (idx % 3) : stageIdx <= 3 ? 1 + (idx % 2) : 0 + (idx % 2);
+  const closeDate = new Date(2026, 1 + monthsAhead, 10 + (idx % 18));
+  const daysAgo = stageIdx === 0 ? 5 + (idx % 20) : stageIdx === 1 ? 10 + (idx % 25) : 20 + (idx % 30);
+  const created = new Date(Date.now() - daysAgo * 24 * 60 * 60 * 1000);
+  return {
+    id: `110e8400-e29b-41d4-a716-4466554400${String(idx + 5).padStart(2, '0')}`,
+    title: `${_TITLES[idx % 20]} — ${_COMPANIES[idx % 20]}`,
+    description: `Oportunidade ${idx + 1}: ${_TITLES[idx % 20]} para ${_COMPANIES[idx % 20]}`,
+    amount,
+    probability: stage.prob,
+    weightedAmount: Math.round((amount * stage.prob) / 100),
+    expectedCloseDate: closeDate.toISOString().split('T')[0],
+    pipelineId: _PIPELINE_ID,
+    pipeline: mockPipelines[0],
+    stageId: stage.id,
+    stage: stageRef,
+    accountId: account.id,
+    account,
+    ownerId: owner.id,
+    owner,
+    status: isWon ? 'won' : isLost ? 'lost' : 'open',
+    tags: _TAGS_POOL[idx % 12],
+    rottingDays: finalRotting,
+    createdAt: created.toISOString(),
+    updatedAt: new Date(Date.now() - (idx % 5) * 24 * 60 * 60 * 1000).toISOString(),
+  };
+}
+
+export const mockDeals: Deal[] = [
+  // Deals originais (IDs preservados para compatibilidade)
+  {
+    id: '110e8400-e29b-41d4-a716-446655440001',
+    title: 'Implementação Sistema CRM Customizado',
+    description: 'Desenvolvimento de CRM B2B customizado para Foursys',
+    amount: 500000, probability: 50, weightedAmount: 250000,
+    expectedCloseDate: '2026-03-30', pipelineId: _PIPELINE_ID, pipeline: mockPipelines[0],
+    stageId: '990e8400-e29b-41d4-a716-446655440003',
+    stage: mockStages.find((s) => s.id === '990e8400-e29b-41d4-a716-446655440003'),
+    accountId: '660e8400-e29b-41d4-a716-446655440001', account: mockAccounts[0],
+    primaryContactId: '770e8400-e29b-41d4-a716-446655440001', primaryContact: mockContacts[0],
+    ownerId: '550e8400-e29b-41d4-a716-446655440001', owner: mockUsers[0],
+    status: 'open', tags: ['Enterprise', 'Custom Development'], rottingDays: 5,
+    createdAt: '2026-01-10T10:00:00Z', updatedAt: '2026-02-09T15:00:00Z',
+  },
+  {
+    id: '110e8400-e29b-41d4-a716-446655440002',
+    title: 'Consultoria Azure Cloud Migration',
+    description: 'Migração de infraestrutura on-premise para Azure',
+    amount: 300000, probability: 75, weightedAmount: 225000,
+    expectedCloseDate: '2026-04-15', pipelineId: _PIPELINE_ID, pipeline: mockPipelines[0],
+    stageId: '990e8400-e29b-41d4-a716-446655440004',
+    stage: mockStages.find((s) => s.id === '990e8400-e29b-41d4-a716-446655440004'),
+    accountId: '660e8400-e29b-41d4-a716-446655440002', account: mockAccounts[1],
+    primaryContactId: '770e8400-e29b-41d4-a716-446655440002', primaryContact: mockContacts[1],
+    ownerId: '550e8400-e29b-41d4-a716-446655440002', owner: mockUsers[1],
+    status: 'open', tags: ['Cloud', 'Consultoria'], rottingDays: 8,
+    createdAt: '2026-01-20T10:00:00Z', updatedAt: '2026-02-06T12:00:00Z',
+  },
+  {
+    id: '110e8400-e29b-41d4-a716-446655440003',
+    title: 'Licenças SaaS - Plano Enterprise',
+    description: 'Contratação anual de plataforma SaaS',
+    amount: 100000, probability: 25, weightedAmount: 25000,
+    expectedCloseDate: '2026-05-01', pipelineId: _PIPELINE_ID, pipeline: mockPipelines[0],
+    stageId: '990e8400-e29b-41d4-a716-446655440002',
+    stage: mockStages.find((s) => s.id === '990e8400-e29b-41d4-a716-446655440002'),
+    accountId: '660e8400-e29b-41d4-a716-446655440003', account: mockAccounts[2],
+    primaryContactId: '770e8400-e29b-41d4-a716-446655440003', primaryContact: mockContacts[2],
+    ownerId: '550e8400-e29b-41d4-a716-446655440003', owner: mockUsers[2],
+    status: 'open', tags: ['SaaS', 'Recorrente'], rottingDays: 12,
+    createdAt: '2026-02-01T10:00:00Z', updatedAt: '2026-02-02T14:00:00Z',
+  },
+  {
+    id: '110e8400-e29b-41d4-a716-446655440004',
+    title: 'Modernização Sistema Legado',
+    description: 'Refatoração de sistema legado para arquitetura moderna',
+    amount: 800000, probability: 90, weightedAmount: 720000,
+    expectedCloseDate: '2026-03-15', pipelineId: _PIPELINE_ID, pipeline: mockPipelines[0],
+    stageId: '990e8400-e29b-41d4-a716-446655440005',
+    stage: mockStages.find((s) => s.id === '990e8400-e29b-41d4-a716-446655440005'),
+    accountId: '660e8400-e29b-41d4-a716-446655440004', account: mockAccounts[3],
+    primaryContactId: '770e8400-e29b-41d4-a716-446655440004', primaryContact: mockContacts[3],
+    ownerId: '550e8400-e29b-41d4-a716-446655440001', owner: mockUsers[0],
+    status: 'open', tags: ['Enterprise', 'Modernization', 'Hot Deal'], rottingDays: 2,
+    createdAt: '2026-01-25T10:00:00Z', updatedAt: '2026-02-12T17:00:00Z',
+  },
+  // 120 oportunidades geradas para simular pipeline real com alto volume
+  ...Array.from({ length: 120 }, (_, i) => _genDeal(i)),
+];
+
+// ============================================================================
+// MOCK ACTIVITIES
+// ============================================================================
+
+export const mockActivities: Activity[] = [
+  {
+    id: '220e8400-e29b-41d4-a716-446655440001',
+    type: 'email',
+    subject: 'Proposta Comercial - CRM Customizado',
+    description: 'Envio de proposta detalhada com escopo, cronograma e preços',
+    relatedContactId: '770e8400-e29b-41d4-a716-446655440001',
+    relatedAccountId: '660e8400-e29b-41d4-a716-446655440001',
+    relatedDealId: '110e8400-e29b-41d4-a716-446655440001',
+    userId: '550e8400-e29b-41d4-a716-446655440001',
+    user: mockUsers[0],
+    activityDate: '2026-02-13T14:30:00Z',
+    isSystemGenerated: false,
+    createdAt: '2026-02-13T14:30:00Z',
+    updatedAt: '2026-02-13T14:30:00Z',
+  },
+  {
+    id: '220e8400-e29b-41d4-a716-446655440002',
+    type: 'call',
+    subject: 'Discovery Call - Necessidades Cloud',
+    description: 'Ligação de 45min discutindo necessidades de migração cloud',
+    relatedContactId: '770e8400-e29b-41d4-a716-446655440002',
+    relatedAccountId: '660e8400-e29b-41d4-a716-446655440002',
+    relatedDealId: '110e8400-e29b-41d4-a716-446655440002',
+    userId: '550e8400-e29b-41d4-a716-446655440002',
+    user: mockUsers[1],
+    activityDate: '2026-02-12T10:00:00Z',
+    duration: 45,
+    isSystemGenerated: false,
+    createdAt: '2026-02-12T10:00:00Z',
+    updatedAt: '2026-02-12T10:00:00Z',
+  },
+  {
+    id: '220e8400-e29b-41d4-a716-446655440003',
+    type: 'meeting',
+    subject: 'Reunião de Fechamento - Contrato',
+    description: 'Reunião presencial para assinatura de contrato',
+    relatedContactId: '770e8400-e29b-41d4-a716-446655440004',
+    relatedAccountId: '660e8400-e29b-41d4-a716-446655440004',
+    relatedDealId: '110e8400-e29b-41d4-a716-446655440004',
+    userId: '550e8400-e29b-41d4-a716-446655440001',
+    user: mockUsers[0],
+    activityDate: '2026-02-12T14:00:00Z',
+    duration: 120,
+    isSystemGenerated: false,
+    createdAt: '2026-02-12T14:00:00Z',
+    updatedAt: '2026-02-12T14:00:00Z',
+  },
+  {
+    id: '220e8400-e29b-41d4-a716-446655440004',
+    type: 'stage_change',
+    subject: 'Deal movido: Negociação → Fechamento',
+    description: 'Deal "Modernização Sistema Legado" avançou para Fechamento',
+    relatedDealId: '110e8400-e29b-41d4-a716-446655440004',
+    userId: '550e8400-e29b-41d4-a716-446655440001',
+    user: mockUsers[0],
+    activityDate: '2026-02-12T17:00:00Z',
+    isSystemGenerated: true,
+    metadata: {
+      from_stage: 'Negociação',
+      to_stage: 'Fechamento',
+      from_probability: 75,
+      to_probability: 90,
+    },
+    createdAt: '2026-02-12T17:00:00Z',
+    updatedAt: '2026-02-12T17:00:00Z',
+  },
+];
+
+// ============================================================================
+// MOCK LEADS + LEAD SCORE DETAILS (EP03)
+// ============================================================================
+
+export const mockLeads: Lead[] = [
+  {
+    id: '330e8400-e29b-41d4-a716-446655440001',
+    firstName: 'Bruno',
+    lastName: 'Azevedo',
+    fullName: 'Bruno Azevedo',
+    email: 'bruno.azevedo@novadata.com.br',
+    phone: '+55 11 97777-1234',
+    company: 'NovaData Analytics',
+    jobTitle: 'Head de Dados',
+    source: 'linkedin',
+    status: 'new',
+    leadScore: 85,
+    lifecycle: 'mql',
+    ownerId: '550e8400-e29b-41d4-a716-446655440004',
+    owner: mockUsers[3],
+    tags: ['Enterprise', 'Hot Lead'],
+    customFields: {
+      budgetRange: '100k-250k',
+      techStack: ['Azure', 'Power BI'],
+    },
+    isConverted: false,
+    createdAt: '2026-02-11T09:10:00Z',
+    updatedAt: '2026-02-14T12:40:00Z',
+  },
+  {
+    id: '330e8400-e29b-41d4-a716-446655440002',
+    firstName: 'Larissa',
+    lastName: 'Melo',
+    fullName: 'Larissa Melo',
+    email: 'larissa.melo@scaleup.io',
+    phone: '+55 11 98888-1010',
+    company: 'ScaleUp SaaS',
+    jobTitle: 'Marketing Ops Manager',
+    source: 'website',
+    status: 'working',
+    leadScore: 72,
+    lifecycle: 'mql',
+    ownerId: '550e8400-e29b-41d4-a716-446655440004',
+    owner: mockUsers[3],
+    tags: ['SaaS', 'Demo Requested'],
+    customFields: {
+      interest: 'Automacao comercial',
+    },
+    isConverted: false,
+    createdAt: '2026-02-10T13:20:00Z',
+    updatedAt: '2026-02-14T09:00:00Z',
+  },
+  {
+    id: '330e8400-e29b-41d4-a716-446655440003',
+    firstName: 'Diego',
+    lastName: 'Prado',
+    fullName: 'Diego Prado',
+    email: 'diego.prado@finbiz.com.br',
+    company: 'FinBiz',
+    source: 'referral',
+    status: 'nurturing',
+    leadScore: 45,
+    lifecycle: 'lead',
+    ownerId: '550e8400-e29b-41d4-a716-446655440001',
+    owner: mockUsers[0],
+    tags: ['Fintech', 'Warm Lead'],
+    customFields: {},
+    isConverted: false,
+    createdAt: '2026-02-05T08:00:00Z',
+    updatedAt: '2026-02-13T16:05:00Z',
+  },
+  {
+    id: '330e8400-e29b-41d4-a716-446655440004',
+    firstName: 'Aline',
+    lastName: 'Ferraz',
+    fullName: 'Aline Ferraz',
+    email: 'aline.ferraz@industrialx.com',
+    company: 'Industrial X',
+    source: 'event',
+    status: 'converted',
+    leadScore: 88,
+    lifecycle: 'mql',
+    ownerId: '550e8400-e29b-41d4-a716-446655440002',
+    owner: mockUsers[1],
+    tags: ['Industrial', 'Converted'],
+    customFields: {
+      eventName: 'Future Tech Expo',
+    },
+    isConverted: true,
+    convertedToContactId: '770e8400-e29b-41d4-a716-446655440004',
+    convertedAt: '2026-02-12T11:20:00Z',
+    createdAt: '2026-02-02T11:00:00Z',
+    updatedAt: '2026-02-12T11:20:00Z',
+  },
+];
+
+export const mockLeadScoreDetails: Record<string, LeadScoreDetails> = {
+  '330e8400-e29b-41d4-a716-446655440001': {
+    total: 85,
+    classification: 'hot',
+    breakdown: {
+      demographicFit: {
+        score: 42,
+        maxScore: 50,
+        factors: [
+          { name: 'jobTitle', value: 20, reason: 'Cargo aderente ao ICP (Head de Dados)' },
+          { name: 'companySize', value: 15, reason: 'Empresa mid-enterprise' },
+          { name: 'industry', value: 10, reason: 'Segmento alvo: tecnologia' },
+          { name: 'location', value: -3, reason: 'Regiao fora da priorizacao principal' },
+        ],
+      },
+      behavioralEngagement: {
+        score: 43,
+        maxScore: 50,
+        factors: [
+          { name: 'emailOpened', value: 15, reason: 'Abriu emails 3x na ultima semana' },
+          { name: 'ctaClicks', value: 10, reason: 'Clicou em 2 CTAs' },
+          { name: 'contentDownload', value: 8, reason: 'Baixou whitepaper tecnico' },
+          { name: 'pricingVisits', value: 10, reason: 'Visitou pagina de precos 2x' },
+        ],
+      },
+    },
+    triggers: [
+      { event: 'Visitou pagina de precos', timestamp: '2026-02-14T11:00:00Z', points: 10, icon: '🔥' },
+      { event: 'Abriu email duas vezes em 48h', timestamp: '2026-02-14T09:30:00Z', points: 6, icon: '🔥' },
+      { event: 'Download de case study', timestamp: '2026-02-11T16:00:00Z', points: 4, icon: '⚡' },
+    ],
+    lastCalculatedAt: '2026-02-14T12:30:00Z',
+  },
+  '330e8400-e29b-41d4-a716-446655440002': {
+    total: 72,
+    classification: 'hot',
+    breakdown: {
+      demographicFit: {
+        score: 35,
+        maxScore: 50,
+        factors: [
+          { name: 'role', value: 15, reason: 'Marketing Ops com fit para automacao' },
+          { name: 'segment', value: 12, reason: 'SaaS em crescimento' },
+          { name: 'companySize', value: 8, reason: 'Porte compativel com ICP' },
+        ],
+      },
+      behavioralEngagement: {
+        score: 37,
+        maxScore: 50,
+        factors: [
+          { name: 'trial', value: 20, reason: 'Solicitou demo' },
+          { name: 'email', value: 9, reason: 'Abertura recorrente de emails' },
+          { name: 'content', value: 8, reason: 'Interacao com comparativo de CRM' },
+        ],
+      },
+    },
+    triggers: [
+      { event: 'Solicitou demo no formulario', timestamp: '2026-02-14T08:00:00Z', points: 15, icon: '🔥' },
+      { event: 'Clicou CTA de agendamento', timestamp: '2026-02-13T19:20:00Z', points: 8, icon: '⚡' },
+    ],
+    lastCalculatedAt: '2026-02-14T09:00:00Z',
+  },
+};
+
+// ============================================================================
+// MOCK LIFECYCLE FUNNEL (EP03)
+// ============================================================================
+
+export const mockLifecycleFunnel: LifecycleFunnel = {
+  period: { from: '2026-01-01', to: '2026-03-31' },
+  stages: [
+    {
+      stage: 'subscriber',
+      count: 2340,
+      percentage: 100,
+      avgDaysInStage: 5,
+      topSources: [
+        { source: 'Website', count: 1100 },
+        { source: 'Content Download', count: 760 },
+      ],
+      topOwners: [
+        { ownerName: 'João Costa', count: 980 },
+        { ownerName: 'Maria Santos', count: 650 },
+      ],
+      conversionToNext: { rate: 0.325, avgDays: 12, count: 761 },
+    },
+    {
+      stage: 'lead',
+      count: 761,
+      percentage: 32.5,
+      avgDaysInStage: 8,
+      topSources: [
+        { source: 'LinkedIn', count: 280 },
+        { source: 'Referral', count: 190 },
+      ],
+      topOwners: [
+        { ownerName: 'João Costa', count: 310 },
+        { ownerName: 'Ana Silva', count: 220 },
+      ],
+      conversionToNext: { rate: 0.45, avgDays: 8, count: 342 },
+    },
+    {
+      stage: 'mql',
+      count: 342,
+      percentage: 14.6,
+      avgDaysInStage: 6,
+      topSources: [
+        { source: 'Website', count: 140 },
+        { source: 'Webinar', count: 92 },
+      ],
+      topOwners: [
+        { ownerName: 'Maria Santos', count: 148 },
+        { ownerName: 'Pedro Oliveira', count: 101 },
+      ],
+      conversionToNext: { rate: 0.55, avgDays: 7, count: 188 },
+    },
+    {
+      stage: 'sql',
+      count: 188,
+      percentage: 8.0,
+      avgDaysInStage: 10,
+      topSources: [
+        { source: 'Referral', count: 74 },
+        { source: 'LinkedIn', count: 60 },
+      ],
+      topOwners: [
+        { ownerName: 'Pedro Oliveira', count: 77 },
+        { ownerName: 'Maria Santos', count: 58 },
+      ],
+      conversionToNext: { rate: 0.42, avgDays: 15, count: 79 },
+    },
+    {
+      stage: 'opportunity',
+      count: 79,
+      percentage: 3.4,
+      avgDaysInStage: 12,
+      topSources: [
+        { source: 'Referral', count: 31 },
+        { source: 'Website', count: 19 },
+      ],
+      topOwners: [
+        { ownerName: 'Maria Santos', count: 34 },
+        { ownerName: 'Pedro Oliveira', count: 26 },
+      ],
+      conversionToNext: { rate: 0.67, avgDays: 10, count: 53 },
+    },
+    {
+      stage: 'customer',
+      count: 53,
+      percentage: 2.3,
+      avgDaysInStage: 0,
+      topSources: [
+        { source: 'Referral', count: 20 },
+        { source: 'LinkedIn', count: 14 },
+      ],
+      topOwners: [
+        { ownerName: 'Maria Santos', count: 25 },
+        { ownerName: 'Pedro Oliveira', count: 17 },
+      ],
+    },
+  ],
+  insights: [
+    {
+      type: 'bottleneck',
+      message: 'Maior drop-off: Subscriber para Lead (67.5%)',
+      from: 'subscriber',
+      to: 'lead',
+      value: 67.5,
+    },
+    {
+      type: 'warning',
+      message: 'Gargalo secundario: SQL para Opportunity com 58% de perda',
+      from: 'sql',
+      to: 'opportunity',
+      value: 58,
+    },
+    {
+      type: 'success',
+      message: 'Melhor conversao: MQL para SQL com 55%',
+      from: 'mql',
+      to: 'sql',
+      value: 55,
+    },
+  ],
+};
+
+// ============================================================================
+// MOCK NURTURE SEQUENCES (EP03)
+// ============================================================================
+
+export const mockNurtureSequences: NurtureSequence[] = [
+  {
+    id: '440e8400-e29b-41d4-a716-446655440001',
+    name: 'Nurture Leads Frios Tech',
+    isActive: true,
+    enrollmentTrigger: {
+      type: 'lead_score',
+      config: { min: 20, max: 45 },
+    },
+    stopConditions: [
+      { type: 'converted', config: {} },
+      { type: 'unsubscribed', config: {} },
+    ],
+    steps: [
+      {
+        id: 'step-1',
+        order: 1,
+        type: 'email',
+        delayDays: 0,
+        emailTemplateId: 'tpl-crm-guide',
+        emailSubject: 'Guia prático de CRM para times B2B',
+        stats: {
+          sent: 45,
+          opened: 28,
+          clicked: 12,
+          replied: 2,
+          bounced: 1,
+          unsubscribed: 0,
+        },
+      },
+      {
+        id: 'step-2',
+        order: 2,
+        type: 'email',
+        delayDays: 3,
+        emailTemplateId: 'tpl-case-study',
+        emailSubject: 'Case de modernização comercial',
+        stats: {
+          sent: 40,
+          opened: 22,
+          clicked: 8,
+          replied: 1,
+          bounced: 0,
+          unsubscribed: 2,
+        },
+      },
+      {
+        id: 'step-3',
+        order: 3,
+        type: 'email',
+        delayDays: 7,
+        emailTemplateId: 'tpl-demo-offer',
+        emailSubject: 'Quer ver o CRM em ação?',
+        stats: {
+          sent: 35,
+          opened: 18,
+          clicked: 9,
+          replied: 1,
+          bounced: 0,
+          unsubscribed: 3,
+        },
+      },
+    ],
+    stats: {
+      enrollments: 45,
+      active: 12,
+      completed: 28,
+      unsubscribed: 5,
+      conversions: 5,
+      overallConversionRate: 11.1,
+    },
+    createdAt: '2026-02-01T10:00:00Z',
+    updatedAt: '2026-02-14T17:00:00Z',
+  },
+];
+
+// ============================================================================
+// MOCK REPORTS, SCHEDULES E EXPORTS (EP06)
+// ============================================================================
+
+export const mockReportTemplates: ReportDefinition[] = [
+  {
+    id: 'rp-template-1',
+    name: 'Deals Won/Lost Analysis',
+    description: 'Análise de ganhos/perdas por período e owner',
+    category: 'sales',
+    dataSource: 'deals',
+    filters: {},
+    columns: ['title', 'owner', 'amount', 'status', 'stage'],
+    groupBy: 'owner',
+    aggregations: [{ field: 'amount', fn: 'sum' }, { field: 'id', fn: 'count' }],
+    visualization: 'both',
+    isTemplate: true,
+    isShared: true,
+    createdBy: '550e8400-e29b-41d4-a716-446655440001',
+    createdAt: '2026-02-10T10:00:00Z',
+    updatedAt: '2026-02-10T10:00:00Z',
+  },
+  {
+    id: 'rp-template-2',
+    name: 'Lead Sources Performance',
+    description: 'Conversão e volume por origem dos leads',
+    category: 'marketing',
+    dataSource: 'leads',
+    filters: {},
+    columns: ['fullName', 'source', 'leadScore', 'status'],
+    groupBy: 'source',
+    aggregations: [{ field: 'id', fn: 'count' }],
+    visualization: 'bar',
+    isTemplate: true,
+    isShared: true,
+    createdBy: '550e8400-e29b-41d4-a716-446655440004',
+    createdAt: '2026-02-10T10:00:00Z',
+    updatedAt: '2026-02-10T10:00:00Z',
+  },
+];
+
+export const mockSavedReports: ReportDefinition[] = [
+  {
+    id: 'rp-saved-1',
+    name: 'Pipeline por Owner - Q1',
+    description: 'Visão consolidada por responsável',
+    category: 'sales',
+    dataSource: 'deals',
+    filters: {
+      dateFrom: '2026-01-01',
+      dateTo: '2026-03-31',
+    },
+    columns: ['title', 'owner', 'amount', 'stage', 'status'],
+    groupBy: 'owner',
+    aggregations: [{ field: 'amount', fn: 'sum' }],
+    visualization: 'both',
+    isShared: true,
+    createdBy: '550e8400-e29b-41d4-a716-446655440001',
+    createdAt: '2026-02-12T09:00:00Z',
+    updatedAt: '2026-02-14T11:00:00Z',
+  },
+];
+
+export const mockReportSchedules: ReportSchedule[] = [
+  {
+    id: 'rps-1',
+    reportId: 'rp-saved-1',
+    reportName: 'Pipeline por Owner - Q1',
+    enabled: true,
+    frequency: 'weekly',
+    time: '09:00',
+    dayOfWeek: 1,
+    recipients: ['maria@foursys.com.br', 'pedro@foursys.com.br'],
+    format: 'pdf',
+    subject: 'Resumo semanal de pipeline',
+    message: 'Segue o relatório semanal.',
+    nextRunAt: '2026-02-16T09:00:00Z',
+  },
+];
+
+export const mockReportExecutionLogs: ReportExecutionLog[] = [
+  {
+    id: 'rpl-1',
+    scheduleId: 'rps-1',
+    reportId: 'rp-saved-1',
+    executedAt: '2026-02-09T09:00:00Z',
+    status: 'success',
+    recipients: ['maria@foursys.com.br', 'pedro@foursys.com.br'],
+    message: 'Relatório enviado com sucesso.',
+  },
+];
+
+export const mockExportJobs: ExportJob[] = [
+  {
+    id: 'exp-1',
+    entity: 'deals',
+    format: 'csv',
+    status: 'done',
+    records: 2400,
+    requestedBy: '550e8400-e29b-41d4-a716-446655440001',
+    requestedAt: '2026-02-14T16:20:00Z',
+    downloadUrl: '/downloads/exports/deals-q1.csv',
+  },
+  {
+    id: 'exp-2',
+    entity: 'leads',
+    format: 'excel',
+    status: 'processing',
+    records: 15400,
+    requestedBy: '550e8400-e29b-41d4-a716-446655440004',
+    requestedAt: '2026-02-15T10:15:00Z',
+  },
+];
+
+export const mockBiConnectors: BiConnectorStatus[] = [
+  {
+    connector: 'power_bi',
+    connected: true,
+    lastSyncAt: '2026-02-15T08:30:00Z',
+    details: 'Conector read-only ativo',
+  },
+  {
+    connector: 'google_sheets',
+    connected: false,
+    details: 'Não autenticado',
+  },
+  {
+    connector: 'api',
+    connected: true,
+    details: 'API key gerada para integrações',
+  },
+];
+
+// ============================================================================
+// MOCK BILLING (EP07)
+// ============================================================================
+
+export const mockInvoices: Invoice[] = [
+  {
+    id: 'inv-2026-0001',
+    invoiceNumber: 'INV-2026-0001',
+    accountId: mockAccounts[0].id,
+    accountName: mockAccounts[0].name,
+    contactId: mockContacts[0].id,
+    contactName: mockContacts[0].fullName,
+    status: 'open',
+    currency: 'BRL',
+    issueDate: '2026-02-01',
+    dueDate: '2026-02-20',
+    items: [
+      {
+        id: 'inv-2026-0001-it-1',
+        description: 'Serviços de consultoria - Sprint 1',
+        quantity: 1,
+        unitPrice: 80000,
+        taxRatePct: 0,
+        discountValue: 0,
+      },
+      {
+        id: 'inv-2026-0001-it-2',
+        description: 'Serviços de consultoria - Sprint 2',
+        quantity: 1,
+        unitPrice: 40000,
+        taxRatePct: 0,
+        discountValue: 0,
+      },
+    ],
+    totals: {
+      subtotal: 120000,
+      discountTotal: 0,
+      taxTotal: 0,
+      total: 120000,
+      amountPaid: 0,
+      amountOpen: 120000,
+    },
+    createdAt: '2026-02-01T10:00:00Z',
+    updatedAt: '2026-02-01T10:00:00Z',
+  },
+  {
+    id: 'inv-2026-0002',
+    invoiceNumber: 'INV-2026-0002',
+    accountId: mockAccounts[1].id,
+    accountName: mockAccounts[1].name,
+    contactId: mockContacts[1].id,
+    contactName: mockContacts[1].fullName,
+    status: 'partial',
+    currency: 'BRL',
+    issueDate: '2026-01-15',
+    dueDate: '2026-02-05',
+    items: [
+      {
+        id: 'inv-2026-0002-it-1',
+        description: 'Licenças SaaS - Plano Pro (mensal)',
+        quantity: 10,
+        unitPrice: 1500,
+        taxRatePct: 0,
+        discountValue: 0,
+      },
+    ],
+    totals: {
+      subtotal: 15000,
+      discountTotal: 0,
+      taxTotal: 0,
+      total: 15000,
+      amountPaid: 5000,
+      amountOpen: 10000,
+    },
+    createdAt: '2026-01-15T09:00:00Z',
+    updatedAt: '2026-02-10T12:00:00Z',
+  },
+  {
+    id: 'inv-2026-0003',
+    invoiceNumber: 'INV-2026-0003',
+    accountId: mockAccounts[2].id,
+    accountName: mockAccounts[2].name,
+    contactId: mockContacts[2].id,
+    contactName: mockContacts[2].fullName,
+    status: 'paid',
+    currency: 'BRL',
+    issueDate: '2026-01-05',
+    dueDate: '2026-01-20',
+    items: [
+      {
+        id: 'inv-2026-0003-it-1',
+        description: 'Setup inicial + treinamento',
+        quantity: 1,
+        unitPrice: 6000,
+        taxRatePct: 0,
+        discountValue: 0,
+      },
+    ],
+    totals: {
+      subtotal: 6000,
+      discountTotal: 0,
+      taxTotal: 0,
+      total: 6000,
+      amountPaid: 6000,
+      amountOpen: 0,
+    },
+    createdAt: '2026-01-05T08:00:00Z',
+    updatedAt: '2026-01-18T15:20:00Z',
+  },
+  {
+    id: 'inv-2026-0004',
+    invoiceNumber: 'INV-2026-0004',
+    accountId: mockAccounts[3].id,
+    accountName: mockAccounts[3].name,
+    contactId: mockContacts[3].id,
+    contactName: mockContacts[3].fullName,
+    status: 'overdue',
+    currency: 'BRL',
+    issueDate: '2025-12-20',
+    dueDate: '2026-01-10',
+    items: [
+      {
+        id: 'inv-2026-0004-it-1',
+        description: 'Serviços profissionais - parcela 1/3',
+        quantity: 1,
+        unitPrice: 90000,
+        taxRatePct: 0,
+        discountValue: 0,
+      },
+    ],
+    totals: {
+      subtotal: 90000,
+      discountTotal: 0,
+      taxTotal: 0,
+      total: 90000,
+      amountPaid: 0,
+      amountOpen: 90000,
+    },
+    createdAt: '2025-12-20T10:00:00Z',
+    updatedAt: '2026-02-15T09:00:00Z',
+  },
+];
+
+export const mockPaymentConnectors: ConnectorViewModel[] = [
+  {
+    connector: 'pagarme',
+    label: 'Pagar.me',
+    status: 'connected',
+    lastSyncAt: '2026-02-15T08:10:00Z',
+    details: 'Sandbox conectado',
+    canEdit: true,
+  },
+  {
+    connector: 'stripe',
+    label: 'Stripe',
+    status: 'disconnected',
+    lastSyncAt: null,
+    details: 'Não configurado',
+    canEdit: true,
+  },
+  {
+    connector: 'manual',
+    label: 'Manual',
+    status: 'connected',
+    lastSyncAt: '2026-02-14T18:00:00Z',
+    details: 'Baixa manual habilitada',
+    canEdit: false,
+  },
+];
+
+export const mockCollectionTemplates: TemplateModel[] = [
+  {
+    id: 'tpl-collect-1',
+    name: 'Cobrança amigável (D-3)',
+    channel: 'email',
+    isActive: true,
+    variables: [
+      { key: '{{invoiceNumber}}', label: 'Número da fatura', example: 'INV-2026-0002' },
+      { key: '{{amountOpen}}', label: 'Saldo em aberto', example: 'R$ 10.000' },
+      { key: '{{dueDate}}', label: 'Vencimento', example: '2026-02-05' },
+      { key: '{{paymentLink}}', label: 'Link de pagamento', example: 'https://pay.example/abc' },
+    ],
+    versions: [
+      {
+        id: 'tpl-collect-1-v1',
+        version: 1,
+        subject: 'Lembrete amigável • Fatura {{invoiceNumber}}',
+        body: 'Olá, tudo bem? Sua fatura {{invoiceNumber}} vence em {{dueDate}}. Saldo: {{amountOpen}}. Link: {{paymentLink}}',
+        createdAt: '2026-02-01T10:00:00Z',
+        createdByName: 'Maria Santos',
+      },
+    ],
+    currentVersionId: 'tpl-collect-1-v1',
+    createdAt: '2026-02-01T10:00:00Z',
+    updatedAt: '2026-02-01T10:00:00Z',
+  },
+  {
+    id: 'tpl-collect-2',
+    name: 'Cobrança formal (D+5)',
+    channel: 'whatsapp',
+    isActive: true,
+    variables: [
+      { key: '{{accountName}}', label: 'Empresa', example: 'Tech Corp Solutions' },
+      { key: '{{invoiceNumber}}', label: 'Número da fatura', example: 'INV-2026-0004' },
+      { key: '{{daysOverdue}}', label: 'Dias em atraso', example: '12' },
+    ],
+    versions: [
+      {
+        id: 'tpl-collect-2-v1',
+        version: 1,
+        subject: null,
+        body: 'Olá {{accountName}}. Identificamos a fatura {{invoiceNumber}} com {{daysOverdue}} dias em atraso. Podemos ajudar?',
+        createdAt: '2026-02-03T10:00:00Z',
+        createdByName: 'Pedro Oliveira',
+      },
+    ],
+    currentVersionId: 'tpl-collect-2-v1',
+    createdAt: '2026-02-03T10:00:00Z',
+    updatedAt: '2026-02-03T10:00:00Z',
+  },
+];
+
+export const mockCollectionRules: CollectionRule[] = [
+  {
+    id: 'rule-1',
+    name: 'Régua padrão - Atraso leve',
+    isActive: true,
+    appliesToStatus: ['overdue', 'partial'],
+    minDaysOverdue: 1,
+    maxDaysOverdue: 15,
+    steps: [
+      {
+        id: 'rule-1-step-1',
+        order: 1,
+        delayDays: 0,
+        channel: 'email',
+        templateId: 'tpl-collect-1',
+        isBlocking: false,
+      },
+      {
+        id: 'rule-1-step-2',
+        order: 2,
+        delayDays: 5,
+        channel: 'whatsapp',
+        templateId: 'tpl-collect-2',
+        isBlocking: false,
+      },
+    ],
+    createdAt: '2026-02-05T10:00:00Z',
+    updatedAt: '2026-02-12T10:00:00Z',
+  },
+];
+
+export const mockCollectionJobs: CollectionJob[] = [
+  {
+    id: 'job-1',
+    ruleId: 'rule-1',
+    ruleName: 'Régua padrão - Atraso leve',
+    status: 'done',
+    startedAt: '2026-02-14T08:00:00Z',
+    finishedAt: '2026-02-14T08:02:30Z',
+    totalInvoices: 12,
+    processedInvoices: 12,
+    sentCount: 19,
+    errorCount: 0,
+    errors: [],
+  },
+  {
+    id: 'job-2',
+    ruleId: 'rule-1',
+    ruleName: 'Régua padrão - Atraso leve',
+    status: 'error',
+    startedAt: '2026-02-15T08:00:00Z',
+    finishedAt: '2026-02-15T08:01:10Z',
+    totalInvoices: 8,
+    processedInvoices: 6,
+    sentCount: 9,
+    errorCount: 2,
+    errors: [
+      { code: 'WHATSAPP_RATE_LIMIT', message: 'Rate limit do provedor', invoiceId: 'inv-2026-0004' },
+      { code: 'EMAIL_BOUNCE', message: 'E-mail inválido', invoiceId: 'inv-2026-0002' },
+    ],
+  },
+];
+
+export const mockAllocations: AllocationEntry[] = [
+  {
+    allocationId: 'alloc-1',
+    invoiceId: 'inv-2026-0002',
+    receivedAt: '2026-02-10',
+    amount: 5000,
+    method: 'pix',
+    createdByName: 'Maria Santos',
+    createdAt: '2026-02-10T12:00:00Z',
+  },
+];
+
+export const mockInvoiceHistoryEvents: InvoiceHistoryEvent[] = [
+  {
+    eventId: 'evt-1',
+    invoiceId: 'inv-2026-0002',
+    type: 'payment',
+    title: 'Pagamento parcial registrado',
+    description: 'Recebimento via PIX',
+    amount: 5000,
+    previousStatus: 'overdue',
+    newStatus: 'partial',
+    createdByName: 'Maria Santos',
+    createdAt: '2026-02-10T12:00:00Z',
+  },
+  {
+    eventId: 'evt-2',
+    invoiceId: 'inv-2026-0003',
+    type: 'status_change',
+    title: 'Fatura quitada',
+    description: null,
+    amount: null,
+    previousStatus: 'open',
+    newStatus: 'paid',
+    createdByName: 'Pedro Oliveira',
+    createdAt: '2026-01-18T15:20:00Z',
+  },
+];
+
+export const mockRolePermissionMatrix: RolePermissionMatrixModel = {
+  roles: [
+    { role: 'admin', label: 'Admin' },
+    { role: 'finance', label: 'Financeiro' },
+    { role: 'sales', label: 'Vendas' },
+    { role: 'auditor', label: 'Auditoria' },
+    { role: 'viewer', label: 'Leitura' },
+  ],
+  permissions: [
+    { key: 'billing.invoice.create', label: 'Criar fatura', description: 'Criar fatura avulsa/recorrente' },
+    { key: 'billing.invoice.edit', label: 'Editar fatura', description: 'Editar faturas em rascunho' },
+    { key: 'billing.invoice.cancel', label: 'Cancelar fatura', description: 'Cancelar fatura' },
+    { key: 'billing.payment.record', label: 'Registrar pagamento', description: 'Baixa manual/parcial' },
+    { key: 'billing.payment.reverse', label: 'Estornar pagamento', description: 'Registrar estorno' },
+    { key: 'billing.collections.manage', label: 'Cobrança', description: 'Régua e templates' },
+    { key: 'billing.audit.view', label: 'Auditoria', description: 'Ver trilha de auditoria' },
+    { key: 'billing.compliance.export', label: 'Export compliance', description: 'Exportar logs filtrados' },
+  ],
+  grants: {
+    admin: {
+      'billing.invoice.create': true,
+      'billing.invoice.edit': true,
+      'billing.invoice.cancel': true,
+      'billing.payment.record': true,
+      'billing.payment.reverse': true,
+      'billing.collections.manage': true,
+      'billing.audit.view': true,
+      'billing.compliance.export': true,
+    },
+    finance: {
+      'billing.invoice.create': true,
+      'billing.invoice.edit': true,
+      'billing.invoice.cancel': true,
+      'billing.payment.record': true,
+      'billing.payment.reverse': true,
+      'billing.collections.manage': true,
+      'billing.audit.view': true,
+      'billing.compliance.export': true,
+    },
+    sales: {
+      'billing.invoice.create': false,
+      'billing.invoice.edit': false,
+      'billing.invoice.cancel': false,
+      'billing.payment.record': false,
+      'billing.payment.reverse': false,
+      'billing.collections.manage': false,
+      'billing.audit.view': false,
+      'billing.compliance.export': false,
+    },
+    auditor: {
+      'billing.invoice.create': false,
+      'billing.invoice.edit': false,
+      'billing.invoice.cancel': false,
+      'billing.payment.record': false,
+      'billing.payment.reverse': false,
+      'billing.collections.manage': false,
+      'billing.audit.view': true,
+      'billing.compliance.export': true,
+    },
+    viewer: {
+      'billing.invoice.create': false,
+      'billing.invoice.edit': false,
+      'billing.invoice.cancel': false,
+      'billing.payment.record': false,
+      'billing.payment.reverse': false,
+      'billing.collections.manage': false,
+      'billing.audit.view': true,
+      'billing.compliance.export': false,
+    },
+  },
+  lastUpdatedAt: '2026-02-12T10:00:00Z',
+  lastUpdatedByName: 'Maria Santos',
+};
+
+export const mockAuditEvents: AuditEvent[] = [
+  {
+    auditId: 'aud-1',
+    entityType: 'invoice',
+    entityId: 'inv-2026-0001',
+    action: 'create',
+    severity: 'info',
+    summary: 'Fatura criada INV-2026-0001',
+    actorUserId: mockUsers[0].id,
+    actorName: mockUsers[0].fullName,
+    actorIp: '127.0.0.1',
+    occurredAt: '2026-02-01T10:00:00Z',
+    diffs: [],
+  },
+  {
+    auditId: 'aud-2',
+    entityType: 'payment',
+    entityId: 'alloc-1',
+    action: 'create',
+    severity: 'warning',
+    summary: 'Pagamento parcial registrado para INV-2026-0002',
+    actorUserId: mockUsers[0].id,
+    actorName: mockUsers[0].fullName,
+    actorIp: '127.0.0.1',
+    occurredAt: '2026-02-10T12:00:00Z',
+    diffs: [{ field: 'amount', before: null, after: 5000, isSensitive: false }],
+  },
+];
+
+export const mockComplianceExportJobs: ComplianceExportJob[] = [
+  {
+    jobId: 'cpexp-1',
+    status: 'done',
+    requestedAt: '2026-02-14T10:00:00Z',
+    finishedAt: '2026-02-14T10:00:10Z',
+    fileName: 'audit-2026-02.csv',
+    downloadUrl: '/downloads/compliance/audit-2026-02.csv',
+    errorMessage: null,
+    totalRows: 42,
+  },
+];
+
+// ============================================================================
+// MOCK ACCESS MANAGEMENT (EP08)
+// ============================================================================
+
+export const mockAccessPermissionCatalog: AccessPermissionCatalogItem[] = [
+  { key: 'contacts.view', label: 'Visualizar contatos', description: 'Permite visualizar contatos', module: 'Contatos', isCritical: false },
+  { key: 'contacts.create', label: 'Criar contatos', description: 'Permite criar contatos', module: 'Contatos', isCritical: false },
+  { key: 'contacts.edit', label: 'Editar contatos', description: 'Permite editar contatos', module: 'Contatos', isCritical: false },
+  { key: 'contacts.delete', label: 'Excluir contatos', description: 'Permite excluir contatos', module: 'Contatos', isCritical: true },
+  { key: 'deals.view', label: 'Visualizar negócios', description: 'Permite visualizar negócios', module: 'Negócios', isCritical: false },
+  { key: 'deals.create', label: 'Criar negócios', description: 'Permite criar negócios', module: 'Negócios', isCritical: false },
+  { key: 'deals.edit', label: 'Editar negócios', description: 'Permite editar negócios', module: 'Negócios', isCritical: false },
+  { key: 'deals.delete', label: 'Excluir negócios', description: 'Permite excluir negócios', module: 'Negócios', isCritical: true },
+  { key: 'reports.view', label: 'Visualizar relatórios', description: 'Permite visualizar relatórios', module: 'Relatórios', isCritical: false },
+  { key: 'reports.export', label: 'Exportar relatórios', description: 'Permite exportar relatórios', module: 'Relatórios', isCritical: false },
+  { key: 'billing.view', label: 'Visualizar faturamento', description: 'Permite visualizar faturamento', module: 'Faturamento', isCritical: false },
+  { key: 'billing.manage', label: 'Gerenciar faturamento', description: 'Permite editar faturamento', module: 'Faturamento', isCritical: true },
+  { key: 'iam.groups.manage', label: 'Gerenciar grupos', description: 'Permite gerenciar grupos de acesso', module: 'IAM', isCritical: true },
+  { key: 'iam.users.manage', label: 'Gerenciar usuários', description: 'Permite gerenciar usuários e vínculos', module: 'IAM', isCritical: true },
+  { key: 'iam.audit.view', label: 'Consultar auditoria IAM', description: 'Permite consultar logs de auditoria IAM', module: 'IAM', isCritical: false },
+  { key: 'iam.approvals.manage', label: 'Aprovar elevações', description: 'Permite aprovar solicitações de elevação', module: 'IAM', isCritical: true },
+];
+
+export const mockAccessGroups: AccessGroup[] = [
+  {
+    id: 'grp-admin',
+    name: 'Administradores',
+    description: 'Grupo administrativo completo',
+    isActive: true,
+    permissionKeys: mockAccessPermissionCatalog.map((p) => p.key),
+    membersCount: 2,
+    createdAt: '2026-02-10T09:00:00Z',
+    createdBy: 'Maria Santos',
+    updatedAt: '2026-02-14T11:00:00Z',
+    updatedBy: 'Maria Santos',
+  },
+  {
+    id: 'grp-gerente-comercial',
+    name: 'Gerente Comercial',
+    description: 'Acessos para liderança comercial',
+    isActive: true,
+    permissionKeys: ['contacts.view', 'contacts.create', 'contacts.edit', 'deals.view', 'deals.create', 'deals.edit', 'reports.view', 'reports.export'],
+    membersCount: 3,
+    createdAt: '2026-02-10T09:30:00Z',
+    createdBy: 'Maria Santos',
+    updatedAt: '2026-02-15T10:10:00Z',
+    updatedBy: 'Pedro Oliveira',
+  },
+  {
+    id: 'grp-financeiro',
+    name: 'Financeiro',
+    description: 'Acessos financeiros e compliance',
+    isActive: true,
+    permissionKeys: ['billing.view', 'billing.manage', 'iam.audit.view', 'reports.view'],
+    membersCount: 1,
+    createdAt: '2026-02-11T10:00:00Z',
+    createdBy: 'Maria Santos',
+    updatedAt: '2026-02-11T10:00:00Z',
+    updatedBy: 'Maria Santos',
+  },
+];
+
+export const mockAccessUserGroupMemberships: AccessUserGroupMembership[] = [
+  {
+    userId: mockUsers[0].id,
+    userName: mockUsers[0].fullName,
+    userEmail: mockUsers[0].email,
+    avatarUrl: mockUsers[0].avatar || null,
+    groupId: 'grp-admin',
+    groupName: 'Administradores',
+    addedAt: '2026-02-10T09:10:00Z',
+    addedBy: 'Sistema',
+  },
+  {
+    userId: mockUsers[1].id,
+    userName: mockUsers[1].fullName,
+    userEmail: mockUsers[1].email,
+    avatarUrl: mockUsers[1].avatar || null,
+    groupId: 'grp-gerente-comercial',
+    groupName: 'Gerente Comercial',
+    addedAt: '2026-02-11T11:00:00Z',
+    addedBy: 'Maria Santos',
+  },
+  {
+    userId: mockUsers[2].id,
+    userName: mockUsers[2].fullName,
+    userEmail: mockUsers[2].email,
+    avatarUrl: mockUsers[2].avatar || null,
+    groupId: 'grp-gerente-comercial',
+    groupName: 'Gerente Comercial',
+    addedAt: '2026-02-11T11:05:00Z',
+    addedBy: 'Maria Santos',
+  },
+  {
+    userId: mockUsers[3].id,
+    userName: mockUsers[3].fullName,
+    userEmail: mockUsers[3].email,
+    avatarUrl: mockUsers[3].avatar || null,
+    groupId: 'grp-financeiro',
+    groupName: 'Financeiro',
+    addedAt: '2026-02-11T11:10:00Z',
+    addedBy: 'Maria Santos',
+  },
+];
+
+export const mockDirectUserPermissionGrants: DirectUserPermissionGrant[] = [
+  {
+    id: 'dpg-1',
+    userId: mockUsers[1].id,
+    permissionKey: 'deals.delete',
+    permissionLabel: 'Excluir negócios',
+    justification: 'Acesso temporário para saneamento de pipeline.',
+    grantedAt: '2026-02-15T09:00:00Z',
+    grantedBy: 'Maria Santos',
+    expiresAt: '2026-02-20T23:59:59Z',
+    isActive: true,
+  },
+];
+
+export const mockEffectiveAccessSummaryByUser: EffectiveAccessSummary[] = [
+  {
+    userId: mockUsers[1].id,
+    groupsCount: 1,
+    inheritedPermissionsCount: 8,
+    directPermissionsCount: 1,
+    totalEffectivePermissions: 9,
+    conflictsCount: 1,
+    calculatedAt: '2026-02-15T10:00:00Z',
+  },
+];
+
+export const mockEffectivePermissions: EffectiveUserPermission[] = [
+  {
+    permissionKey: 'deals.delete',
+    permissionLabel: 'Excluir negócios',
+    module: 'Negócios',
+    origin: 'direct',
+    sourceId: null,
+    sourceName: 'Direta',
+    status: 'expiring_soon',
+    grantedAt: '2026-02-15T09:00:00Z',
+    expiresAt: '2026-02-20T23:59:59Z',
+    canRevoke: true,
+  },
+  {
+    permissionKey: 'deals.view',
+    permissionLabel: 'Visualizar negócios',
+    module: 'Negócios',
+    origin: 'group',
+    sourceId: 'grp-gerente-comercial',
+    sourceName: 'Gerente Comercial',
+    status: 'active',
+    grantedAt: '2026-02-11T11:00:00Z',
+    expiresAt: null,
+    canRevoke: false,
+  },
+];
+
+export const mockAccessPermissionConflicts: AccessPermissionConflict[] = [
+  {
+    conflictId: 'conf-1',
+    userId: mockUsers[1].id,
+    permissionKey: 'deals.delete',
+    reason: 'Permissão crítica concedida diretamente enquanto há papel equivalente em grupo.',
+    sources: [
+      { origin: 'direct', sourceName: 'Direta', grantedAt: '2026-02-15T09:00:00Z', expiresAt: '2026-02-20T23:59:59Z' },
+      { origin: 'group', sourceName: 'Gerente Comercial', grantedAt: '2026-02-11T11:00:00Z', expiresAt: null },
+    ],
+    severity: 'medium',
+  },
+];
+
+export const mockAccessElevationRequests: AccessElevationRequest[] = [
+  {
+    requestId: 'req-1',
+    userId: mockUsers[2].id,
+    userName: mockUsers[2].fullName,
+    permissionKey: 'billing.manage',
+    permissionLabel: 'Gerenciar faturamento',
+    isCritical: true,
+    justification: 'Fechamento financeiro mensal do cliente Enterprise.',
+    validFrom: '2026-02-16T00:00:00Z',
+    validUntil: '2026-02-20T23:59:59Z',
+    status: 'pending',
+    approverId: mockUsers[0].id,
+    approverName: mockUsers[0].fullName,
+    requestedAt: '2026-02-15T14:00:00Z',
+    reviewedAt: null,
+    reviewObservation: null,
+    canCancel: true,
+  },
+];
+
+export const mockAccessAuditEvents: AccessAuditEvent[] = [
+  {
+    eventId: 'aa-1',
+    timestamp: '2026-02-15T14:01:00Z',
+    actor: mockUsers[2].fullName,
+    actorId: mockUsers[2].id,
+    action: 'created',
+    entityType: 'request',
+    entityId: 'req-1',
+    entityName: 'Solicitação de elevação',
+    details: 'Solicitou billing.manage por 5 dias',
+    ipAddress: '127.0.0.1',
+    severity: 'medium',
+  },
+];
+
+export const mockAccessExportHistory: AccessExportRecord[] = [
+  {
+    exportId: 'aexp-1',
+    type: 'audit_trail',
+    format: 'csv',
+    status: 'completed',
+    generatedAt: '2026-02-15T13:00:00Z',
+    expiresAt: '2026-02-22T13:00:00Z',
+    downloadUrl: '/downloads/access/audit-trail-2026-02-15.csv',
+    sizeBytes: 32000,
+    generatedBy: mockUsers[0].fullName,
+  },
+];
+
+// ============================================================================
+// PRODUCT CATALOG (EP11)
+// ============================================================================
+
+import type {
+  Product,
+  Proposal,
+  Contract,
+  Project,
+  Integration,
+  SsoConfig,
+  SaasMetricsSnapshot,
+  SaasMetricsTrend,
+  SaasDashboardData,
+  AccountHealthScore,
+  CsOverviewData,
+  CsAlert,
+  CsPlaybook,
+  AccountHealthHistory,
+} from '../types';
+
+export const mockProducts: Product[] = [
+  {
+    id: 'prod-001', name: 'Squad Dedicada', code: 'SQD-DED', description: 'Time completo alocado (Tech Lead + 3 Devs + QA + Scrum Master)',
+    category: 'squad', pricingModel: 'per_squad', basePrice: 85000, currency: 'BRL', recurrence: 'monthly',
+    isActive: true, marginPercent: 32, costPrice: 57800,
+    features: ['Tech Lead sênior', '3 Devs full-stack', 'QA dedicado', 'Scrum Master', 'Daily + Sprint Review', 'Métricas de delivery'],
+    createdAt: '2025-06-01T10:00:00Z', updatedAt: '2026-01-15T10:00:00Z',
+  },
+  {
+    id: 'prod-002', name: 'Licença Plataforma SaaS', code: 'LIC-SAAS', description: 'Acesso à plataforma SaaS com módulos base',
+    category: 'saas', pricingModel: 'per_user', basePrice: 189, currency: 'BRL', recurrence: 'monthly',
+    isActive: true, marginPercent: 78, costPrice: 42,
+    features: ['Dashboard analytics', 'Gestão de projetos', 'Integrações API', 'Suporte 8x5'],
+    tiers: [
+      { name: 'Starter', minUnits: 1, maxUnits: 10, pricePerUnit: 189 },
+      { name: 'Business', minUnits: 11, maxUnits: 50, pricePerUnit: 159 },
+      { name: 'Enterprise', minUnits: 51, maxUnits: null, pricePerUnit: 129 },
+    ],
+    createdAt: '2025-03-01T10:00:00Z', updatedAt: '2026-02-01T10:00:00Z',
+  },
+  {
+    id: 'prod-003', name: 'Consultoria Estratégica', code: 'CON-EST', description: 'Horas de consultoria com especialistas sênior',
+    category: 'consulting', pricingModel: 'hourly', basePrice: 450, currency: 'BRL', recurrence: 'one_time',
+    isActive: true, marginPercent: 55, costPrice: 202,
+    features: ['Arquiteto sênior', 'Diagnóstico técnico', 'Roadmap estratégico', 'Documentação'],
+    createdAt: '2025-04-01T10:00:00Z', updatedAt: '2026-01-10T10:00:00Z',
+  },
+  {
+    id: 'prod-004', name: 'Suporte Premium 24x7', code: 'SUP-PRM', description: 'Suporte técnico 24x7 com SLA garantido',
+    category: 'support', pricingModel: 'flat', basePrice: 12000, currency: 'BRL', recurrence: 'monthly',
+    isActive: true, marginPercent: 45, costPrice: 6600,
+    features: ['SLA 4h resposta', 'SLA 8h resolução', 'Canal Slack dedicado', 'Relatório mensal'],
+    createdAt: '2025-05-01T10:00:00Z', updatedAt: '2026-01-20T10:00:00Z',
+  },
+  {
+    id: 'prod-005', name: 'Treinamento Tech', code: 'TRN-TCH', description: 'Programa de capacitação técnica customizado',
+    category: 'training', pricingModel: 'flat', basePrice: 8500, currency: 'BRL', recurrence: 'one_time',
+    isActive: true, marginPercent: 60, costPrice: 3400,
+    features: ['40h de conteúdo', 'Labs práticos', 'Certificação', 'Material digital'],
+    createdAt: '2025-07-01T10:00:00Z', updatedAt: '2026-02-05T10:00:00Z',
+  },
+  {
+    id: 'prod-006', name: 'Licença Enterprise', code: 'LIC-ENT', description: 'Licença enterprise com módulos avançados + BI + SSO',
+    category: 'license', pricingModel: 'tiered', basePrice: 349, currency: 'BRL', recurrence: 'monthly',
+    isActive: true, marginPercent: 82, costPrice: 63,
+    features: ['Todos módulos', 'BI avançado', 'SSO/SAML', 'API ilimitada', 'Suporte prioritário', 'SLA 99.9%'],
+    tiers: [
+      { name: 'até 25 users', minUnits: 1, maxUnits: 25, pricePerUnit: 349 },
+      { name: '26-100 users', minUnits: 26, maxUnits: 100, pricePerUnit: 299 },
+      { name: '101+ users', minUnits: 101, maxUnits: null, pricePerUnit: 249 },
+    ],
+    createdAt: '2025-08-01T10:00:00Z', updatedAt: '2026-02-10T10:00:00Z',
+  },
+];
+
+export const mockProposals: Proposal[] = [
+  {
+    id: 'prop-001', code: 'PROP-2026-001', title: 'Proposta Squad + SaaS - Foursys',
+    accountId: mockAccounts[0].id, accountName: mockAccounts[0].name,
+    contactId: mockContacts[0]?.id, contactName: mockContacts[0]?.fullName,
+    ownerId: mockUsers[0].id, ownerName: mockUsers[0].fullName,
+    status: 'accepted',
+    lineItems: [
+      { id: 'li-1', productId: 'prod-001', productName: 'Squad Dedicada', quantity: 1, unitPrice: 85000, discount: 5, totalPrice: 80750, recurrence: 'monthly' },
+      { id: 'li-2', productId: 'prod-002', productName: 'Licença Plataforma SaaS', quantity: 30, unitPrice: 159, discount: 0, totalPrice: 4770, recurrence: 'monthly' },
+    ],
+    totalOneTime: 0, totalMrr: 85520, totalArr: 1026240,
+    validUntil: '2026-03-15', approvedBy: 'Diretor Comercial', approvedAt: '2026-01-20T10:00:00Z',
+    sentAt: '2026-01-21T10:00:00Z', respondedAt: '2026-01-28T10:00:00Z',
+    createdAt: '2026-01-15T10:00:00Z', updatedAt: '2026-01-28T10:00:00Z',
+  },
+  {
+    id: 'prop-002', code: 'PROP-2026-002', title: 'Consultoria + Treinamento - Tech Corp',
+    accountId: mockAccounts[1].id, accountName: mockAccounts[1].name,
+    ownerId: mockUsers[1].id, ownerName: mockUsers[1].fullName,
+    status: 'sent',
+    lineItems: [
+      { id: 'li-3', productId: 'prod-003', productName: 'Consultoria Estratégica', quantity: 80, unitPrice: 450, discount: 10, totalPrice: 32400, recurrence: 'one_time' },
+      { id: 'li-4', productId: 'prod-005', productName: 'Treinamento Tech', quantity: 2, unitPrice: 8500, discount: 0, totalPrice: 17000, recurrence: 'one_time' },
+    ],
+    totalOneTime: 49400, totalMrr: 0, totalArr: 0,
+    validUntil: '2026-03-30',
+    sentAt: '2026-02-10T10:00:00Z',
+    createdAt: '2026-02-05T10:00:00Z', updatedAt: '2026-02-10T10:00:00Z',
+  },
+  {
+    id: 'prop-003', code: 'PROP-2026-003', title: 'Enterprise + Suporte Premium - BigCo',
+    accountId: mockAccounts[3].id, accountName: mockAccounts[3].name,
+    ownerId: mockUsers[0].id, ownerName: mockUsers[0].fullName,
+    status: 'pending_approval',
+    lineItems: [
+      { id: 'li-5', productId: 'prod-006', productName: 'Licença Enterprise', quantity: 80, unitPrice: 299, discount: 8, totalPrice: 22006, recurrence: 'monthly' },
+      { id: 'li-6', productId: 'prod-004', productName: 'Suporte Premium 24x7', quantity: 1, unitPrice: 12000, discount: 0, totalPrice: 12000, recurrence: 'monthly' },
+      { id: 'li-7', productId: 'prod-003', productName: 'Consultoria Estratégica', quantity: 40, unitPrice: 450, discount: 15, totalPrice: 15300, recurrence: 'one_time' },
+    ],
+    totalOneTime: 15300, totalMrr: 34006, totalArr: 408072,
+    validUntil: '2026-04-15',
+    createdAt: '2026-02-14T10:00:00Z', updatedAt: '2026-02-18T10:00:00Z',
+  },
+  {
+    id: 'prop-004', code: 'PROP-2026-004', title: 'SaaS Starter - StartupX',
+    accountId: mockAccounts[2].id, accountName: mockAccounts[2].name,
+    ownerId: mockUsers[2].id, ownerName: mockUsers[2].fullName,
+    status: 'draft',
+    lineItems: [
+      { id: 'li-8', productId: 'prod-002', productName: 'Licença Plataforma SaaS', quantity: 8, unitPrice: 189, discount: 0, totalPrice: 1512, recurrence: 'monthly' },
+    ],
+    totalOneTime: 0, totalMrr: 1512, totalArr: 18144,
+    validUntil: '2026-03-20',
+    createdAt: '2026-02-18T10:00:00Z', updatedAt: '2026-02-18T10:00:00Z',
+  },
+];
+
+export const mockContracts: Contract[] = [
+  {
+    id: 'ctr-001', code: 'CTR-2026-001', title: 'Contrato Squad + SaaS - Foursys',
+    accountId: mockAccounts[0].id, accountName: mockAccounts[0].name,
+    proposalId: 'prop-001', ownerId: mockUsers[0].id, ownerName: mockUsers[0].fullName,
+    type: 'new', status: 'active',
+    startDate: '2026-02-01', endDate: '2027-01-31', autoRenew: true, renewalNoticeDays: 60,
+    mrr: 85520, totalContractValue: 1026240,
+    lineItems: mockProposals[0].lineItems,
+    signedAt: '2026-01-30T10:00:00Z', signedByClient: 'Carlos Mendes (CTO)', signedByUs: 'Maria Santos',
+    amendments: [],
+    createdAt: '2026-01-30T10:00:00Z', updatedAt: '2026-02-01T10:00:00Z',
+  },
+  {
+    id: 'ctr-002', code: 'CTR-2025-014', title: 'Licenças Enterprise - BigCo',
+    accountId: mockAccounts[3].id, accountName: mockAccounts[3].name,
+    ownerId: mockUsers[0].id, ownerName: mockUsers[0].fullName,
+    type: 'renewal', status: 'active',
+    startDate: '2025-04-01', endDate: '2026-03-31', autoRenew: true, renewalNoticeDays: 90,
+    mrr: 68000, totalContractValue: 816000,
+    lineItems: [
+      { id: 'li-c1', productId: 'prod-006', productName: 'Licença Enterprise', quantity: 200, unitPrice: 249, discount: 12, totalPrice: 43824, recurrence: 'monthly' },
+      { id: 'li-c2', productId: 'prod-004', productName: 'Suporte Premium 24x7', quantity: 1, unitPrice: 12000, discount: 0, totalPrice: 12000, recurrence: 'monthly' },
+    ],
+    signedAt: '2025-03-20T10:00:00Z', signedByClient: 'Roberto Lima (VP TI)', signedByUs: 'Maria Santos',
+    amendments: [
+      { id: 'amd-1', description: 'Adição de 50 licenças', mrrDelta: 12450, effectiveDate: '2025-10-01', createdAt: '2025-09-15T10:00:00Z' },
+    ],
+    createdAt: '2025-03-20T10:00:00Z', updatedAt: '2025-10-01T10:00:00Z',
+  },
+  {
+    id: 'ctr-003', code: 'CTR-2025-020', title: 'SaaS Business - Tech Corp',
+    accountId: mockAccounts[1].id, accountName: mockAccounts[1].name,
+    ownerId: mockUsers[1].id, ownerName: mockUsers[1].fullName,
+    type: 'new', status: 'expiring_soon',
+    startDate: '2025-07-01', endDate: '2026-06-30', autoRenew: false, renewalNoticeDays: 60,
+    mrr: 22000, totalContractValue: 264000,
+    lineItems: [
+      { id: 'li-c3', productId: 'prod-002', productName: 'Licença Plataforma SaaS', quantity: 40, unitPrice: 159, discount: 5, totalPrice: 6042, recurrence: 'monthly' },
+      { id: 'li-c4', productId: 'prod-001', productName: 'Squad Dedicada', quantity: 0.5, unitPrice: 85000, discount: 10, totalPrice: 38250, recurrence: 'monthly' },
+    ],
+    signedAt: '2025-06-25T10:00:00Z', signedByClient: 'Ana Beatriz (Diretora)', signedByUs: 'Pedro Oliveira',
+    amendments: [],
+    createdAt: '2025-06-25T10:00:00Z', updatedAt: '2026-02-01T10:00:00Z',
+  },
+  {
+    id: 'ctr-004', code: 'CTR-2025-025', title: 'SaaS Starter - StartupX',
+    accountId: mockAccounts[2].id, accountName: mockAccounts[2].name,
+    ownerId: mockUsers[2].id, ownerName: mockUsers[2].fullName,
+    type: 'new', status: 'expiring_soon',
+    startDate: '2025-05-01', endDate: '2026-04-30', autoRenew: false, renewalNoticeDays: 30,
+    mrr: 8500, totalContractValue: 102000,
+    lineItems: [
+      { id: 'li-c5', productId: 'prod-002', productName: 'Licença Plataforma SaaS', quantity: 15, unitPrice: 189, discount: 0, totalPrice: 2835, recurrence: 'monthly' },
+    ],
+    signedAt: '2025-04-28T10:00:00Z', signedByClient: 'Lucas Ferreira (CEO)', signedByUs: 'Ana Silva',
+    amendments: [],
+    createdAt: '2025-04-28T10:00:00Z', updatedAt: '2026-02-15T10:00:00Z',
+  },
+];
+
+// ============================================================================
+// PROJECTS / DELIVERY (EP14)
+// ============================================================================
+
+export const mockProjects: Project[] = [
+  {
+    id: 'proj-001', code: 'PRJ-2026-001', name: 'Modernização Plataforma Core',
+    description: 'Migração do monólito .NET para microserviços com React frontend',
+    accountId: mockAccounts[0].id, accountName: mockAccounts[0].name,
+    contractId: 'ctr-001', dealId: mockDeals[0]?.id,
+    ownerId: mockUsers[0].id, ownerName: mockUsers[0].fullName,
+    status: 'in_progress', health: 'green',
+    startDate: '2026-02-01', targetEndDate: '2026-07-31',
+    budget: 510000, spent: 127500, teamSize: 6,
+    methodology: 'scrum', sprintCount: 12, currentSprint: 3, velocityAvg: 42,
+    milestones: [
+      { id: 'ms-1', name: 'Discovery & Arquitetura', status: 'completed', dueDate: '2026-02-14', completedDate: '2026-02-13', deliverables: ['Documentação arquitetural', 'ADRs', 'Spike técnico'], completionPercent: 100, order: 1 },
+      { id: 'ms-2', name: 'MVP — Módulo Autenticação', status: 'in_progress', dueDate: '2026-03-15', deliverables: ['SSO/SAML', 'RBAC', 'Audit trail'], completionPercent: 55, order: 2 },
+      { id: 'ms-3', name: 'Módulo Dashboard & Analytics', status: 'pending', dueDate: '2026-04-30', deliverables: ['Dashboard executivo', 'Reports engine', 'Exports'], completionPercent: 0, order: 3 },
+      { id: 'ms-4', name: 'Módulo Core Business', status: 'pending', dueDate: '2026-06-15', deliverables: ['CRUD entidades', 'Workflow engine', 'Integrações'], completionPercent: 0, order: 4 },
+      { id: 'ms-5', name: 'Go-Live & Estabilização', status: 'pending', dueDate: '2026-07-31', deliverables: ['Deploy produção', 'Migração dados', 'Treinamento'], completionPercent: 0, order: 5 },
+    ],
+    tags: ['modernização', 'react', 'microserviços'],
+    createdAt: '2026-01-30T10:00:00Z', updatedAt: '2026-02-19T10:00:00Z',
+  },
+  {
+    id: 'proj-002', code: 'PRJ-2026-002', name: 'Implementação BI Self-Service',
+    description: 'Plataforma de BI com dashboards customizáveis e data lake',
+    accountId: mockAccounts[3].id, accountName: mockAccounts[3].name,
+    contractId: 'ctr-002',
+    ownerId: mockUsers[0].id, ownerName: mockUsers[0].fullName,
+    status: 'in_progress', health: 'yellow',
+    startDate: '2025-11-01', targetEndDate: '2026-04-30',
+    budget: 380000, spent: 285000, teamSize: 4,
+    methodology: 'kanban',
+    milestones: [
+      { id: 'ms-6', name: 'Data Lake Setup', status: 'completed', dueDate: '2025-12-15', completedDate: '2025-12-20', deliverables: ['AWS S3/Glue setup', 'ETL pipelines'], completionPercent: 100, order: 1 },
+      { id: 'ms-7', name: 'Dashboard Engine', status: 'completed', dueDate: '2026-02-01', completedDate: '2026-02-05', deliverables: ['Metabase embed', 'Custom widgets'], completionPercent: 100, order: 2 },
+      { id: 'ms-8', name: 'Self-Service Portal', status: 'in_progress', dueDate: '2026-03-15', deliverables: ['Drag-drop builder', 'Saved views', 'Sharing'], completionPercent: 40, order: 3, description: 'Atrasado 1 semana — dependência de API do fornecedor' },
+      { id: 'ms-9', name: 'Go-Live', status: 'pending', dueDate: '2026-04-30', deliverables: ['Deploy', 'Treinamento 200 users', 'Rollout faseado'], completionPercent: 0, order: 4 },
+    ],
+    tags: ['bi', 'data', 'analytics'],
+    createdAt: '2025-10-20T10:00:00Z', updatedAt: '2026-02-19T10:00:00Z',
+  },
+  {
+    id: 'proj-003', code: 'PRJ-2025-015', name: 'App Mobile Tech Corp',
+    description: 'Aplicativo mobile React Native para gestão de field service',
+    accountId: mockAccounts[1].id, accountName: mockAccounts[1].name,
+    contractId: 'ctr-003',
+    ownerId: mockUsers[1].id, ownerName: mockUsers[1].fullName,
+    status: 'on_hold', health: 'red',
+    startDate: '2025-09-01', targetEndDate: '2026-02-28',
+    budget: 220000, spent: 176000, teamSize: 3,
+    methodology: 'scrum', sprintCount: 10, currentSprint: 8, velocityAvg: 28,
+    milestones: [
+      { id: 'ms-10', name: 'Design & Protótipo', status: 'completed', dueDate: '2025-10-15', completedDate: '2025-10-14', deliverables: ['Figma completo', 'Design system mobile'], completionPercent: 100, order: 1 },
+      { id: 'ms-11', name: 'Core Features', status: 'completed', dueDate: '2025-12-15', completedDate: '2025-12-20', deliverables: ['Login/SSO', 'Lista OS', 'Check-in/out'], completionPercent: 100, order: 2 },
+      { id: 'ms-12', name: 'Offline Mode + Sync', status: 'delayed', dueDate: '2026-01-31', deliverables: ['SQLite local', 'Sync engine', 'Conflict resolution'], completionPercent: 65, order: 3, description: 'Bloqueado — cliente pausou por reestruturação interna' },
+      { id: 'ms-13', name: 'Release App Stores', status: 'pending', dueDate: '2026-02-28', deliverables: ['iOS App Store', 'Google Play', 'MDM config'], completionPercent: 0, order: 4 },
+    ],
+    tags: ['mobile', 'react-native', 'field-service'],
+    createdAt: '2025-08-25T10:00:00Z', updatedAt: '2026-02-10T10:00:00Z',
+  },
+  {
+    id: 'proj-004', code: 'PRJ-2025-022', name: 'Integração SAP - StartupX',
+    description: 'Integração bidirecional CRM <-> SAP B1 via API REST',
+    accountId: mockAccounts[2].id, accountName: mockAccounts[2].name,
+    ownerId: mockUsers[2].id, ownerName: mockUsers[2].fullName,
+    status: 'completed', health: 'green',
+    startDate: '2025-08-01', targetEndDate: '2025-11-30', actualEndDate: '2025-11-28',
+    budget: 95000, spent: 88000, teamSize: 2,
+    methodology: 'kanban',
+    milestones: [
+      { id: 'ms-14', name: 'Mapeamento APIs', status: 'completed', dueDate: '2025-08-31', completedDate: '2025-08-28', deliverables: ['API mapping doc', 'Auth flow'], completionPercent: 100, order: 1 },
+      { id: 'ms-15', name: 'Sync Engine', status: 'completed', dueDate: '2025-10-15', completedDate: '2025-10-12', deliverables: ['Sync bidimensional', 'Error handling', 'Retry logic'], completionPercent: 100, order: 2 },
+      { id: 'ms-16', name: 'Go-Live', status: 'completed', dueDate: '2025-11-30', completedDate: '2025-11-28', deliverables: ['Deploy prod', 'Monitoramento', 'Docs'], completionPercent: 100, order: 3 },
+    ],
+    tags: ['integração', 'sap', 'api'],
+    createdAt: '2025-07-25T10:00:00Z', updatedAt: '2025-11-28T10:00:00Z',
+  },
+];
+
+// ============================================================================
+// INTEGRATIONS (EP15)
+// ============================================================================
+
+export const mockIntegrations: Integration[] = [
+  {
+    id: 'int-slack', type: 'slack', name: 'Slack', description: 'Notificações em canais Slack',
+    status: 'connected', configuredAt: '2026-01-10T10:00:00Z', configuredBy: 'Maria Santos',
+    settings: { workspace: 'foursys-crm.slack.com', botToken: '••••••••' },
+    events: [
+      { id: 'ev-1', eventType: 'deal_won', label: 'Deal ganho', enabled: true, channel: '#vendas-wins' },
+      { id: 'ev-2', eventType: 'deal_lost', label: 'Deal perdido', enabled: true, channel: '#vendas-alerts' },
+      { id: 'ev-3', eventType: 'cs_alert', label: 'Alerta CS (risco churn)', enabled: true, channel: '#cs-alerts' },
+      { id: 'ev-4', eventType: 'contract_expiring', label: 'Contrato expirando', enabled: true, channel: '#renovacoes' },
+      { id: 'ev-5', eventType: 'project_milestone', label: 'Milestone concluída', enabled: false, channel: '' },
+      { id: 'ev-6', eventType: 'invoice_overdue', label: 'Fatura em atraso', enabled: true, channel: '#financeiro' },
+    ],
+  },
+  {
+    id: 'int-teams', type: 'teams', name: 'Microsoft Teams', description: 'Notificações via Teams',
+    status: 'disconnected', settings: {},
+    events: [
+      { id: 'ev-7', eventType: 'deal_won', label: 'Deal ganho', enabled: false },
+      { id: 'ev-8', eventType: 'cs_alert', label: 'Alerta CS', enabled: false },
+    ],
+  },
+  {
+    id: 'int-webhook', type: 'webhook', name: 'Webhook Customizado', description: 'HTTP POST para endpoints externos',
+    status: 'connected', configuredAt: '2026-02-01T10:00:00Z', configuredBy: 'Pedro Oliveira',
+    settings: { url: 'https://hooks.example.com/crm-events', secret: '••••••••' },
+    events: [
+      { id: 'ev-9', eventType: 'deal_stage_change', label: 'Mudança de stage', enabled: true },
+      { id: 'ev-10', eventType: 'contact_created', label: 'Contato criado', enabled: true },
+      { id: 'ev-11', eventType: 'invoice_paid', label: 'Fatura paga', enabled: true },
+    ],
+  },
+  {
+    id: 'int-jira', type: 'jira', name: 'Jira Cloud', description: 'Sync de projetos CRM <-> Jira',
+    status: 'connected', configuredAt: '2026-01-15T10:00:00Z', configuredBy: 'Maria Santos',
+    settings: { instance: 'foursys.atlassian.net', project: 'CRM' },
+    events: [
+      { id: 'ev-12', eventType: 'project_created', label: 'Projeto criado → Jira board', enabled: true },
+      { id: 'ev-13', eventType: 'milestone_completed', label: 'Milestone → Jira release', enabled: true },
+    ],
+  },
+];
+
+// ============================================================================
+// SSO / SAML (EP16)
+// ============================================================================
+
+export const mockSsoConfig: SsoConfig = {
+  id: 'sso-001', protocol: 'saml', status: 'active',
+  providerName: 'Azure AD', entityId: 'https://login.microsoftonline.com/tenant-id',
+  ssoUrl: 'https://login.microsoftonline.com/tenant-id/saml2',
+  certificate: '••• certificado SAML •••',
+  mappings: [
+    { ssoAttribute: 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress', crmField: 'email' },
+    { ssoAttribute: 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname', crmField: 'firstName' },
+    { ssoAttribute: 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname', crmField: 'lastName' },
+    { ssoAttribute: 'http://schemas.microsoft.com/ws/2008/06/identity/claims/groups', crmField: 'groups' },
+  ],
+  enforceForAllUsers: false,
+  allowPasswordFallback: true,
+  configuredAt: '2026-01-05T10:00:00Z', configuredBy: 'Maria Santos',
+  lastTestedAt: '2026-02-18T14:00:00Z', lastTestResult: 'success',
+};
+
+// ============================================================================
+// SAAS METRICS (EP09)
+// ============================================================================
+
+export const mockSaasMetricsCurrent: SaasMetricsSnapshot = {
+  period: '2026-02',
+  mrr: 487500,
+  arr: 5850000,
+  mrrGrowthRate: 8.2,
+  newMrr: 62000,
+  expansionMrr: 28000,
+  contractionMrr: 12000,
+  churnedMrr: 38500,
+  netNewMrr: 39500,
+  logoChurnRate: 2.1,
+  revenueChurnRate: 3.4,
+  netRevenueRetention: 112,
+  grossRevenueRetention: 92.1,
+  ltv: 185000,
+  cac: 32000,
+  ltvCacRatio: 5.78,
+  avgRevenuePerAccount: 12187.5,
+  totalActiveAccounts: 40,
+  newAccounts: 4,
+  churnedAccounts: 1,
+};
+
+export const mockSaasMetricsPrevious: SaasMetricsSnapshot = {
+  period: '2026-01',
+  mrr: 448000,
+  arr: 5376000,
+  mrrGrowthRate: 6.5,
+  newMrr: 55000,
+  expansionMrr: 18000,
+  contractionMrr: 8000,
+  churnedMrr: 36000,
+  netNewMrr: 29000,
+  logoChurnRate: 2.6,
+  revenueChurnRate: 4.1,
+  netRevenueRetention: 108,
+  grossRevenueRetention: 91.5,
+  ltv: 172000,
+  cac: 34000,
+  ltvCacRatio: 5.06,
+  avgRevenuePerAccount: 12108,
+  totalActiveAccounts: 37,
+  newAccounts: 3,
+  churnedAccounts: 1,
+};
+
+export const mockSaasMetricsTrend: SaasMetricsTrend[] = [
+  { month: '2025-09', mrr: 360000, arr: 4320000, newMrr: 42000, churnedMrr: 28000, netNewMrr: 14000, logoChurnRate: 3.2, revenueChurnRate: 5.0, netRevenueRetention: 104, activeAccounts: 30 },
+  { month: '2025-10', mrr: 382000, arr: 4584000, newMrr: 48000, churnedMrr: 26000, netNewMrr: 22000, logoChurnRate: 2.9, revenueChurnRate: 4.6, netRevenueRetention: 106, activeAccounts: 32 },
+  { month: '2025-11', mrr: 405000, arr: 4860000, newMrr: 45000, churnedMrr: 22000, netNewMrr: 23000, logoChurnRate: 2.8, revenueChurnRate: 4.2, netRevenueRetention: 107, activeAccounts: 34 },
+  { month: '2025-12', mrr: 419000, arr: 5028000, newMrr: 38000, churnedMrr: 24000, netNewMrr: 14000, logoChurnRate: 2.5, revenueChurnRate: 4.0, netRevenueRetention: 108, activeAccounts: 35 },
+  { month: '2026-01', mrr: 448000, arr: 5376000, newMrr: 55000, churnedMrr: 36000, netNewMrr: 29000, logoChurnRate: 2.6, revenueChurnRate: 4.1, netRevenueRetention: 108, activeAccounts: 37 },
+  { month: '2026-02', mrr: 487500, arr: 5850000, newMrr: 62000, churnedMrr: 38500, netNewMrr: 39500, logoChurnRate: 2.1, revenueChurnRate: 3.4, netRevenueRetention: 112, activeAccounts: 40 },
+];
+
+export const mockSaasDashboard: SaasDashboardData = {
+  current: mockSaasMetricsCurrent,
+  previous: mockSaasMetricsPrevious,
+  trend: mockSaasMetricsTrend,
+  generatedAt: '2026-02-19T10:00:00Z',
+};
+
+// ============================================================================
+// CUSTOMER SUCCESS (EP10)
+// ============================================================================
+
+export const mockAccountHealthScores: AccountHealthScore[] = [
+  {
+    accountId: mockAccounts[0].id,
+    accountName: mockAccounts[0].name,
+    accountTier: 'Enterprise',
+    ownerId: mockUsers[0].id,
+    ownerName: mockUsers[0].fullName,
+    overallScore: 92,
+    level: 'healthy',
+    dimensions: [
+      { name: 'Uso do Produto', score: 9, maxScore: 10, weight: 0.3, signals: [{ label: 'Logins/semana', value: '45', status: 'positive' }, { label: 'Features adotadas', value: '87%', status: 'positive' }] },
+      { name: 'Engajamento', score: 9, maxScore: 10, weight: 0.25, signals: [{ label: 'Reuniões QBR', value: 'Em dia', status: 'positive' }, { label: 'Resposta a emails', value: '<2h', status: 'positive' }] },
+      { name: 'Suporte', score: 10, maxScore: 10, weight: 0.2, signals: [{ label: 'Tickets abertos', value: '1', status: 'positive' }, { label: 'CSAT suporte', value: '4.8/5', status: 'positive' }] },
+      { name: 'Financeiro', score: 9, maxScore: 10, weight: 0.25, signals: [{ label: 'Pagamento em dia', value: 'Sim', status: 'positive' }, { label: 'Expansão recente', value: '+2 licenças', status: 'positive' }] },
+    ],
+    mrr: 45000,
+    contractEndDate: '2026-12-31',
+    daysSinceLastContact: 3,
+    openTickets: 1,
+    npsScore: 9,
+    csatScore: 4.8,
+    lastNpsDate: '2026-02-01',
+    riskFactors: [],
+    opportunities: ['Expansão para squad adicional', 'Upsell módulo analytics'],
+    lastUpdatedAt: '2026-02-19T08:00:00Z',
+  },
+  {
+    accountId: mockAccounts[1].id,
+    accountName: mockAccounts[1].name,
+    accountTier: 'MidMarket',
+    ownerId: mockUsers[1].id,
+    ownerName: mockUsers[1].fullName,
+    overallScore: 68,
+    level: 'attention',
+    dimensions: [
+      { name: 'Uso do Produto', score: 6, maxScore: 10, weight: 0.3, signals: [{ label: 'Logins/semana', value: '12', status: 'neutral' }, { label: 'Features adotadas', value: '52%', status: 'negative' }] },
+      { name: 'Engajamento', score: 7, maxScore: 10, weight: 0.25, signals: [{ label: 'Reuniões QBR', value: 'Atrasada 1 mês', status: 'negative' }, { label: 'Resposta a emails', value: '<24h', status: 'neutral' }] },
+      { name: 'Suporte', score: 8, maxScore: 10, weight: 0.2, signals: [{ label: 'Tickets abertos', value: '3', status: 'neutral' }, { label: 'CSAT suporte', value: '4.2/5', status: 'neutral' }] },
+      { name: 'Financeiro', score: 6, maxScore: 10, weight: 0.25, signals: [{ label: 'Pagamento em dia', value: 'Atraso 5 dias', status: 'negative' }, { label: 'Expansão recente', value: 'Nenhuma', status: 'neutral' }] },
+    ],
+    mrr: 22000,
+    contractEndDate: '2026-06-30',
+    daysSinceLastContact: 18,
+    openTickets: 3,
+    npsScore: 7,
+    csatScore: 4.2,
+    lastNpsDate: '2026-01-15',
+    riskFactors: ['QBR atrasada', 'Baixa adoção de features', 'Contrato vence em 4 meses'],
+    opportunities: ['Treinamento para aumentar adoção'],
+    lastUpdatedAt: '2026-02-19T08:00:00Z',
+  },
+  {
+    accountId: mockAccounts[2].id,
+    accountName: mockAccounts[2].name,
+    accountTier: 'SMB',
+    ownerId: mockUsers[2].id,
+    ownerName: mockUsers[2].fullName,
+    overallScore: 42,
+    level: 'at_risk',
+    dimensions: [
+      { name: 'Uso do Produto', score: 3, maxScore: 10, weight: 0.3, signals: [{ label: 'Logins/semana', value: '2', status: 'negative' }, { label: 'Features adotadas', value: '25%', status: 'negative' }] },
+      { name: 'Engajamento', score: 4, maxScore: 10, weight: 0.25, signals: [{ label: 'Reuniões QBR', value: 'Nunca realizou', status: 'negative' }, { label: 'Resposta a emails', value: '>3 dias', status: 'negative' }] },
+      { name: 'Suporte', score: 5, maxScore: 10, weight: 0.2, signals: [{ label: 'Tickets abertos', value: '7', status: 'negative' }, { label: 'CSAT suporte', value: '3.1/5', status: 'negative' }] },
+      { name: 'Financeiro', score: 5, maxScore: 10, weight: 0.25, signals: [{ label: 'Pagamento em dia', value: 'Atraso 15 dias', status: 'negative' }, { label: 'Expansão recente', value: 'Downgrade solicitado', status: 'negative' }] },
+    ],
+    mrr: 8500,
+    contractEndDate: '2026-04-15',
+    daysSinceLastContact: 32,
+    openTickets: 7,
+    npsScore: 4,
+    csatScore: 3.1,
+    lastNpsDate: '2025-12-10',
+    riskFactors: ['Uso caindo 60%', 'Downgrade solicitado', '7 tickets abertos', 'Sem contato há 32 dias', 'Contrato vence em 2 meses'],
+    opportunities: [],
+    lastUpdatedAt: '2026-02-19T08:00:00Z',
+  },
+  {
+    accountId: mockAccounts[3].id,
+    accountName: mockAccounts[3].name,
+    accountTier: 'Enterprise',
+    ownerId: mockUsers[0].id,
+    ownerName: mockUsers[0].fullName,
+    overallScore: 85,
+    level: 'healthy',
+    dimensions: [
+      { name: 'Uso do Produto', score: 8, maxScore: 10, weight: 0.3, signals: [{ label: 'Logins/semana', value: '38', status: 'positive' }, { label: 'Features adotadas', value: '78%', status: 'positive' }] },
+      { name: 'Engajamento', score: 9, maxScore: 10, weight: 0.25, signals: [{ label: 'Reuniões QBR', value: 'Em dia', status: 'positive' }, { label: 'Resposta a emails', value: '<4h', status: 'positive' }] },
+      { name: 'Suporte', score: 8, maxScore: 10, weight: 0.2, signals: [{ label: 'Tickets abertos', value: '2', status: 'neutral' }, { label: 'CSAT suporte', value: '4.5/5', status: 'positive' }] },
+      { name: 'Financeiro', score: 9, maxScore: 10, weight: 0.25, signals: [{ label: 'Pagamento em dia', value: 'Sim', status: 'positive' }, { label: 'Expansão recente', value: '+5 licenças', status: 'positive' }] },
+    ],
+    mrr: 68000,
+    contractEndDate: '2027-03-15',
+    daysSinceLastContact: 5,
+    openTickets: 2,
+    npsScore: 8,
+    csatScore: 4.5,
+    lastNpsDate: '2026-02-05',
+    riskFactors: [],
+    opportunities: ['Cross-sell módulo BI', 'Expansão para nova BU'],
+    lastUpdatedAt: '2026-02-19T08:00:00Z',
+  },
+];
+
+export const mockCsAlerts: CsAlert[] = [
+  { id: 'alert-1', accountId: mockAccounts[2].id, accountName: mockAccounts[2].name, type: 'churn_risk', severity: 'critical', message: 'Score caiu de 58 para 42 nos últimos 30 dias. Downgrade solicitado.', createdAt: '2026-02-18T10:00:00Z', acknowledged: false },
+  { id: 'alert-2', accountId: mockAccounts[2].id, accountName: mockAccounts[2].name, type: 'no_contact', severity: 'high', message: 'Sem contato há 32 dias. Última interação foi ticket de suporte.', createdAt: '2026-02-17T08:00:00Z', acknowledged: false },
+  { id: 'alert-3', accountId: mockAccounts[1].id, accountName: mockAccounts[1].name, type: 'contract_expiring', severity: 'medium', message: 'Contrato expira em 4 meses (30/06/2026). Iniciar renovação.', createdAt: '2026-02-15T09:00:00Z', acknowledged: true },
+  { id: 'alert-4', accountId: mockAccounts[2].id, accountName: mockAccounts[2].name, type: 'usage_drop', severity: 'high', message: 'Uso caiu 60% comparado ao mês anterior.', createdAt: '2026-02-14T14:00:00Z', acknowledged: false },
+  { id: 'alert-5', accountId: mockAccounts[1].id, accountName: mockAccounts[1].name, type: 'nps_drop', severity: 'medium', message: 'NPS caiu de 8 para 7. Verificar motivos.', createdAt: '2026-02-12T11:00:00Z', acknowledged: true },
+];
+
+export const mockCsOverview: CsOverviewData = {
+  totalAccounts: 40,
+  healthDistribution: { healthy: 22, attention: 12, at_risk: 5, critical: 1 },
+  avgHealthScore: 74,
+  accountsAtRisk: 6,
+  renewalsNext30Days: 2,
+  renewalsNext90Days: 8,
+  totalMrrAtRisk: 52500,
+  avgNps: 7.8,
+  npsRespondents: 32,
+  recentAlerts: mockCsAlerts,
+};
+
+export const mockCsPlaybooks: CsPlaybook[] = [
+  {
+    id: 'pb-1',
+    name: 'Resgate de Conta em Risco',
+    targetLevel: 'at_risk',
+    isActive: true,
+    steps: [
+      { order: 1, action: 'Ligação imediata com sponsor do cliente', owner: 'csm', dueInDays: 1 },
+      { order: 2, action: 'Agendar reunião de diagnóstico presencial/remota', owner: 'csm', dueInDays: 3 },
+      { order: 3, action: 'Escalar para Gerente de CS se score < 30', owner: 'csm', dueInDays: 3 },
+      { order: 4, action: 'Criar plano de ação com owner do produto', owner: 'product', dueInDays: 7 },
+      { order: 5, action: 'Oferecer treinamento adicional gratuito', owner: 'csm', dueInDays: 10 },
+      { order: 6, action: 'Review semanal de progresso por 4 semanas', owner: 'csm', dueInDays: 30 },
+    ],
+  },
+  {
+    id: 'pb-2',
+    name: 'Atenção Preventiva',
+    targetLevel: 'attention',
+    isActive: true,
+    steps: [
+      { order: 1, action: 'Enviar email de check-in personalizado', owner: 'csm', dueInDays: 2 },
+      { order: 2, action: 'Analisar métricas de uso e identificar gaps', owner: 'csm', dueInDays: 5 },
+      { order: 3, action: 'Agendar QBR se atrasada', owner: 'csm', dueInDays: 7 },
+      { order: 4, action: 'Compartilhar caso de sucesso similar', owner: 'csm', dueInDays: 10 },
+    ],
+  },
+];
+
+export const mockAccountHealthHistory: Record<string, AccountHealthHistory[]> = {
+  [mockAccounts[0].id]: [
+    { date: '2025-09', score: 88, level: 'healthy' },
+    { date: '2025-10', score: 89, level: 'healthy' },
+    { date: '2025-11', score: 91, level: 'healthy' },
+    { date: '2025-12', score: 90, level: 'healthy', event: 'Renovação contrato' },
+    { date: '2026-01', score: 91, level: 'healthy' },
+    { date: '2026-02', score: 92, level: 'healthy', event: 'Expansão +2 licenças' },
+  ],
+  [mockAccounts[1].id]: [
+    { date: '2025-09', score: 82, level: 'healthy' },
+    { date: '2025-10', score: 78, level: 'attention' },
+    { date: '2025-11', score: 75, level: 'attention' },
+    { date: '2025-12', score: 72, level: 'attention', event: 'QBR cancelada pelo cliente' },
+    { date: '2026-01', score: 70, level: 'attention' },
+    { date: '2026-02', score: 68, level: 'attention', event: 'Atraso pagamento' },
+  ],
+  [mockAccounts[2].id]: [
+    { date: '2025-09', score: 71, level: 'attention' },
+    { date: '2025-10', score: 65, level: 'attention' },
+    { date: '2025-11', score: 58, level: 'attention', event: 'Ticket spike' },
+    { date: '2025-12', score: 52, level: 'at_risk', event: 'Uso caiu 40%' },
+    { date: '2026-01', score: 48, level: 'at_risk' },
+    { date: '2026-02', score: 42, level: 'at_risk', event: 'Downgrade solicitado' },
+  ],
+  [mockAccounts[3].id]: [
+    { date: '2025-09', score: 80, level: 'healthy' },
+    { date: '2025-10', score: 82, level: 'healthy' },
+    { date: '2025-11', score: 83, level: 'healthy' },
+    { date: '2025-12', score: 84, level: 'healthy' },
+    { date: '2026-01', score: 84, level: 'healthy', event: 'Expansão +5 licenças' },
+    { date: '2026-02', score: 85, level: 'healthy' },
+  ],
+};
+
+// ============================================================================
+// EXPORT ALL MOCK DATA
+// ============================================================================
+
+export const mockData = {
+  users: mockUsers,
+  accounts: mockAccounts,
+  contacts: mockContacts,
+  pipelines: mockPipelines,
+  stages: mockStages,
+  deals: mockDeals,
+  activities: mockActivities,
+  leads: mockLeads,
+  leadScoreDetails: mockLeadScoreDetails,
+  lifecycleFunnel: mockLifecycleFunnel,
+  nurtureSequences: mockNurtureSequences,
+  reportTemplates: mockReportTemplates,
+  savedReports: mockSavedReports,
+  reportSchedules: mockReportSchedules,
+  reportExecutionLogs: mockReportExecutionLogs,
+  exportJobs: mockExportJobs,
+  biConnectors: mockBiConnectors,
+  invoices: mockInvoices,
+  paymentConnectors: mockPaymentConnectors,
+  collectionTemplates: mockCollectionTemplates,
+  collectionRules: mockCollectionRules,
+  collectionJobs: mockCollectionJobs,
+  allocations: mockAllocations,
+  invoiceHistoryEvents: mockInvoiceHistoryEvents,
+  rolePermissionMatrix: mockRolePermissionMatrix,
+  auditEvents: mockAuditEvents,
+  complianceExportJobs: mockComplianceExportJobs,
+  accessPermissionCatalog: mockAccessPermissionCatalog,
+  accessGroups: mockAccessGroups,
+  accessUserGroupMemberships: mockAccessUserGroupMemberships,
+  directUserPermissionGrants: mockDirectUserPermissionGrants,
+  effectiveAccessSummaryByUser: mockEffectiveAccessSummaryByUser,
+  effectivePermissions: mockEffectivePermissions,
+  accessPermissionConflicts: mockAccessPermissionConflicts,
+  accessElevationRequests: mockAccessElevationRequests,
+  accessAuditEvents: mockAccessAuditEvents,
+  accessExportHistory: mockAccessExportHistory,
+  products: mockProducts,
+  proposals: mockProposals,
+  contracts: mockContracts,
+  projects: mockProjects,
+  integrations: mockIntegrations,
+  ssoConfig: mockSsoConfig,
+  saasDashboard: mockSaasDashboard,
+  accountHealthScores: mockAccountHealthScores,
+  csOverview: mockCsOverview,
+  csAlerts: mockCsAlerts,
+  csPlaybooks: mockCsPlaybooks,
+  accountHealthHistory: mockAccountHealthHistory,
+};
+
+export default mockData;

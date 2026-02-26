@@ -1,0 +1,20 @@
+<svg width="256" height="256" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg5" x1="22" y1="20" x2="234" y2="236" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#EFF6FF"/>
+      <stop offset="1" stop-color="#DCEBFF"/>
+    </linearGradient>
+    <linearGradient id="shirt5" x1="70" y1="164" x2="193" y2="236" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#2563EB"/>
+      <stop offset="1" stop-color="#1D4ED8"/>
+    </linearGradient>
+  </defs>
+  <rect x="8" y="8" width="240" height="240" rx="120" fill="url(#bg5)"/>
+  <circle cx="128" cy="98" r="43" fill="#D2A07B"/>
+  <path d="M84 96C84 66 104 45 128 45C152 45 172 66 172 96V103H84V96Z" fill="#273342"/>
+  <path d="M80 176C92 153 108 143 128 143C148 143 164 153 176 176V210H80V176Z" fill="url(#shirt5)"/>
+  <circle cx="112" cy="100" r="4" fill="#1E2A39"/>
+  <circle cx="144" cy="100" r="4" fill="#1E2A39"/>
+  <path d="M112 121C118 127 138 127 144 121" stroke="#AE7353" stroke-width="4" stroke-linecap="round"/>
+  <rect x="8" y="8" width="240" height="240" rx="120" stroke="#CBDBF1" stroke-width="4"/>
+</svg>
