@@ -105,7 +105,7 @@ const AccountHealthDetailPage: React.FC = () => {
   const applicablePlaybook = playbooks.find((pb) => pb.targetLevel === health.level && pb.isActive);
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box sx={{ p: { xs: 2, md: 3 } }}>
       {/* Header */}
       <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 0.5 }}>
         <Button startIcon={<ArrowBackIcon />} onClick={() => navigate('/cs')} size="small">
@@ -113,7 +113,13 @@ const AccountHealthDetailPage: React.FC = () => {
         </Button>
       </Stack>
 
-      <Stack direction="row" justifyContent="space-between" alignItems="flex-start" sx={{ mb: 3 }}>
+      <Stack
+        direction={{ xs: 'column', md: 'row' }}
+        justifyContent="space-between"
+        alignItems={{ xs: 'flex-start', md: 'flex-start' }}
+        spacing={1.5}
+        sx={{ mb: 3 }}
+      >
         <Box>
           <Stack direction="row" spacing={1.5} alignItems="center">
             <Typography variant="h4" sx={{ fontWeight: 700 }}>
@@ -147,13 +153,29 @@ const AccountHealthDetailPage: React.FC = () => {
       </Stack>
 
       {/* Score + Summary */}
-      <Box sx={{ display: 'grid', gridTemplateColumns: '280px 1fr', gap: 2, mb: 3 }}>
+      <Box
+        sx={{
+          display: 'grid',
+          gridTemplateColumns: { xs: '1fr', lg: '280px 1fr' },
+          gap: 2,
+          mb: 3,
+        }}
+      >
         <Card sx={{ textAlign: 'center', borderLeft: `5px solid ${config.color}` }}>
           <CardContent>
             <Typography variant="caption" color="text.secondary">
               Health Score
             </Typography>
-            <Typography variant="h2" sx={{ fontWeight: 700, color: config.color, my: 1 }}>
+            <Typography
+              variant="h2"
+              sx={{
+                fontWeight: 700,
+                color: config.color,
+                my: 1,
+                fontSize: { xs: 'clamp(2rem, 12vw, 2.8rem)', md: '3.75rem' },
+                lineHeight: 1.05,
+              }}
+            >
               {health.overallScore}
             </Typography>
             <Typography variant="caption" color="text.secondary">
@@ -230,7 +252,7 @@ const AccountHealthDetailPage: React.FC = () => {
       </Box>
 
       {/* Risk Factors + Opportunities */}
-      <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2, mb: 3 }}>
+      <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 2, mb: 3 }}>
         <Card variant="outlined" sx={{ borderColor: health.riskFactors.length > 0 ? '#FEE2E2' : undefined }}>
           <CardContent>
             <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 1, color: '#DC2626' }}>
