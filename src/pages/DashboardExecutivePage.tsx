@@ -146,7 +146,7 @@ const DashboardExecutivePage: React.FC = () => {
   };
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box sx={{ p: { xs: 2, md: 3 } }}>
       <Box
         sx={{
           display: 'flex',
@@ -255,7 +255,11 @@ const DashboardExecutivePage: React.FC = () => {
           <Box
             sx={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(5, minmax(170px, 1fr))',
+              gridTemplateColumns: {
+                xs: 'repeat(2, minmax(0, 1fr))',
+                sm: 'repeat(3, minmax(0, 1fr))',
+                lg: 'repeat(5, minmax(170px, 1fr))',
+              },
               gap: 1.5,
               mb: 2,
             }}
@@ -295,7 +299,10 @@ const DashboardExecutivePage: React.FC = () => {
               <Box
                 sx={{
                   display: 'grid',
-                  gridTemplateColumns: 'repeat(4, 1fr)',
+                  gridTemplateColumns: {
+                    xs: 'repeat(2, minmax(0, 1fr))',
+                    md: 'repeat(4, minmax(0, 1fr))',
+                  },
                   gap: 1.5,
                   mb: 2,
                 }}
@@ -330,7 +337,10 @@ const DashboardExecutivePage: React.FC = () => {
               <Box
                 sx={{
                   display: 'grid',
-                  gridTemplateColumns: 'repeat(4, 1fr)',
+                  gridTemplateColumns: {
+                    xs: 'repeat(2, minmax(0, 1fr))',
+                    md: 'repeat(4, minmax(0, 1fr))',
+                  },
                   gap: 1.5,
                   mb: 2,
                 }}
@@ -363,7 +373,14 @@ const DashboardExecutivePage: React.FC = () => {
                 />
               </Box>
 
-              <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2, mb: 2 }}>
+              <Box
+                sx={{
+                  display: 'grid',
+                  gridTemplateColumns: { xs: '1fr', lg: '1fr 1fr' },
+                  gap: 2,
+                  mb: 2,
+                }}
+              >
                 <Card variant="outlined">
                   <CardContent>
                     <Typography variant="subtitle2" sx={{ mb: 1.5, fontWeight: 700 }}>
@@ -419,7 +436,7 @@ const DashboardExecutivePage: React.FC = () => {
             </>
           )}
 
-          <Box sx={{ display: 'grid', gridTemplateColumns: '1.6fr 1fr', gap: 2 }}>
+          <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', lg: '1.6fr 1fr' }, gap: 2 }}>
             <Card>
               <CardContent>
                 <Typography variant="h6" sx={{ mb: 1.2 }}>
@@ -570,7 +587,15 @@ const SaasKpiCard: React.FC<SaasKpiCardProps> = ({
         <Typography variant="caption" color="text.secondary">
           {label}
         </Typography>
-        <Typography variant="h5" sx={{ fontWeight: 700 }}>
+        <Typography
+          variant="h5"
+          sx={{
+            fontWeight: 700,
+            fontSize: { xs: 'clamp(1.25rem, 5vw, 1.55rem)', sm: '1.5rem' },
+            lineHeight: 1.15,
+            overflowWrap: 'anywhere',
+          }}
+        >
           {formatted}
         </Typography>
         <Tooltip title={`Anterior: ${format === 'currency' ? 'R$ ' : ''}${previousValue.toLocaleString('pt-BR')}${format === 'percent' ? '%' : ''}`}>

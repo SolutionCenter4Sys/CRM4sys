@@ -85,7 +85,7 @@ const ProductCatalogPage: React.FC = () => {
     .reduce((sum, p) => sum + p.basePrice, 0);
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box sx={{ p: { xs: 2, md: 3 } }}>
       <Box sx={{ mb: 2 }}>
         <Typography variant="h4" sx={{ fontWeight: 700 }}>
           Catálogo de Produtos & Serviços
@@ -102,7 +102,17 @@ const ProductCatalogPage: React.FC = () => {
       )}
 
       {/* KPIs */}
-      <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 1.5, mb: 2 }}>
+      <Box
+        sx={{
+          display: 'grid',
+          gridTemplateColumns: {
+            xs: 'repeat(2, minmax(0, 1fr))',
+            md: 'repeat(4, minmax(0, 1fr))',
+          },
+          gap: 1.5,
+          mb: 2,
+        }}
+      >
         <MiniKpi label="Produtos Ativos" value={String(products.filter((p) => p.isActive).length)} />
         <MiniKpi label="Categorias" value={String(new Set(products.map((p) => p.category)).size)} />
         <MiniKpi label="Base Price MRR" value={`R$ ${totalMrr.toLocaleString('pt-BR')}`} />
@@ -118,9 +128,9 @@ const ProductCatalogPage: React.FC = () => {
             value={filters.search || ''}
             onChange={(e) => updateFilter('search', e.target.value)}
             InputProps={{ startAdornment: <InputAdornment position="start"><SearchIcon fontSize="small" /></InputAdornment> }}
-            sx={{ minWidth: 220 }}
+            sx={{ minWidth: { xs: '100%', md: 220 } }}
           />
-          <FormControl size="small" sx={{ minWidth: 150 }}>
+          <FormControl size="small" sx={{ minWidth: { xs: '100%', md: 150 } }}>
             <InputLabel>Categoria</InputLabel>
             <Select value={filters.category || ''} label="Categoria" onChange={(e) => updateFilter('category', e.target.value as ProductFilters['category'])}>
               <MenuItem value="">Todas</MenuItem>
@@ -129,7 +139,7 @@ const ProductCatalogPage: React.FC = () => {
               ))}
             </Select>
           </FormControl>
-          <FormControl size="small" sx={{ minWidth: 150 }}>
+          <FormControl size="small" sx={{ minWidth: { xs: '100%', md: 150 } }}>
             <InputLabel>Precificação</InputLabel>
             <Select value={filters.pricingModel || ''} label="Precificação" onChange={(e) => updateFilter('pricingModel', e.target.value as ProductFilters['pricingModel'])}>
               <MenuItem value="">Todas</MenuItem>
@@ -138,7 +148,7 @@ const ProductCatalogPage: React.FC = () => {
               ))}
             </Select>
           </FormControl>
-          <FormControl size="small" sx={{ minWidth: 140 }}>
+          <FormControl size="small" sx={{ minWidth: { xs: '100%', md: 140 } }}>
             <InputLabel>Recorrência</InputLabel>
             <Select value={filters.recurrence || ''} label="Recorrência" onChange={(e) => updateFilter('recurrence', e.target.value as ProductFilters['recurrence'])}>
               <MenuItem value="">Todas</MenuItem>
@@ -153,7 +163,13 @@ const ProductCatalogPage: React.FC = () => {
       {loading ? (
         <Box sx={{ py: 6, textAlign: 'center' }}><CircularProgress /></Box>
       ) : (
-        <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(360px, 1fr))', gap: 2 }}>
+        <Box
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: { xs: '1fr', lg: 'repeat(auto-fill, minmax(360px, 1fr))' },
+            gap: 2,
+          }}
+        >
           {products.map((product) => {
             const cat = categoryLabels[product.category];
             return (
@@ -249,7 +265,17 @@ const MiniKpi: React.FC<{ label: string; value: string }> = ({ label, value }) =
   <Card variant="outlined">
     <CardContent sx={{ pb: '12px !important' }}>
       <Typography variant="caption" color="text.secondary">{label}</Typography>
-      <Typography variant="h6" sx={{ fontWeight: 700 }}>{value}</Typography>
+      <Typography
+        variant="h6"
+        sx={{
+          fontWeight: 700,
+          fontSize: { xs: 'clamp(1.1rem, 4.5vw, 1.35rem)', sm: '1.25rem' },
+          lineHeight: 1.2,
+          overflowWrap: 'anywhere',
+        }}
+      >
+        {value}
+      </Typography>
     </CardContent>
   </Card>
 );
