@@ -350,6 +350,23 @@ const componentsOverrides = {
       },
     },
   },
+  MuiBottomNavigation: {
+    styleOverrides: {
+      root: {
+        width: '100%',
+        maxWidth: '100%',
+        overflowX: 'hidden',
+      },
+    },
+  },
+  MuiBottomNavigationAction: {
+    styleOverrides: {
+      root: {
+        minWidth: 0,
+        flex: 1,
+      },
+    },
+  },
 };
 
 // ============================================================================
