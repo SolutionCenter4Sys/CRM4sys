@@ -96,7 +96,7 @@ const ContractsPage: React.FC = () => {
   };
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box sx={{ p: { xs: 2, md: 3 } }}>
       <Box sx={{ mb: 2 }}>
         <Typography variant="h4" sx={{ fontWeight: 700 }}>
           Gestão de Contratos
@@ -113,7 +113,18 @@ const ContractsPage: React.FC = () => {
       )}
 
       {/* KPIs */}
-      <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 1.5, mb: 2 }}>
+      <Box
+        sx={{
+          display: 'grid',
+          gridTemplateColumns: {
+            xs: 'repeat(2, minmax(0, 1fr))',
+            sm: 'repeat(3, minmax(0, 1fr))',
+            lg: 'repeat(5, minmax(0, 1fr))',
+          },
+          gap: 1.5,
+          mb: 2,
+        }}
+      >
         <KpiCard label="Total Contratos" value={String(contracts.length)} />
         <KpiCard label="Ativos" value={String(contracts.filter((c) => c.status === 'active' || c.status === 'expiring_soon').length)} color="#16A34A" />
         <KpiCard label="MRR Contratado" value={`R$ ${totalMrr.toLocaleString('pt-BR')}`} color="#7C3AED" />
@@ -130,9 +141,9 @@ const ContractsPage: React.FC = () => {
             value={filters.search || ''}
             onChange={(e) => updateFilter('search', e.target.value)}
             InputProps={{ startAdornment: <InputAdornment position="start"><SearchIcon fontSize="small" /></InputAdornment> }}
-            sx={{ minWidth: 240 }}
+            sx={{ minWidth: { xs: '100%', md: 240 } }}
           />
-          <FormControl size="small" sx={{ minWidth: 150 }}>
+          <FormControl size="small" sx={{ minWidth: { xs: '100%', md: 150 } }}>
             <InputLabel>Status</InputLabel>
             <Select value={filters.status || ''} label="Status" onChange={(e) => updateFilter('status', e.target.value as ContractFilters['status'])}>
               <MenuItem value="">Todos</MenuItem>
@@ -141,7 +152,7 @@ const ContractsPage: React.FC = () => {
               ))}
             </Select>
           </FormControl>
-          <FormControl size="small" sx={{ minWidth: 140 }}>
+          <FormControl size="small" sx={{ minWidth: { xs: '100%', md: 140 } }}>
             <InputLabel>Tipo</InputLabel>
             <Select value={filters.type || ''} label="Tipo" onChange={(e) => updateFilter('type', e.target.value as ContractFilters['type'])}>
               <MenuItem value="">Todos</MenuItem>
@@ -191,7 +202,7 @@ const ContractsPage: React.FC = () => {
                       </Typography>
                     </Box>
 
-                    <Stack alignItems="flex-end" sx={{ minWidth: 180 }}>
+                    <Stack alignItems={{ xs: 'flex-start', md: 'flex-end' }} sx={{ minWidth: { xs: 0, md: 180 } }}>
                       <Typography variant="body2" sx={{ fontWeight: 700, color: '#7C3AED' }}>
                         MRR R$ {contract.mrr.toLocaleString('pt-BR')}
                       </Typography>
@@ -285,7 +296,18 @@ const KpiCard: React.FC<{ label: string; value: string; color?: string }> = ({ l
   <Card variant="outlined">
     <CardContent sx={{ pb: '12px !important' }}>
       <Typography variant="caption" color="text.secondary">{label}</Typography>
-      <Typography variant="h6" sx={{ fontWeight: 700, color: color || 'text.primary' }}>{value}</Typography>
+      <Typography
+        variant="h6"
+        sx={{
+          fontWeight: 700,
+          color: color || 'text.primary',
+          fontSize: { xs: 'clamp(1.1rem, 4.5vw, 1.35rem)', sm: '1.25rem' },
+          lineHeight: 1.2,
+          overflowWrap: 'anywhere',
+        }}
+      >
+        {value}
+      </Typography>
     </CardContent>
   </Card>
 );
