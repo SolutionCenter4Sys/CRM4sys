@@ -352,6 +352,10 @@ const componentsOverrides = {
         '& .MuiBottomNavigationAction-label': {
           fontSize: '0.625rem',
           fontWeight: 600,
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          whiteSpace: 'nowrap',
+          maxWidth: '100%',
           '&.Mui-selected': {
             fontSize: '0.625rem',
           },

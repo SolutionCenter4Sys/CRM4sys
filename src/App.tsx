@@ -767,6 +767,7 @@ const AppLayout: React.FC = () => {
   const { mode, toggle: toggleTheme } = useAppTheme();
   const muiTheme = useMuiTheme();
   const isMobile = useMediaQuery(muiTheme.breakpoints.down('md'));
+  const isNarrowMobile = useMediaQuery('(max-width:400px)');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState<
@@ -1066,6 +1067,10 @@ const AppLayout: React.FC = () => {
             bottom: 0,
             left: 0,
             right: 0,
+            width: '100%',
+            maxWidth: '100%',
+            overflow: 'hidden',
+            boxSizing: 'border-box',
             zIndex: (theme) => theme.zIndex.appBar,
             borderRadius: 0,
             pb: 'env(safe-area-inset-bottom)',
@@ -1086,7 +1091,16 @@ const AppLayout: React.FC = () => {
                 navigate(routes[newValue] ?? '/dashboard');
               }
             }}
-            showLabels
+            showLabels={!isNarrowMobile}
+            sx={{
+              width: '100%',
+              maxWidth: '100%',
+              '& .MuiBottomNavigationAction-root': {
+                minWidth: 0,
+                flex: 1,
+                padding: isNarrowMobile ? '6px 4px 8px' : '6px 0 8px',
+              },
+            }}
           >
             <BottomNavigationAction label="Início" value="dashboard" icon={<HomeOutlinedIcon />} />
             <BottomNavigationAction label="Contatos" value="contacts" icon={<ContactsOutlinedIcon />} />
