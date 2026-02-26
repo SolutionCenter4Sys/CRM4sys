@@ -3,9 +3,17 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>CRM Foursys - MVP Mock</title>
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>CRM Foursys - Ambiente de Demonstração</title>
+
+    <!-- PWA / Mobile -->
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="CRM Foursys" />
+    <meta name="theme-color" content="#4C1D95" />
+    <meta name="description" content="CRM Foursys - Ambiente de Demonstração" />
+
     <!-- Google Fonts - Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -13,7 +21,7 @@
       href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
       rel="stylesheet"
     />
-    
+
     <style>
       body {
         margin: 0;
@@ -22,14 +30,27 @@
           sans-serif;
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
+        overscroll-behavior-y: none;
       }
-      
+
       code {
         font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
       }
-      
+
       * {
         box-sizing: border-box;
+      }
+
+      #root {
+        min-height: 100dvh;
+      }
+
+      /* Smooth momentum scrolling for iOS */
+      .scroll-momentum {
+        -webkit-overflow-scrolling: touch;
+        overflow-y: auto;
       }
     </style>
   </head>
