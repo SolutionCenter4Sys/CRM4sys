@@ -33,6 +33,8 @@ import {
   useTheme as useMuiTheme,
   ListItemIcon,
   Chip,
+  BottomNavigation,
+  BottomNavigationAction,
 } from '@mui/material';
 import {
   HomeOutlined as HomeOutlinedIcon,
@@ -72,12 +74,14 @@ import {
   AccountBalanceOutlined as AccountBalanceOutlinedIcon,
   RequestQuote as RequestQuoteIcon,
   CreditCardOutlined as CreditCardOutlinedIcon,
+  MoreHoriz as MoreHorizIcon,
+  Close as CloseIcon,
 } from '@mui/icons-material';
 import { createAppTheme } from './styles/theme';
 import CommandPalette from './components/CommandPalette';
 import NotificationCenter from './components/NotificationCenter';
 
-// ── Theme Context ─────────────────────────────────────────────────────────────
+// 🌙 Theme Context ·············································
 interface ThemeCtx { mode: 'light' | 'dark'; toggle: () => void }
 const ThemeContext = createContext<ThemeCtx>({ mode: 'light', toggle: () => {} });
 export const useAppTheme = () => useContext(ThemeContext);
@@ -394,7 +398,7 @@ const RoutePerfTracker: React.FC = () => {
   return null;
 };
 
-// ── SidebarContent ───────────────────────────────────────────────────────────
+// 🔸 SidebarContent ···········································
 interface SidebarContentProps {
   isActiveRoute: (to: string) => boolean;
   settingsOpen: boolean;
@@ -452,7 +456,7 @@ const SidebarContent: React.FC<SidebarContentProps> = ({
       <Tooltip title="Propostas"><IconButton component={NavLink} to="/proposals" onClick={onNavClick} onMouseEnter={() => prefetchRoute('proposals', importProposalsPage)} sx={{ color: 'inherit', bgcolor: isActiveRoute('/proposals') ? 'rgba(255,255,255,0.18)' : 'transparent' }}><DescriptionOutlinedIcon /></IconButton></Tooltip>
       <Tooltip title="Contratos"><IconButton component={NavLink} to="/contracts" onClick={onNavClick} onMouseEnter={() => prefetchRoute('contracts', importContractsPage)} sx={{ color: 'inherit', bgcolor: isActiveRoute('/contracts') ? 'rgba(255,255,255,0.18)' : 'transparent' }}><ArticleOutlinedIcon /></IconButton></Tooltip>
 
-      {/* ── Ícone Financeiro com flyout ─────────────────────────────── */}
+      {/* 💰 Ícone Financeiro com flyout */}
       <Tooltip title="Financeiro" placement="right">
         <IconButton
           onClick={(e) => setFinancialAnchorEl(e.currentTarget)}
@@ -484,7 +488,6 @@ const SidebarContent: React.FC<SidebarContentProps> = ({
           },
         }}
       >
-        {/* Header do flyout */}
         <Box sx={{ px: 2, py: 1.5, background: 'linear-gradient(135deg, #4C1D95 0%, #7C3AED 100%)', color: '#fff' }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <AccountBalanceOutlinedIcon sx={{ fontSize: 18 }} />
@@ -495,7 +498,6 @@ const SidebarContent: React.FC<SidebarContentProps> = ({
           </Typography>
         </Box>
 
-        {/* Itens do flyout */}
         <MenuList dense sx={{ py: 0.5 }}>
           {financialItems.map((item, idx) => (
             <React.Fragment key={item.to}>
@@ -542,7 +544,6 @@ const SidebarContent: React.FC<SidebarContentProps> = ({
           <MenuItem component={NavLink} to="/projects" onClick={() => close(null)} onMouseEnter={() => prefetchRoute('projects', importProjectsPage)}><ListItemIcon><RocketLaunchOutlinedIcon fontSize="small" /></ListItemIcon>Projetos & Delivery</MenuItem>
           <MenuItem component={NavLink} to="/cs" onClick={() => close(null)} onMouseEnter={() => prefetchRoute('customer-success', importCustomerSuccessPage)}><ListItemIcon><FavoriteBorderOutlinedIcon fontSize="small" /></ListItemIcon>Customer Success</MenuItem>
           <Divider sx={{ my: 0.5 }} />
-          {/* Seção Automações */}
           <Box component="li" sx={{ px: 2, pt: 0.5, pb: 0.2 }}>
             <Typography sx={{ fontSize: 10, fontWeight: 700, letterSpacing: 0.8, color: 'text.disabled', textTransform: 'uppercase' }}>
               Automações
@@ -550,7 +551,6 @@ const SidebarContent: React.FC<SidebarContentProps> = ({
           </Box>
           <MenuItem component={NavLink} to="/nurture" onClick={() => close(null)} onMouseEnter={() => prefetchRoute('nurture-sequences', importNurtureSequencesPage)}><ListItemIcon><AutoAwesomeMotionOutlinedIcon fontSize="small" /></ListItemIcon>Nurture Sequences</MenuItem>
           <Divider sx={{ my: 0.5 }} />
-          {/* Seção Analytics */}
           <Box component="li" sx={{ px: 2, pt: 0.5, pb: 0.2 }}>
             <Typography sx={{ fontSize: 10, fontWeight: 700, letterSpacing: 0.8, color: 'text.disabled', textTransform: 'uppercase' }}>
               Analytics
@@ -560,19 +560,17 @@ const SidebarContent: React.FC<SidebarContentProps> = ({
           <MenuItem component={NavLink} to="/exports" onClick={() => close(null)} onMouseEnter={() => prefetchRoute('exports', importExportsPage)}><ListItemIcon><FileDownloadOutlinedIcon fontSize="small" /></ListItemIcon>Exportações</MenuItem>
           <MenuItem component={NavLink} to="/bi/connectors" onClick={() => close(null)} onMouseEnter={() => prefetchRoute('bi-connectors', importBIConnectorsPage)}><ListItemIcon><HubOutlinedIcon fontSize="small" /></ListItemIcon>BI Connectors</MenuItem>
           <Divider sx={{ my: 0.5 }} />
-          {/* Seção Acesso */}
           <Box component="li" sx={{ px: 2, pt: 0.5, pb: 0.2 }}>
             <Typography sx={{ fontSize: 10, fontWeight: 700, letterSpacing: 0.8, color: 'text.disabled', textTransform: 'uppercase' }}>
               Acesso & Segurança
             </Typography>
           </Box>
-          <MenuItem component={NavLink} to="/access/users" onClick={() => close(null)} onMouseEnter={() => prefetchRoute('access-users', importUsersManagementPage)}><ListItemIcon><PeopleOutlinedIcon fontSize="small" /></ListItemIcon>IAM · Usuários</MenuItem>
-          <MenuItem component={NavLink} to="/access/groups" onClick={() => close(null)} onMouseEnter={() => prefetchRoute('access-groups', importAccessGroupsPage)}><ListItemIcon><GroupWorkOutlinedIcon fontSize="small" /></ListItemIcon>IAM · Grupos</MenuItem>
-          <MenuItem component={NavLink} to="/access/approvals" onClick={() => close(null)} onMouseEnter={() => prefetchRoute('access-approvals', importAccessApprovalsPage)}><ListItemIcon><VerifiedUserOutlinedIcon fontSize="small" /></ListItemIcon>IAM · Aprovações</MenuItem>
+          <MenuItem component={NavLink} to="/access/users" onClick={() => close(null)} onMouseEnter={() => prefetchRoute('access-users', importUsersManagementPage)}><ListItemIcon><PeopleOutlinedIcon fontSize="small" /></ListItemIcon>IAM – Usuários</MenuItem>
+          <MenuItem component={NavLink} to="/access/groups" onClick={() => close(null)} onMouseEnter={() => prefetchRoute('access-groups', importAccessGroupsPage)}><ListItemIcon><GroupWorkOutlinedIcon fontSize="small" /></ListItemIcon>IAM – Grupos</MenuItem>
+          <MenuItem component={NavLink} to="/access/approvals" onClick={() => close(null)} onMouseEnter={() => prefetchRoute('access-approvals', importAccessApprovalsPage)}><ListItemIcon><VerifiedUserOutlinedIcon fontSize="small" /></ListItemIcon>IAM – Aprovações</MenuItem>
           <MenuItem component={NavLink} to="/billing/permissions" onClick={() => close(null)} onMouseEnter={() => prefetchRoute('permissions-matrix', importPermissionsMatrixPage)}><ListItemIcon><AdminPanelSettingsOutlinedIcon fontSize="small" /></ListItemIcon>Permissões</MenuItem>
           <MenuItem component={NavLink} to="/billing/audit" onClick={() => close(null)} onMouseEnter={() => prefetchRoute('audit-trail', importAuditTrailPage)}><ListItemIcon><PolicyOutlinedIcon fontSize="small" /></ListItemIcon>Auditoria</MenuItem>
           <Divider sx={{ my: 0.5 }} />
-          {/* Seção Integrações */}
           <Box component="li" sx={{ px: 2, pt: 0.5, pb: 0.2 }}>
             <Typography sx={{ fontSize: 10, fontWeight: 700, letterSpacing: 0.8, color: 'text.disabled', textTransform: 'uppercase' }}>
               Integrações
@@ -586,14 +584,190 @@ const SidebarContent: React.FC<SidebarContentProps> = ({
   );
 };
 
-// ─────────────────────────────────────────────────────────────────────────────
+// 📱 MobileNavDrawer — drawer 280px com labels completos ·····
+interface MobileNavDrawerProps {
+  open: boolean;
+  onClose: () => void;
+  isActiveRoute: (to: string) => boolean;
+  settingsOpen: boolean;
+  settingsAnchorEl: HTMLElement | null;
+  setSettingsAnchorEl: (el: HTMLElement | null) => void;
+}
+
+const MobileNavDrawer: React.FC<MobileNavDrawerProps> = ({
+  open,
+  onClose,
+  isActiveRoute,
+  settingsOpen,
+  settingsAnchorEl,
+  setSettingsAnchorEl,
+}) => {
+  const navigate = useNavigate();
+
+  const go = (to: string) => {
+    navigate(to);
+    onClose();
+  };
+
+  const navSections = [
+    {
+      items: [
+        { label: 'Início', to: '/dashboard', icon: <HomeOutlinedIcon fontSize="small" /> },
+      ],
+    },
+    {
+      title: 'CRM',
+      items: [
+        { label: 'Empresas', to: '/accounts', icon: <BusinessOutlinedIcon fontSize="small" /> },
+        { label: 'Contatos', to: '/contacts', icon: <ContactsOutlinedIcon fontSize="small" /> },
+        { label: 'Negócios', to: '/deals', icon: <WorkOutlineIcon fontSize="small" /> },
+        { label: 'Leads', to: '/leads', icon: <TrackChangesOutlinedIcon fontSize="small" /> },
+        { label: 'Atividades', to: '/activities', icon: <TimelineOutlinedIcon fontSize="small" /> },
+      ],
+    },
+    {
+      title: 'Vendas',
+      items: [
+        { label: 'Propostas', to: '/proposals', icon: <DescriptionOutlinedIcon fontSize="small" /> },
+        { label: 'Contratos', to: '/contracts', icon: <ArticleOutlinedIcon fontSize="small" /> },
+        { label: 'Financeiro', to: '/billing/invoices', icon: <AccountBalanceOutlinedIcon fontSize="small" /> },
+      ],
+    },
+    {
+      title: 'Analytics',
+      items: [
+        { label: 'Relatórios', to: '/reports', icon: <AssessmentOutlinedIcon fontSize="small" /> },
+        { label: 'Customer Success', to: '/cs', icon: <FavoriteBorderOutlinedIcon fontSize="small" /> },
+      ],
+    },
+    {
+      title: 'Configurações',
+      items: [
+        { label: 'Produtos & Serviços', to: '/products', icon: <Inventory2OutlinedIcon fontSize="small" /> },
+        { label: 'IAM – Usuários', to: '/access/users', icon: <PeopleOutlinedIcon fontSize="small" /> },
+        { label: 'Integrações', to: '/settings/integrations', icon: <ExtensionOutlinedIcon fontSize="small" /> },
+        { label: 'SSO / SAML', to: '/settings/sso', icon: <LockOutlinedIcon fontSize="small" /> },
+        { label: 'Auditoria', to: '/billing/audit', icon: <PolicyOutlinedIcon fontSize="small" /> },
+      ],
+    },
+  ];
+
+  return (
+    <Drawer
+      anchor="left"
+      open={open}
+      onClose={onClose}
+      sx={{ display: { xs: 'block', md: 'none' } }}
+      PaperProps={{
+        sx: {
+          width: 280,
+          paddingTop: 'env(safe-area-inset-top)',
+          display: 'flex',
+          flexDirection: 'column',
+          overflowX: 'hidden',
+        },
+      }}
+    >
+      {/* Header */}
+      <Box
+        sx={{
+          px: 2,
+          py: 2,
+          background: 'linear-gradient(135deg, #4C1D95 0%, #7C3AED 100%)',
+          color: '#fff',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          flexShrink: 0,
+        }}
+      >
+        <Box>
+          <Typography variant="h6" sx={{ fontWeight: 700, lineHeight: 1.2 }}>CRM Foursys</Typography>
+          <Typography variant="caption" sx={{ opacity: 0.75 }}>Ambiente de Demonstração</Typography>
+        </Box>
+        <IconButton onClick={onClose} size="small" sx={{ color: '#fff', minWidth: 40, minHeight: 40 }}>
+          <CloseIcon />
+        </IconButton>
+      </Box>
+
+      {/* Nav sections */}
+      <Box sx={{ flex: 1, overflowY: 'auto', py: 1, WebkitOverflowScrolling: 'touch' }}>
+        {navSections.map((section, sIdx) => (
+          <Box key={sIdx}>
+            {section.title && (
+              <Typography
+                sx={{
+                  px: 2,
+                  pt: sIdx === 0 ? 1 : 1.5,
+                  pb: 0.25,
+                  fontSize: 10,
+                  fontWeight: 700,
+                  letterSpacing: 0.8,
+                  color: 'text.disabled',
+                  textTransform: 'uppercase',
+                }}
+              >
+                {section.title}
+              </Typography>
+            )}
+            <List dense disablePadding sx={{ px: 1 }}>
+              {section.items.map((item) => {
+                const active = isActiveRoute(item.to);
+                return (
+                  <ListItemButton
+                    key={item.to}
+                    onClick={() => go(item.to)}
+                    selected={active}
+                    sx={{
+                      borderRadius: 2,
+                      minHeight: 48,
+                      mb: 0.25,
+                      '&.Mui-selected': {
+                        bgcolor: '#4C1D95',
+                        color: '#fff',
+                        '& .MuiListItemIcon-root': { color: '#fff' },
+                        '&:hover': { bgcolor: '#3b1279' },
+                      },
+                    }}
+                  >
+                    <ListItemIcon sx={{ minWidth: 36, color: active ? 'inherit' : 'text.secondary' }}>
+                      {item.icon}
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={item.label}
+                      primaryTypographyProps={{ variant: 'body2', fontWeight: active ? 600 : 400 }}
+                    />
+                  </ListItemButton>
+                );
+              })}
+            </List>
+            {sIdx < navSections.length - 1 && <Divider sx={{ mx: 2, mt: 1 }} />}
+          </Box>
+        ))}
+      </Box>
+
+      {/* Footer */}
+      <Box sx={{ px: 1, pb: 'calc(8px + env(safe-area-inset-bottom))', pt: 1, borderTop: '1px solid', borderColor: 'divider', flexShrink: 0 }}>
+        <ListItemButton
+          onClick={(e) => setSettingsAnchorEl(e.currentTarget)}
+          sx={{ borderRadius: 2, minHeight: 48, color: 'text.secondary' }}
+        >
+          <ListItemIcon sx={{ minWidth: 36 }}><SettingsOutlinedIcon fontSize="small" /></ListItemIcon>
+          <ListItemText primary="Mais configurações" primaryTypographyProps={{ variant: 'body2' }} />
+        </ListItemButton>
+      </Box>
+    </Drawer>
+  );
+};
+
+// ···············································································
 const AppLayout: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { mode, toggle: toggleTheme } = useAppTheme();
   const muiTheme = useMuiTheme();
   const isMobile = useMediaQuery(muiTheme.breakpoints.down('md'));
-  const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState<
     Array<{ id: string; label: string; subtitle: string; to: string; type: string }>
@@ -603,6 +777,15 @@ const AppLayout: React.FC = () => {
   const [settingsAnchorEl, setSettingsAnchorEl] = useState<HTMLElement | null>(null);
   const settingsOpen = Boolean(settingsAnchorEl);
   const [cmdPaletteOpen, setCmdPaletteOpen] = useState(false);
+
+  // Bottom nav value derived from current route
+  const bottomNavValue = useMemo(() => {
+    if (location.pathname === '/dashboard' || location.pathname.startsWith('/dashboard')) return 'dashboard';
+    if (location.pathname.startsWith('/contacts')) return 'contacts';
+    if (location.pathname.startsWith('/deals')) return 'deals';
+    if (location.pathname.startsWith('/leads')) return 'leads';
+    return 'more';
+  }, [location.pathname]);
 
   useEffect(() => {
     const handleGlobalKey = (e: KeyboardEvent) => {
@@ -645,7 +828,7 @@ const AppLayout: React.FC = () => {
         const contactItems = (contactsRes.data?.data || []).slice(0, 4).map((contact) => ({
           id: `contact-${contact.id}`,
           label: contact.fullName,
-          subtitle: `Contato • ${contact.email}`,
+          subtitle: `Contato  ${contact.email}`,
           to: `/contacts/${contact.id}`,
           type: 'Contato',
         }));
@@ -653,7 +836,7 @@ const AppLayout: React.FC = () => {
         const accountItems = (accountsRes.data || []).slice(0, 4).map((account) => ({
           id: `account-${account.id}`,
           label: account.name,
-          subtitle: `Empresa • ${account.domain || 'sem domínio'}`,
+          subtitle: `Empresa  ${account.domain || 'sem domínio'}`,
           to: `/accounts/${account.id}`,
           type: 'Empresa',
         }));
@@ -668,7 +851,7 @@ const AppLayout: React.FC = () => {
           .map((deal) => ({
             id: `deal-${deal.id}`,
             label: deal.title,
-            subtitle: `Negócio • ${deal.account?.name || 'sem empresa'}`,
+            subtitle: `Negócio  ${deal.account?.name || 'sem empresa'}`,
             to: `/deals/${deal.id}`,
             type: 'Negócio',
           }));
@@ -676,7 +859,7 @@ const AppLayout: React.FC = () => {
         const leadItems = (leadsRes.data?.data || []).slice(0, 4).map((lead) => ({
           id: `lead-${lead.id}`,
           label: lead.fullName,
-          subtitle: `Lead • ${lead.email}`,
+          subtitle: `Lead  ${lead.email}`,
           to: `/leads/${lead.id}`,
           type: 'Lead',
         }));
@@ -705,33 +888,34 @@ const AppLayout: React.FC = () => {
     <>
       <RoutePrefetcher />
       <RoutePerfTracker />
-      <Box sx={{ display: 'flex', minHeight: '100vh', backgroundColor: 'background.default' }}>
-        {/* ── Sidebar mobile (Drawer) ──────────────────────────────────────── */}
-        <Drawer
-          variant="temporary"
-          open={mobileDrawerOpen}
-          onClose={() => setMobileDrawerOpen(false)}
-          ModalProps={{ keepMounted: true }}
-          sx={{ display: { xs: 'block', md: 'none' }, '& .MuiDrawer-paper': { width: 76, boxSizing: 'border-box' } }}
-        >
+      <Box sx={{ display: 'flex', minHeight: '100dvh', backgroundColor: 'background.default' }}>
+
+        {/* 🖥️ Sidebar desktop (fixo) */}
+        <Box sx={{ display: { xs: 'none', md: 'block' } }}>
           <SidebarContent
             isActiveRoute={isActiveRoute}
             settingsOpen={settingsOpen}
             settingsAnchorEl={settingsAnchorEl}
-            setSettingsAnchorEl={(el) => { setSettingsAnchorEl(el); if (!el) setMobileDrawerOpen(false); }}
-            onNavClick={() => setMobileDrawerOpen(false)}
+            setSettingsAnchorEl={setSettingsAnchorEl}
           />
-        </Drawer>
-
-        {/* ── Sidebar desktop (fixo) ──────────────────────────────────────── */}
-        <Box sx={{ display: { xs: 'none', md: 'block' } }}>
-          <SidebarContent isActiveRoute={isActiveRoute} settingsOpen={settingsOpen} settingsAnchorEl={settingsAnchorEl} setSettingsAnchorEl={setSettingsAnchorEl} />
         </Box>
 
-        <Box sx={{ flexGrow: 1, minWidth: 0 }}>
+        {/* 📱 Mobile Nav Drawer */}
+        <MobileNavDrawer
+          open={mobileMenuOpen}
+          onClose={() => setMobileMenuOpen(false)}
+          isActiveRoute={isActiveRoute}
+          settingsOpen={settingsOpen}
+          settingsAnchorEl={settingsAnchorEl}
+          setSettingsAnchorEl={(el) => { setSettingsAnchorEl(el); if (!el) setMobileMenuOpen(false); }}
+        />
+
+        <Box sx={{ flexGrow: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
+          {/* AppBar */}
           <Box
             sx={{
-              height: 56,
+              height: { xs: 'calc(56px + env(safe-area-inset-top))', md: 56 },
+              pt: { xs: 'env(safe-area-inset-top)', md: 0 },
               px: 2,
               display: 'flex',
               alignItems: 'center',
@@ -739,16 +923,15 @@ const AppLayout: React.FC = () => {
               borderBottom: 1,
               borderColor: 'divider',
               backgroundColor: 'background.paper',
+              flexShrink: 0,
+              position: 'sticky',
+              top: 0,
+              zIndex: (theme) => theme.zIndex.appBar,
             }}
           >
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              {isMobile && (
-                <IconButton onClick={() => setMobileDrawerOpen(true)} size="small">
-                  <MenuIcon />
-                </IconButton>
-              )}
               <Typography variant="body2" color="text.secondary" sx={{ display: { xs: 'none', sm: 'block' } }}>
-                CRM Foursys • Mock
+                CRM Foursys • Ambiente de Demonstração
               </Typography>
             </Box>
             <Box
@@ -763,7 +946,7 @@ const AppLayout: React.FC = () => {
                 borderColor: 'divider',
                 borderRadius: 2,
                 cursor: 'pointer',
-                width: { xs: 200, md: 300 },
+                width: { xs: 180, sm: 200, md: 300 },
                 color: 'text.secondary',
                 bgcolor: 'action.hover',
                 transition: 'all 0.15s',
@@ -772,9 +955,9 @@ const AppLayout: React.FC = () => {
             >
               <SearchIcon sx={{ fontSize: 16 }} />
               <Typography variant="body2" sx={{ flexGrow: 1, color: 'text.disabled' }}>
-                Pesquisar ou navegar…
+                Pesquisar...
               </Typography>
-              <Box sx={{ display: 'flex', gap: 0.5 }}>
+              <Box sx={{ display: { xs: 'none', sm: 'flex' }, gap: 0.5 }}>
                 <Chip
                   label="Ctrl"
                   size="small"
@@ -786,83 +969,134 @@ const AppLayout: React.FC = () => {
                   sx={{ height: 20, fontSize: 10, fontFamily: 'monospace', bgcolor: 'background.default' }}
                 />
               </Box>
-              </Box>
-              <Tooltip title={mode === 'light' ? 'Modo escuro' : 'Modo claro'}>
-                <IconButton onClick={toggleTheme} size="small" sx={{ color: 'text.secondary' }}>
-                  {mode === 'light' ? <DarkModeIcon /> : <LightModeIcon />}
-                </IconButton>
-              </Tooltip>
-              <NotificationCenter />
             </Box>
+            <Tooltip title={mode === 'light' ? 'Modo escuro' : 'Modo claro'}>
+              <IconButton onClick={toggleTheme} size="small" sx={{ color: 'text.secondary' }}>
+                {mode === 'light' ? <DarkModeIcon /> : <LightModeIcon />}
+              </IconButton>
+            </Tooltip>
+            <NotificationCenter />
+          </Box>
 
-          <Suspense
-            fallback={
-              <Box
-                sx={{
-                  minHeight: '60vh',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-              >
-                <CircularProgress />
-              </Box>
-            }
+          {/* Main content */}
+          <Box
+            sx={{
+              flex: 1,
+              overflowY: 'auto',
+              WebkitOverflowScrolling: 'touch',
+              pb: { xs: 'calc(56px + env(safe-area-inset-bottom))', md: 0 },
+            }}
           >
-            <Routes>
-              <Route path="/" element={<Navigate to="/dashboard" replace />} />
-              <Route path="/dashboard" element={<DashboardExecutivePage />} />
-              <Route path="/dashboard/analytics" element={<DashboardAnalyticsPage />} />
-              <Route path="/contacts" element={<ContactsListPage />} />
-              <Route path="/contacts/:id" element={<ContactDetailPage />} />
-              <Route path="/accounts" element={<AccountsListPage />} />
-              <Route path="/accounts/:id" element={<AccountDetailPage />} />
-              <Route path="/deals" element={<DealsPipelinePage />} />
-              <Route path="/deals/:id" element={<DealDetailPage />} />
-              <Route path="/leads" element={<LeadsListPage />} />
-              <Route path="/leads/:id" element={<LeadDetailPage />} />
-              <Route path="/lifecycle" element={<LifecycleFunnelPage />} />
-              <Route path="/nurture" element={<NurtureSequencesPage />} />
-              <Route path="/activities" element={<ActivitiesTimelinePage />} />
-              <Route path="/reports" element={<ReportsPage />} />
-              <Route path="/reports/new" element={<ReportBuilderPage />} />
-              <Route path="/reports/:id" element={<ReportBuilderPage />} />
-              <Route path="/reports/scheduled" element={<ScheduledReportsPage />} />
-              <Route path="/exports" element={<ExportsPage />} />
-              <Route path="/bi/connectors" element={<BIConnectorsPage />} />
-              <Route path="/billing/invoices" element={<InvoicesListPage />} />
-              <Route path="/billing/invoices/new" element={<InvoiceFormPage />} />
-              <Route path="/billing/invoices/:id" element={<InvoiceDetailPage />} />
-              <Route path="/billing/collections/rules" element={<CollectionRulesPage />} />
-              <Route path="/billing/collections/templates" element={<CollectionTemplatesPage />} />
-              <Route path="/billing/collections/jobs" element={<CollectionJobsPage />} />
-              <Route path="/billing/receivables" element={<ReceivablesDashboardPage />} />
-              <Route path="/billing/gateways" element={<PaymentGatewaysPage />} />
-              <Route path="/billing/payment-links" element={<PaymentLinksPage />} />
-              <Route path="/billing/webhooks" element={<WebhookEventsPage />} />
-              <Route path="/billing/permissions" element={<PermissionsMatrixPage />} />
-              <Route path="/billing/audit" element={<AuditTrailPage />} />
-              <Route path="/billing/compliance-exports" element={<ComplianceExportsPage />} />
-              <Route path="/access/users" element={<UsersManagementPage />} />
-              <Route path="/access/groups" element={<AccessGroupsPage />} />
-              <Route path="/access/user" element={<Navigate to="/access/users" replace />} />
-              <Route path="/access/user/detail" element={<AccessUserAccessPage />} />
-              <Route path="/access/approvals" element={<AccessApprovalsPage />} />
-              <Route path="/access/audit" element={<AccessAuditReportsPage />} />
-              <Route path="/cs" element={<CustomerSuccessPage />} />
-              <Route path="/cs/:id" element={<AccountHealthDetailPage />} />
-              <Route path="/products" element={<ProductCatalogPage />} />
-              <Route path="/proposals" element={<ProposalsPage />} />
-              <Route path="/contracts" element={<ContractsPage />} />
-              <Route path="/projects" element={<ProjectsPage />} />
-              <Route path="/projects/:id" element={<ProjectDetailPage />} />
-              <Route path="/settings/integrations" element={<IntegrationsPage />} />
-              <Route path="/settings/sso" element={<SsoConfigPage />} />
-              <Route path="*" element={<Navigate to="/dashboard" replace />} />
-            </Routes>
-          </Suspense>
+            <Suspense
+              fallback={
+                <Box
+                  sx={{
+                    minHeight: '60vh',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <CircularProgress />
+                </Box>
+              }
+            >
+              <Routes>
+                <Route path="/" element={<Navigate to="/dashboard" replace />} />
+                <Route path="/dashboard" element={<DashboardExecutivePage />} />
+                <Route path="/dashboard/analytics" element={<DashboardAnalyticsPage />} />
+                <Route path="/contacts" element={<ContactsListPage />} />
+                <Route path="/contacts/:id" element={<ContactDetailPage />} />
+                <Route path="/accounts" element={<AccountsListPage />} />
+                <Route path="/accounts/:id" element={<AccountDetailPage />} />
+                <Route path="/deals" element={<DealsPipelinePage />} />
+                <Route path="/deals/:id" element={<DealDetailPage />} />
+                <Route path="/leads" element={<LeadsListPage />} />
+                <Route path="/leads/:id" element={<LeadDetailPage />} />
+                <Route path="/lifecycle" element={<LifecycleFunnelPage />} />
+                <Route path="/nurture" element={<NurtureSequencesPage />} />
+                <Route path="/activities" element={<ActivitiesTimelinePage />} />
+                <Route path="/reports" element={<ReportsPage />} />
+                <Route path="/reports/new" element={<ReportBuilderPage />} />
+                <Route path="/reports/:id" element={<ReportBuilderPage />} />
+                <Route path="/reports/scheduled" element={<ScheduledReportsPage />} />
+                <Route path="/exports" element={<ExportsPage />} />
+                <Route path="/bi/connectors" element={<BIConnectorsPage />} />
+                <Route path="/billing/invoices" element={<InvoicesListPage />} />
+                <Route path="/billing/invoices/new" element={<InvoiceFormPage />} />
+                <Route path="/billing/invoices/:id" element={<InvoiceDetailPage />} />
+                <Route path="/billing/collections/rules" element={<CollectionRulesPage />} />
+                <Route path="/billing/collections/templates" element={<CollectionTemplatesPage />} />
+                <Route path="/billing/collections/jobs" element={<CollectionJobsPage />} />
+                <Route path="/billing/receivables" element={<ReceivablesDashboardPage />} />
+                <Route path="/billing/gateways" element={<PaymentGatewaysPage />} />
+                <Route path="/billing/payment-links" element={<PaymentLinksPage />} />
+                <Route path="/billing/webhooks" element={<WebhookEventsPage />} />
+                <Route path="/billing/permissions" element={<PermissionsMatrixPage />} />
+                <Route path="/billing/audit" element={<AuditTrailPage />} />
+                <Route path="/billing/compliance-exports" element={<ComplianceExportsPage />} />
+                <Route path="/access/users" element={<UsersManagementPage />} />
+                <Route path="/access/groups" element={<AccessGroupsPage />} />
+                <Route path="/access/user" element={<Navigate to="/access/users" replace />} />
+                <Route path="/access/user/detail" element={<AccessUserAccessPage />} />
+                <Route path="/access/approvals" element={<AccessApprovalsPage />} />
+                <Route path="/access/audit" element={<AccessAuditReportsPage />} />
+                <Route path="/cs" element={<CustomerSuccessPage />} />
+                <Route path="/cs/:id" element={<AccountHealthDetailPage />} />
+                <Route path="/products" element={<ProductCatalogPage />} />
+                <Route path="/proposals" element={<ProposalsPage />} />
+                <Route path="/contracts" element={<ContractsPage />} />
+                <Route path="/projects" element={<ProjectsPage />} />
+                <Route path="/projects/:id" element={<ProjectDetailPage />} />
+                <Route path="/settings/integrations" element={<IntegrationsPage />} />
+                <Route path="/settings/sso" element={<SsoConfigPage />} />
+                <Route path="*" element={<Navigate to="/dashboard" replace />} />
+              </Routes>
+            </Suspense>
+          </Box>
         </Box>
       </Box>
+
+      {/* 📱 Bottom Navigation — visível apenas em mobile */}
+      {isMobile && (
+        <Paper
+          elevation={8}
+          sx={{
+            position: 'fixed',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            zIndex: (theme) => theme.zIndex.appBar,
+            borderRadius: 0,
+            pb: 'env(safe-area-inset-bottom)',
+          }}
+        >
+          <BottomNavigation
+            value={bottomNavValue}
+            onChange={(_, newValue) => {
+              if (newValue === 'more') {
+                setMobileMenuOpen(true);
+              } else {
+                const routes: Record<string, string> = {
+                  dashboard: '/dashboard',
+                  contacts: '/contacts',
+                  deals: '/deals',
+                  leads: '/leads',
+                };
+                navigate(routes[newValue] ?? '/dashboard');
+              }
+            }}
+            showLabels
+          >
+            <BottomNavigationAction label="Início" value="dashboard" icon={<HomeOutlinedIcon />} />
+            <BottomNavigationAction label="Contatos" value="contacts" icon={<ContactsOutlinedIcon />} />
+            <BottomNavigationAction label="Negócios" value="deals" icon={<WorkOutlineIcon />} />
+            <BottomNavigationAction label="Leads" value="leads" icon={<TrackChangesOutlinedIcon />} />
+            <BottomNavigationAction label="Mais" value="more" icon={<MoreHorizIcon />} />
+          </BottomNavigation>
+        </Paper>
+      )}
+
       <CommandPalette open={cmdPaletteOpen} onClose={() => setCmdPaletteOpen(false)} />
     </>
   );

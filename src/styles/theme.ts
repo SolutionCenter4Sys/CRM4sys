@@ -69,26 +69,24 @@ const foursysColors = {
     paper: '#FFFFFF',
     dark: '#020617',
   },
-  // Domínio CRM (mantido)
   leadScore: {
-    hot: '#E53E3E', // 70-100 (🔥)
-    warm: '#FFB800', // 40-69 (⚡)
-    cold: '#00B4D8', // 0-39 (❄️)
+    hot: '#E53E3E',
+    warm: '#FFB800',
+    cold: '#00B4D8',
   },
-  // Domínio CRM (mantido)
   dealStages: {
-    stage1: '#4C8BF5', // Prospecção
-    stage2: '#00B4D8', // Qualificação
-    stage3: '#FFB800', // Proposta
-    stage4: '#FF8C00', // Negociação
-    stage5: '#00B341', // Fechamento
+    stage1: '#4C8BF5',
+    stage2: '#00B4D8',
+    stage3: '#FFB800',
+    stage4: '#FF8C00',
+    stage5: '#00B341',
     won: '#00B341',
     lost: '#E53E3E',
   },
 };
 
 // ============================================================================
-// TYPOGRAPHY FOURSYS
+// TYPOGRAPHY FOURSYS — com responsive clamp
 // ============================================================================
 
 const foursysTypography = {
@@ -102,74 +100,71 @@ const foursysTypography = {
     'Arial',
     'sans-serif',
   ].join(','),
-  // Headings
   h1: {
-    fontSize: '2.25rem',
+    fontSize: 'clamp(1.5rem, 4vw, 2.25rem)',
     fontWeight: 700,
     lineHeight: 1.2,
     letterSpacing: '-0.02em',
   },
   h2: {
-    fontSize: '1.875rem',
+    fontSize: 'clamp(1.25rem, 3vw, 1.875rem)',
     fontWeight: 700,
     lineHeight: 1.3,
     letterSpacing: '-0.01em',
   },
   h3: {
-    fontSize: '1.5rem',
+    fontSize: 'clamp(1.125rem, 2.5vw, 1.5rem)',
     fontWeight: 600,
     lineHeight: 1.3,
   },
   h4: {
-    fontSize: '1.25rem',
+    fontSize: 'clamp(1rem, 2vw, 1.25rem)',
     fontWeight: 600,
     lineHeight: 1.4,
   },
   h5: {
-    fontSize: '1.25rem', // 20px
+    fontSize: 'clamp(1rem, 1.5vw, 1.25rem)',
     fontWeight: 600,
     lineHeight: 1.4,
   },
   h6: {
-    fontSize: '1rem', // 16px
+    fontSize: '1rem',
     fontWeight: 600,
     lineHeight: 1.5,
   },
-  // Body
   body1: {
-    fontSize: '1rem', // 16px
+    fontSize: '1rem',
     fontWeight: 400,
     lineHeight: 1.5,
   },
   body2: {
-    fontSize: '0.875rem', // 14px
+    fontSize: '0.875rem',
     fontWeight: 400,
     lineHeight: 1.5,
   },
-  // Others
   subtitle1: {
-    fontSize: '1rem', // 16px
+    fontSize: '1rem',
     fontWeight: 500,
     lineHeight: 1.5,
   },
   subtitle2: {
-    fontSize: '0.875rem', // 14px
+    fontSize: '0.875rem',
     fontWeight: 500,
     lineHeight: 1.5,
   },
   button: {
-    fontSize: '0.875rem', // 14px
+    fontSize: '0.875rem',
     fontWeight: 600,
     lineHeight: 1.75,
-    textTransform: 'none' as const, // Sem uppercase
+    textTransform: 'none' as const,
   },
   caption: {
-    fontSize: '0.75rem', // 12px
+    fontSize: '0.75rem',
     fontWeight: 400,
     lineHeight: 1.5,
   },
   overline: {
-    fontSize: '0.75rem', // 12px
+    fontSize: '0.75rem',
     fontWeight: 700,
     lineHeight: 2,
     textTransform: 'uppercase' as const,
@@ -181,23 +176,23 @@ const foursysTypography = {
 // SPACING & SIZING
 // ============================================================================
 
-const foursysSpacing = 8; // Base unit: 8px
+const foursysSpacing = 8;
 
 const foursysSizing = {
   borderRadius: {
     xs: 6,
     sm: 8,
     md: 12,
-    lg: 20, // DS padrão de superfícies
+    lg: 20,
     pill: 999,
   },
   spacing: {
-    xs: 4, // 4px
-    sm: 8, // 8px
-    md: 16, // 16px
-    lg: 24, // 24px
-    xl: 32, // 32px
-    xxl: 48, // 48px
+    xs: 4,
+    sm: 8,
+    md: 16,
+    lg: 24,
+    xl: 32,
+    xxl: 48,
   },
 };
 
@@ -207,21 +202,19 @@ const foursysSizing = {
 
 const foursysShadows = [
   'none',
-  '0 10px 25px rgba(15,23,42,0.06)', // soft
-  '0 18px 45px rgba(15,23,42,0.10)', // hover
+  '0 10px 25px rgba(15,23,42,0.06)',
+  '0 18px 45px rgba(15,23,42,0.10)',
   '0 10px 25px rgba(15,23,42,0.06)',
   '0 10px 25px rgba(15,23,42,0.06)',
   '0 18px 45px rgba(15,23,42,0.10)',
-  // ... (MUI requires 25 shadow values, rest will be auto-generated)
 ];
 
-// Fill remaining shadow values (MUI needs 25)
 while (foursysShadows.length < 25) {
   foursysShadows.push(foursysShadows[foursysShadows.length - 1]);
 }
 
 // ============================================================================
-// COMPONENTS OVERRIDES
+// COMPONENTS OVERRIDES — com touch targets 48px para mobile
 // ============================================================================
 
 const componentsOverrides = {
@@ -232,8 +225,9 @@ const componentsOverrides = {
         padding: '10px 16px',
         fontWeight: 600,
         boxShadow: 'none',
-        minHeight: 40,
+        minHeight: 48,
         textTransform: 'none',
+        touchAction: 'manipulation',
         '&:focus-visible': {
           outline: '2px solid #000000',
           outlineOffset: '2px',
@@ -249,10 +243,30 @@ const componentsOverrides = {
       sizeSmall: {
         padding: '6px 12px',
         fontSize: '0.813rem',
+        minHeight: 40,
       },
     },
     defaultProps: {
       disableElevation: true,
+    },
+  },
+  MuiIconButton: {
+    styleOverrides: {
+      root: {
+        minWidth: 48,
+        minHeight: 48,
+        padding: 12,
+        touchAction: 'manipulation',
+        '&:focus-visible': {
+          outline: '2px solid #000000',
+          outlineOffset: '2px',
+        },
+      },
+      sizeSmall: {
+        minWidth: 40,
+        minHeight: 40,
+        padding: 8,
+      },
     },
   },
   MuiCard: {
@@ -267,7 +281,7 @@ const componentsOverrides = {
   MuiOutlinedInput: {
     styleOverrides: {
       root: {
-        minHeight: 40,
+        minHeight: 48,
         borderRadius: 20,
         backgroundColor: '#FFFFFF',
         '&:hover .MuiOutlinedInput-notchedOutline': {
@@ -282,18 +296,67 @@ const componentsOverrides = {
         borderColor: '#E2E8F0',
       },
       input: {
-        padding: '10px 12px',
+        padding: '12px 14px',
       },
     },
   },
   MuiTextField: {
     styleOverrides: {
       root: {
-        '& .MuiInputBase-root': { minHeight: 40 },
+        '& .MuiInputBase-root': { minHeight: 48 },
       },
     },
     defaultProps: {
       variant: 'outlined' as const,
+    },
+  },
+  MuiListItemButton: {
+    styleOverrides: {
+      root: {
+        minHeight: 48,
+        touchAction: 'manipulation',
+      },
+    },
+  },
+  MuiMenuItem: {
+    styleOverrides: {
+      root: {
+        minHeight: 48,
+        touchAction: 'manipulation',
+      },
+    },
+  },
+  MuiBottomNavigation: {
+    styleOverrides: {
+      root: {
+        height: 56,
+        width: '100%',
+        maxWidth: '100%',
+        overflowX: 'hidden',
+        borderTop: '1px solid #EEF2FF',
+        backgroundColor: '#FFFFFF',
+      },
+    },
+  },
+  MuiBottomNavigationAction: {
+    styleOverrides: {
+      root: {
+        minWidth: 0,
+        flex: 1,
+        padding: '6px 0 8px',
+        touchAction: 'manipulation',
+        color: '#94A3B8',
+        '&.Mui-selected': {
+          color: '#4C1D95',
+        },
+        '& .MuiBottomNavigationAction-label': {
+          fontSize: '0.625rem',
+          fontWeight: 600,
+          '&.Mui-selected': {
+            fontSize: '0.625rem',
+          },
+        },
+      },
     },
   },
   MuiChip: {
@@ -350,23 +413,6 @@ const componentsOverrides = {
       },
     },
   },
-  MuiBottomNavigation: {
-    styleOverrides: {
-      root: {
-        width: '100%',
-        maxWidth: '100%',
-        overflowX: 'hidden',
-      },
-    },
-  },
-  MuiBottomNavigationAction: {
-    styleOverrides: {
-      root: {
-        minWidth: 0,
-        flex: 1,
-      },
-    },
-  },
 };
 
 // ============================================================================
@@ -379,7 +425,7 @@ const darkBackground = {
 };
 
 // ============================================================================
-// CUSTOM THEME EXTENSIONS (for TypeScript autocomplete)
+// CUSTOM THEME EXTENSIONS
 // ============================================================================
 
 declare module '@mui/material/styles' {
@@ -398,7 +444,7 @@ declare module '@mui/material/styles' {
 }
 
 // ============================================================================
-// THEME FACTORY — suporta light e dark
+// THEME FACTORY
 // ============================================================================
 
 export function createAppTheme(mode: 'light' | 'dark') {
@@ -457,10 +503,34 @@ export function createAppTheme(mode: 'light' | 'dark') {
             },
           },
         },
+        MuiBottomNavigation: {
+          styleOverrides: {
+            root: {
+              height: 56,
+              width: '100%',
+              maxWidth: '100%',
+              overflowX: 'hidden',
+              borderTop: '1px solid #334155',
+              backgroundColor: '#1E293B',
+            },
+          },
+        },
+        MuiBottomNavigationAction: {
+          styleOverrides: {
+            root: {
+              minWidth: 0,
+              flex: 1,
+              color: '#475569',
+              '&.Mui-selected': {
+                color: '#A78BFA',
+              },
+            },
+          },
+        },
         MuiOutlinedInput: {
           styleOverrides: {
             root: {
-              minHeight: 40,
+              minHeight: 48,
               borderRadius: 20,
               backgroundColor: '#0F172A',
               '&:hover .MuiOutlinedInput-notchedOutline': {
@@ -475,7 +545,7 @@ export function createAppTheme(mode: 'light' | 'dark') {
               borderColor: '#334155',
             },
             input: {
-              padding: '10px 12px',
+              padding: '12px 14px',
             },
           },
         },
@@ -554,6 +624,5 @@ export function createAppTheme(mode: 'light' | 'dark') {
   return theme;
 }
 
-// Tema padrão (light) para retrocompatibilidade
 export const foursysTheme = createAppTheme('light');
 export default foursysTheme;
