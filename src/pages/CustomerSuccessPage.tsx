@@ -88,8 +88,17 @@ const CustomerSuccessPage: React.FC = () => {
   };
 
   return (
-    <Box sx={{ p: 3 }}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+    <Box sx={{ p: { xs: 2, md: 3 } }}>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: { xs: 'flex-start', md: 'center' },
+          flexDirection: { xs: 'column', md: 'row' },
+          gap: 1.5,
+          mb: 2,
+        }}
+      >
         <Box>
           <Typography variant="h4" sx={{ fontWeight: 700 }}>
             Customer Success
@@ -116,7 +125,18 @@ const CustomerSuccessPage: React.FC = () => {
       ) : (
         <>
           {/* KPI Cards */}
-          <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 1.5, mb: 2 }}>
+          <Box
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: {
+                xs: 'repeat(2, minmax(0, 1fr))',
+                sm: 'repeat(3, minmax(0, 1fr))',
+                lg: 'repeat(5, minmax(0, 1fr))',
+              },
+              gap: 1.5,
+              mb: 2,
+            }}
+          >
             <OverviewCard label="Score Médio" value={`${overview.avgHealthScore}/100`} subtitle={`${overview.totalAccounts} contas`} />
             <OverviewCard
               label="Contas em Risco"
@@ -135,7 +155,7 @@ const CustomerSuccessPage: React.FC = () => {
               <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 1.5 }}>
                 Distribuição de Saúde
               </Typography>
-              <Stack direction="row" spacing={2}>
+              <Stack direction={{ xs: 'column', md: 'row' }} spacing={2}>
                 {(Object.entries(overview.healthDistribution) as [HealthScoreLevel, number][]).map(
                   ([level, count]) => {
                     const config = levelConfig[level];
@@ -206,9 +226,9 @@ const CustomerSuccessPage: React.FC = () => {
                     </InputAdornment>
                   ),
                 }}
-                sx={{ minWidth: 220 }}
+                sx={{ minWidth: { xs: '100%', md: 220 } }}
               />
-              <FormControl size="small" sx={{ minWidth: 140 }}>
+              <FormControl size="small" sx={{ minWidth: { xs: '100%', md: 140 } }}>
                 <InputLabel>Saúde</InputLabel>
                 <Select
                   value={filters.level || ''}
@@ -222,7 +242,7 @@ const CustomerSuccessPage: React.FC = () => {
                   <MenuItem value="critical">Crítico</MenuItem>
                 </Select>
               </FormControl>
-              <FormControl size="small" sx={{ minWidth: 140 }}>
+              <FormControl size="small" sx={{ minWidth: { xs: '100%', md: 140 } }}>
                 <InputLabel>Tier</InputLabel>
                 <Select
                   value={filters.tier || ''}
@@ -235,7 +255,7 @@ const CustomerSuccessPage: React.FC = () => {
                   <MenuItem value="SMB">SMB</MenuItem>
                 </Select>
               </FormControl>
-              <FormControl size="small" sx={{ minWidth: 180 }}>
+              <FormControl size="small" sx={{ minWidth: { xs: '100%', md: 180 } }}>
                 <InputLabel>Ordenar por</InputLabel>
                 <Select
                   value={filters.sortBy || 'score_asc'}
@@ -288,7 +308,16 @@ const OverviewCard: React.FC<{
       <Typography variant="caption" color="text.secondary">
         {label}
       </Typography>
-      <Typography variant="h5" sx={{ fontWeight: 700, color: color || 'text.primary' }}>
+      <Typography
+        variant="h5"
+        sx={{
+          fontWeight: 700,
+          color: color || 'text.primary',
+          fontSize: { xs: 'clamp(1.15rem, 4.8vw, 1.45rem)', sm: '1.5rem' },
+          lineHeight: 1.15,
+          overflowWrap: 'anywhere',
+        }}
+      >
         {value}
       </Typography>
       <Typography variant="caption" color="text.secondary">
