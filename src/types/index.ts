@@ -192,15 +192,32 @@ export interface Address {
 // DEAL TYPES
 // ============================================================================
 
+export type DeliveryModel = 'alocacao' | 'projetos' | 'produtos' | 'ams' | 'squad' | 'outsourcing';
+
+export type LostReasonType =
+  | 'preco'
+  | 'concorrencia'
+  | 'budget'
+  | 'timing'
+  | 'requisitos_tecnicos'
+  | 'relacionamento'
+  | 'nao_respondeu'
+  | 'cancelamento_interno'
+  | 'outro';
+
+export type DealRelationType = 'recurrence' | 'additive';
+
 export interface Deal {
   id: string;
+  dealCode?: string;
   title: string;
   description?: string;
   amount: number;
-  probability: number; // 0-100 (from stage)
-  weightedAmount: number; // Generated: amount * probability / 100
+  probability: number;
+  weightedAmount: number;
   expectedCloseDate?: string;
   actualCloseDate?: string;
+  closedAt?: string;
   pipelineId: string;
   pipeline?: Pipeline;
   stageId: string;
@@ -211,12 +228,30 @@ export interface Deal {
   primaryContact?: Contact;
   ownerId: string;
   owner?: User;
+  createdBy?: string;
   status: DealStatus;
   lostReason?: string;
+  lostReasonType?: LostReasonType;
+  lostObservation?: string;
+  // Portfolio & delivery
+  portfolioItems?: string[];
+  businessUnit?: string;
+  dealSource?: string;
+  referral?: string;
+  deliveryModel?: DeliveryModel;
+  allocationQty?: number;
+  allocationTerm?: string;
+  allocationHours?: number;
+  // Recurrence & Additive links
+  parentDealId?: string;
+  parentDealTitle?: string;
+  relationType?: DealRelationType;
+  recurrenceNumber?: number;
+  additiveNumber?: number;
   products?: DealProduct[];
   tags: string[];
   customFields?: Record<string, any>;
-  rottingDays?: number; // Days since last activity
+  rottingDays?: number;
   createdAt: string;
   updatedAt: string;
   deletedAt?: string;
@@ -827,6 +862,14 @@ export interface DealFormData {
   accountId: string;
   primaryContactId?: string;
   ownerId?: string;
+  portfolioItems?: string[];
+  businessUnit?: string;
+  dealSource?: string;
+  referral?: string;
+  deliveryModel?: DeliveryModel;
+  allocationQty?: number;
+  allocationTerm?: string;
+  allocationHours?: number;
   products?: DealProduct[];
   tags?: string[];
   customFields?: Record<string, any>;

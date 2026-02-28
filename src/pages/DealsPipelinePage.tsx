@@ -57,6 +57,8 @@ const STAGE_ICONS: Record<string, string> = {
   'Proposta':    '📄',
   'FUP':         '📞',
   'Fechamento':  '🏆',
+  'Vencido':     '🏆',
+  'Perdido':     '❌',
 };
 type QuickFilter = 'all' | 'mine' | 'rotting' | 'highvalue' | 'closing';
 

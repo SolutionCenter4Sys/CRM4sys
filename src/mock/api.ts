@@ -989,7 +989,13 @@ export const dealsApi = {
     };
   },
 
-  async create(data: DealFormData): Promise<ApiResponse<Deal>> {
+  async create(data: DealFormData & {
+    parentDealId?: string;
+    parentDealTitle?: string;
+    relationType?: import('../types').DealRelationType;
+    recurrenceNumber?: number;
+    additiveNumber?: number;
+  }): Promise<ApiResponse<Deal>> {
     await delay(350);
 
     const deals = MockStorage.getDeals();
@@ -1011,9 +1017,16 @@ export const dealsApi = {
     const owner = users.find((u) => u.id === data.ownerId);
     const pipeline = pipelines.find((p) => p.id === data.pipelineId);
 
+    // Generate dealCode: P{year}{4-digit sequential per year}
+    const year = new Date().getFullYear();
+    const yearDeals = deals.filter((d) => d.dealCode?.startsWith(`P${year}`));
+    const seq = String(yearDeals.length + 1).padStart(4, '0');
+    const dealCode = `P${year}${seq}`;
+
     const amount = Number(data.amount) || 0;
     const newDeal: Deal = {
       id: generateId(),
+      dealCode,
       title: data.title,
       description: data.description,
       amount,
@@ -1030,7 +1043,21 @@ export const dealsApi = {
       primaryContact,
       ownerId: data.ownerId || users[0].id,
       owner: owner || users[0],
+      createdBy: users[0]?.id,
       status: 'open',
+      portfolioItems: data.portfolioItems,
+      businessUnit: data.businessUnit,
+      dealSource: data.dealSource,
+      referral: data.referral,
+      deliveryModel: data.deliveryModel,
+      allocationQty: data.allocationQty,
+      allocationTerm: data.allocationTerm,
+      allocationHours: data.allocationHours,
+      parentDealId: data.parentDealId,
+      parentDealTitle: data.parentDealTitle,
+      relationType: data.relationType,
+      recurrenceNumber: data.recurrenceNumber,
+      additiveNumber: data.additiveNumber,
       tags: data.tags || [],
       customFields: data.customFields,
       createdAt: new Date().toISOString(),
@@ -1079,6 +1106,9 @@ export const dealsApi = {
       ? users.find((u) => u.id === data.ownerId)
       : deals[index].owner;
 
+    const nowIso = new Date().toISOString();
+    const isClosing =
+      (data as Partial<Deal>).status === 'won' || (data as Partial<Deal>).status === 'lost';
     const updatedDeal: Deal = {
       ...deals[index],
       ...data,
@@ -1090,7 +1120,8 @@ export const dealsApi = {
       owner,
       probability: stage.probability,
       weightedAmount: (amount * stage.probability) / 100,
-      updatedAt: new Date().toISOString(),
+      closedAt: isClosing && !deals[index].closedAt ? nowIso : deals[index].closedAt,
+      updatedAt: nowIso,
     };
 
     deals[index] = updatedDeal;
@@ -1175,11 +1206,27 @@ export const dealsApi = {
 
     const nowIso = new Date().toISOString();
     const previousDeal = deals[dealIndex];
+
+    // Move deal to the "Perdido" stage when marking as lost
+    const perdidoStage = mockData.stages.find((s) => s.name === 'Perdido');
+    const openStage = mockData.stages.find((s) => s.name !== 'Perdido' && s.name !== 'Vencido');
+    const stageId =
+      status === 'lost' && perdidoStage ? perdidoStage.id :
+      status === 'open' && previousDeal.stageId === perdidoStage?.id && openStage ? openStage.id :
+      previousDeal.stageId;
+    const stage =
+      status === 'lost' && perdidoStage ? perdidoStage :
+      status === 'open' && previousDeal.stageId === perdidoStage?.id && openStage ? openStage :
+      previousDeal.stage;
+
     const updatedDeal: Deal = {
       ...previousDeal,
       status,
+      stageId,
+      stage,
       lostReason: status === 'lost' ? lostReason : undefined,
       actualCloseDate: status === 'open' ? undefined : nowIso,
+      closedAt: status !== 'open' && !previousDeal.closedAt ? nowIso : (status === 'open' ? undefined : previousDeal.closedAt),
       updatedAt: nowIso,
     };
     deals[dealIndex] = updatedDeal;
