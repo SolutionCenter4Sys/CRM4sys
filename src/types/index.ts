@@ -52,17 +52,48 @@ export type BuyingCommitteeRole =
 // ACCOUNT TYPES
 // ============================================================================
 
+export type AccountStatus = 'prospection' | 'active' | 'closed';
+
+export type MarketSegment =
+  | 'Tecnologia da Informação'
+  | 'Telecomunicações'
+  | 'Saúde'
+  | 'Educação'
+  | 'Financeiro / Bancos'
+  | 'Varejo'
+  | 'Indústria / Manufatura'
+  | 'Logística / Transporte'
+  | 'Energia / Utilities'
+  | 'Agronegócio'
+  | 'Governo / Setor Público'
+  | 'Serviços Profissionais'
+  | 'Mídia / Entretenimento'
+  | 'Imobiliário'
+  | 'Seguros'
+  | 'Construção Civil'
+  | 'Químico / Petroquímico'
+  | 'Alimentos e Bebidas'
+  | 'Farmacêutico'
+  | 'Outro';
+
 export interface BillingConditions {
-  paymentTerms?: string;       // ex: "30 dias", "NET30", "À vista"
+  paymentTerms?: string;
   billingCycle?: 'monthly' | 'quarterly' | 'semiannual' | 'annual';
-  paymentMethod?: string;      // ex: "Boleto", "PIX", "Cartão de Crédito", "Transferência"
+  paymentMethod?: string;
   creditLimit?: number;
-  currency?: string;           // ex: "BRL", "USD"
+  currency?: string;
   billingEmail?: string;
   billingContact?: string;
   invoiceFormat?: 'nfe' | 'nfse' | 'recibo';
-  taxRegime?: string;          // ex: "Simples Nacional", "Lucro Presumido", "Lucro Real"
+  taxRegime?: string;
   notes?: string;
+  // Novos campos de faturamento
+  invoiceEmissionLimit?: string;
+  invoicePaymentTerm?: string;
+  additionalInfo?: string;
+  requiresPO?: boolean;
+  invoiceEmail?: string;
+  invoiceDescription?: string;
 }
 
 export interface Branch {
@@ -74,24 +105,31 @@ export interface Branch {
   phone?: string;
   email?: string;
   isActive: boolean;
+  isBillingAddress?: boolean;
 }
 
 export interface Account {
   id: string;
+  clientCode?: string;
   name: string;
   legalName?: string;
   tradeName?: string;
   cnpj?: string;
   domain?: string;
+  emailDomain?: string;
   website?: string;
   phone?: string;
+  linkedin?: string;
+  emailGroup?: string;
   industry?: string;
+  segment?: MarketSegment;
+  accountStatus?: AccountStatus;
   numberOfEmployees?: number;
   annualRevenue?: number;
   address?: Address;
   branches?: Branch[];
   tier: AccountTier;
-  icpScore: number; // 0-100
+  icpScore: number;
   targetAccount: boolean;
   parentAccountId?: string;
   parentAccount?: Account;
@@ -729,8 +767,13 @@ export interface AccountFormData {
   cnpj?: string;
   phone?: string;
   domain?: string;
+  emailDomain?: string;
   website?: string;
+  linkedin?: string;
+  emailGroup?: string;
   industry?: string;
+  segment?: MarketSegment;
+  accountStatus?: AccountStatus;
   numberOfEmployees?: number;
   annualRevenue?: number;
   address?: Address;

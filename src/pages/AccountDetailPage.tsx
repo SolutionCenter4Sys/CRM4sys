@@ -14,11 +14,13 @@ import {
   DialogContent,
   DialogTitle,
   Divider,
+  FormControlLabel,
   Grid,
   IconButton,
   LinearProgress,
   MenuItem,
   Stack,
+  Switch,
   Tab,
   Tabs,
   TextField,
@@ -45,9 +47,22 @@ import {
   AccountBalance as AccountBalanceIcon,
   Apartment as ApartmentIcon,
   PersonAdd as PersonAddIcon,
+  LinkedIn as LinkedInIcon,
+  Tag as TagIcon,
+  TrendingUp as TrendingUpIcon,
 } from '@mui/icons-material';
 import { mockApi } from '../mock/api';
-import type { Account, Contact, BillingConditions, Branch, ContactFormData, User } from '../types';
+import type {
+  Account,
+  Contact,
+  Deal,
+  BillingConditions,
+  Branch,
+  ContactFormData,
+  User,
+  MarketSegment,
+  AccountStatus,
+} from '../types';
 
 // ── helpers ─────────────────────────────────────────────────────────────────
 
@@ -81,6 +96,53 @@ const TIER_COLOR: Record<string, 'default' | 'primary' | 'success' | 'warning' |
   MidMarket: 'warning',
   Enterprise: 'primary',
 };
+
+const ACCOUNT_STATUS_LABEL: Record<AccountStatus, string> = {
+  prospection: 'Prospecção',
+  active: 'Em Operação',
+  closed: 'Encerrada',
+};
+
+const ACCOUNT_STATUS_COLOR: Record<AccountStatus, 'default' | 'primary' | 'success' | 'warning' | 'error'> = {
+  prospection: 'warning',
+  active: 'success',
+  closed: 'error',
+};
+
+const DEAL_STATUS_LABEL: Record<string, string> = {
+  open: 'Aberto',
+  won: 'Ganho',
+  lost: 'Perdido',
+};
+
+const DEAL_STATUS_COLOR: Record<string, 'default' | 'primary' | 'success' | 'warning' | 'error'> = {
+  open: 'primary',
+  won: 'success',
+  lost: 'error',
+};
+
+const MARKET_SEGMENTS: MarketSegment[] = [
+  'Tecnologia da Informação',
+  'Telecomunicações',
+  'Saúde',
+  'Educação',
+  'Financeiro / Bancos',
+  'Varejo',
+  'Indústria / Manufatura',
+  'Logística / Transporte',
+  'Energia / Utilities',
+  'Agronegócio',
+  'Governo / Setor Público',
+  'Serviços Profissionais',
+  'Mídia / Entretenimento',
+  'Imobiliário',
+  'Seguros',
+  'Construção Civil',
+  'Químico / Petroquímico',
+  'Alimentos e Bebidas',
+  'Farmacêutico',
+  'Outro',
+];
 
 // ── subcomponents ────────────────────────────────────────────────────────────
 
@@ -162,7 +224,11 @@ const BranchCard: React.FC<{ branch: Branch }> = ({ branch }) => (
     variant="outlined"
     sx={{
       opacity: branch.isActive ? 1 : 0.6,
-      borderColor: branch.type === 'matriz' ? 'primary.main' : 'divider',
+      borderColor: branch.isBillingAddress
+        ? 'success.main'
+        : branch.type === 'matriz'
+        ? 'primary.main'
+        : 'divider',
     }}
   >
     <CardContent sx={{ py: 1.5, px: 2, '&:last-child': { pb: 1.5 } }}>
@@ -177,7 +243,7 @@ const BranchCard: React.FC<{ branch: Branch }> = ({ branch }) => (
             {branch.name}
           </Typography>
         </Box>
-        <Box sx={{ display: 'flex', gap: 0.5 }}>
+        <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
           <Chip
             label={branch.type.charAt(0).toUpperCase() + branch.type.slice(1)}
             size="small"
@@ -185,6 +251,15 @@ const BranchCard: React.FC<{ branch: Branch }> = ({ branch }) => (
             variant="outlined"
             sx={{ height: 20, fontSize: 11 }}
           />
+          {branch.isBillingAddress && (
+            <Chip
+              label="Endereço de Faturamento"
+              size="small"
+              color="success"
+              variant="outlined"
+              sx={{ height: 20, fontSize: 11 }}
+            />
+          )}
           {!branch.isActive && (
             <Chip label="Inativa" size="small" color="error" variant="outlined" sx={{ height: 20, fontSize: 11 }} />
           )}
@@ -241,7 +316,12 @@ const EditDialog: React.FC<EditDialogProps> = ({ open, onClose, account, onSave 
     phone: account.phone ?? '',
     website: account.website ?? '',
     domain: account.domain ?? '',
+    emailDomain: account.emailDomain ?? '',
+    linkedin: account.linkedin ?? '',
+    emailGroup: account.emailGroup ?? '',
     industry: account.industry ?? '',
+    segment: account.segment ?? '',
+    accountStatus: account.accountStatus ?? '',
     numberOfEmployees: account.numberOfEmployees?.toString() ?? '',
     annualRevenue: account.annualRevenue?.toString() ?? '',
     // Endereço
@@ -261,6 +341,13 @@ const EditDialog: React.FC<EditDialogProps> = ({ open, onClose, account, onSave 
     taxRegime: account.billingConditions?.taxRegime ?? '',
     invoiceFormat: account.billingConditions?.invoiceFormat ?? '',
     billingNotes: account.billingConditions?.notes ?? '',
+    // Novos campos de faturamento
+    invoiceEmissionLimit: account.billingConditions?.invoiceEmissionLimit ?? '',
+    invoicePaymentTerm: account.billingConditions?.invoicePaymentTerm ?? '',
+    additionalInfo: account.billingConditions?.additionalInfo ?? '',
+    requiresPO: account.billingConditions?.requiresPO ?? false,
+    invoiceEmail: account.billingConditions?.invoiceEmail ?? '',
+    invoiceDescription: account.billingConditions?.invoiceDescription ?? '',
   });
 
   const set = (field: string) => (e: React.ChangeEvent<HTMLInputElement>) =>
@@ -275,7 +362,12 @@ const EditDialog: React.FC<EditDialogProps> = ({ open, onClose, account, onSave 
       phone: form.phone || undefined,
       website: form.website || undefined,
       domain: form.domain || undefined,
+      emailDomain: form.emailDomain || undefined,
+      linkedin: form.linkedin || undefined,
+      emailGroup: form.emailGroup || undefined,
       industry: form.industry || undefined,
+      segment: (form.segment as MarketSegment) || undefined,
+      accountStatus: (form.accountStatus as AccountStatus) || undefined,
       numberOfEmployees: form.numberOfEmployees ? Number(form.numberOfEmployees) : undefined,
       annualRevenue: form.annualRevenue ? Number(form.annualRevenue) : undefined,
       address: {
@@ -297,6 +389,12 @@ const EditDialog: React.FC<EditDialogProps> = ({ open, onClose, account, onSave 
         taxRegime: form.taxRegime || undefined,
         invoiceFormat: (form.invoiceFormat as BillingConditions['invoiceFormat']) || undefined,
         notes: form.billingNotes || undefined,
+        invoiceEmissionLimit: form.invoiceEmissionLimit || undefined,
+        invoicePaymentTerm: form.invoicePaymentTerm || undefined,
+        additionalInfo: form.additionalInfo || undefined,
+        requiresPO: form.requiresPO,
+        invoiceEmail: form.invoiceEmail || undefined,
+        invoiceDescription: form.invoiceDescription || undefined,
       },
     });
     onClose();
@@ -308,6 +406,9 @@ const EditDialog: React.FC<EditDialogProps> = ({ open, onClose, account, onSave 
         Editar Empresa
         <Typography variant="caption" color="text.secondary" sx={{ display: 'block', fontWeight: 400, mt: 0.3 }}>
           {account.name}
+          {account.clientCode && (
+            <span style={{ marginLeft: 8, fontFamily: 'monospace' }}>{account.clientCode}</span>
+          )}
         </Typography>
       </DialogTitle>
       <DialogContent dividers>
@@ -338,7 +439,46 @@ const EditDialog: React.FC<EditDialogProps> = ({ open, onClose, account, onSave 
                 <TextField label="Domínio" fullWidth value={form.domain} onChange={set('domain')} size="small" />
               </Grid>
               <Grid item xs={12} md={4}>
+                <TextField label="Domínio de e-mail do cliente" fullWidth value={form.emailDomain} onChange={set('emailDomain')} size="small" placeholder="ex: empresa.com.br" />
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <TextField label="LinkedIn" fullWidth value={form.linkedin} onChange={set('linkedin')} size="small" placeholder="ex: linkedin.com/company/empresa" />
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <TextField label="Grupo de e-mail empresa" fullWidth value={form.emailGroup} onChange={set('emailGroup')} size="small" placeholder="ex: contato@empresa.com.br" />
+              </Grid>
+              <Grid item xs={12} md={4}>
                 <TextField label="Indústria" fullWidth value={form.industry} onChange={set('industry')} size="small" />
+              </Grid>
+              <Grid item xs={12} md={4}>
+                <TextField
+                  label="Segmento de mercado"
+                  fullWidth
+                  select
+                  value={form.segment}
+                  onChange={set('segment')}
+                  size="small"
+                >
+                  <MenuItem value="">Não definido</MenuItem>
+                  {MARKET_SEGMENTS.map((s) => (
+                    <MenuItem key={s} value={s}>{s}</MenuItem>
+                  ))}
+                </TextField>
+              </Grid>
+              <Grid item xs={12} md={4}>
+                <TextField
+                  label="Status da conta"
+                  fullWidth
+                  select
+                  value={form.accountStatus}
+                  onChange={set('accountStatus')}
+                  size="small"
+                >
+                  <MenuItem value="">Não definido</MenuItem>
+                  <MenuItem value="prospection">Prospecção</MenuItem>
+                  <MenuItem value="active">Em Operação</MenuItem>
+                  <MenuItem value="closed">Encerrada</MenuItem>
+                </TextField>
               </Grid>
               <Grid item xs={12} md={6}>
                 <TextField label="Nº funcionários" fullWidth type="number" value={form.numberOfEmployees} onChange={set('numberOfEmployees')} size="small" />
@@ -425,11 +565,38 @@ const EditDialog: React.FC<EditDialogProps> = ({ open, onClose, account, onSave 
               <Grid item xs={12} md={4}>
                 <TextField label="Regime tributário" fullWidth value={form.taxRegime} onChange={set('taxRegime')} size="small" />
               </Grid>
-              <Grid item xs={12} md={6}>
+              <Grid item xs={12} md={4}>
+                <TextField label="Limite de emissão de NF" fullWidth value={form.invoiceEmissionLimit} onChange={set('invoiceEmissionLimit')} size="small" placeholder="ex: R$ 50.000 / mês" />
+              </Grid>
+              <Grid item xs={12} md={4}>
+                <TextField label="Prazo de pagamento da NF" fullWidth value={form.invoicePaymentTerm} onChange={set('invoicePaymentTerm')} size="small" placeholder="ex: 30 dias após emissão" />
+              </Grid>
+              <Grid item xs={12} md={4}>
                 <TextField label="E-mail financeiro" fullWidth value={form.billingEmail} onChange={set('billingEmail')} size="small" />
               </Grid>
               <Grid item xs={12} md={6}>
+                <TextField label="E-mail para envio de NF" fullWidth value={form.invoiceEmail} onChange={set('invoiceEmail')} size="small" placeholder="ex: nf@empresa.com.br" />
+              </Grid>
+              <Grid item xs={12} md={6}>
                 <TextField label="Contato financeiro" fullWidth value={form.billingContact} onChange={set('billingContact')} size="small" />
+              </Grid>
+              <Grid item xs={12} md={12}>
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={form.requiresPO}
+                      onChange={(e) => setForm((prev) => ({ ...prev, requiresPO: e.target.checked }))}
+                      size="small"
+                    />
+                  }
+                  label={<Typography variant="body2">Precisa de PO (Purchase Order)</Typography>}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField label="Descrição" fullWidth multiline minRows={2} value={form.invoiceDescription} onChange={set('invoiceDescription')} size="small" placeholder="Descrição geral das condições de faturamento" />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField label="Informações complementares" fullWidth multiline minRows={2} value={form.additionalInfo} onChange={set('additionalInfo')} size="small" />
               </Grid>
               <Grid item xs={12}>
                 <TextField label="Observações de faturamento" fullWidth multiline minRows={2} value={form.billingNotes} onChange={set('billingNotes')} size="small" />
@@ -468,6 +635,7 @@ export const AccountDetailPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [account, setAccount] = useState<Account | null>(null);
   const [contacts, setContacts] = useState<Contact[]>([]);
+  const [deals, setDeals] = useState<Deal[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [activeTab, setActiveTab] = useState(0);
   const [editOpen, setEditOpen] = useState(false);
@@ -483,14 +651,17 @@ export const AccountDetailPage: React.FC = () => {
     const load = async () => {
       if (!id) return;
       setLoading(true);
-      const [accountRes, contactsRes, usersRes] = await Promise.all([
+      const [accountRes, contactsRes, usersRes, dealsRes] = await Promise.all([
         mockApi.accounts.getById(id),
         mockApi.contacts.listByAccount(id),
         mockApi.users.list(),
+        mockApi.deals.list(),
       ]);
       setAccount(accountRes.data || null);
       setContacts(contactsRes.data || []);
       setUsers(usersRes.data || []);
+      const allDeals = dealsRes.data || [];
+      setDeals(allDeals.filter((d) => d.accountId === id));
       setLoading(false);
     };
     load();
@@ -574,6 +745,12 @@ export const AccountDetailPage: React.FC = () => {
     ...(account.branches ?? []),
   ];
 
+  const openDeals = deals.filter((d) => d.status === 'open');
+  const wonDeals = deals.filter((d) => d.status === 'won');
+  const lostDeals = deals.filter((d) => d.status === 'lost');
+
+  // Tab indices: 0=Geral, 1=Endereços, 2=Negócios, 3=Faturamento, 4=Grupos, 5=Contatos
+
   return (
     <Box sx={{ p: { xs: 2, md: 3 }, maxWidth: 1100, mx: 'auto' }}>
       {/* ── Topo ── */}
@@ -627,18 +804,45 @@ export const AccountDetailPage: React.FC = () => {
                   size="small"
                   sx={{ fontWeight: 700 }}
                 />
+                {account.accountStatus && (
+                  <Chip
+                    label={ACCOUNT_STATUS_LABEL[account.accountStatus]}
+                    color={ACCOUNT_STATUS_COLOR[account.accountStatus]}
+                    size="small"
+                    variant="outlined"
+                  />
+                )}
                 {account.targetAccount && (
                   <Tooltip title="Conta alvo (Target Account)">
                     <StarIcon sx={{ fontSize: 18, color: 'warning.main' }} />
                   </Tooltip>
                 )}
               </Box>
-              <Typography variant="body2" color="text.secondary" sx={{ mt: 0.3 }}>
-                {account.legalName || 'Razão social não informada'}
-                {account.tradeName && account.tradeName !== account.name && (
-                  <span> · {account.tradeName}</span>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap', mt: 0.3 }}>
+                <Typography variant="body2" color="text.secondary">
+                  {account.legalName || 'Razão social não informada'}
+                  {account.tradeName && account.tradeName !== account.name && (
+                    <span> · {account.tradeName}</span>
+                  )}
+                </Typography>
+                {account.clientCode && (
+                  <Chip
+                    label={account.clientCode}
+                    size="small"
+                    variant="outlined"
+                    icon={<TagIcon sx={{ fontSize: 12 }} />}
+                    sx={{ height: 20, fontSize: 11, fontFamily: 'monospace' }}
+                  />
                 )}
-              </Typography>
+                {account.segment && (
+                  <Chip
+                    label={account.segment}
+                    size="small"
+                    variant="outlined"
+                    sx={{ height: 20, fontSize: 11 }}
+                  />
+                )}
+              </Box>
 
               {/* Contatos rápidos inline */}
               <Box sx={{ display: 'flex', gap: 2, mt: 1, flexWrap: 'wrap' }}>
@@ -710,8 +914,8 @@ export const AccountDetailPage: React.FC = () => {
           <Box sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap' }}>
             <KpiCard
               label="Negócios abertos"
-              value={account.openDealsCount ?? 0}
-              color={account.openDealsCount ? 'primary.main' : undefined}
+              value={account.openDealsCount ?? openDeals.length}
+              color={openDeals.length ? 'primary.main' : undefined}
             />
             <KpiCard
               label="Valor em negócios"
@@ -743,8 +947,9 @@ export const AccountDetailPage: React.FC = () => {
         <Tabs value={activeTab} onChange={(_, v) => setActiveTab(v)} variant="scrollable" scrollButtons="auto">
           <Tab icon={<BusinessIcon sx={{ fontSize: 16 }} />} iconPosition="start" label="Geral" />
           <Tab icon={<PlaceIcon sx={{ fontSize: 16 }} />} iconPosition="start" label={`Endereços (${allAddresses.length})`} />
+          <Tab icon={<WorkOutlineIcon sx={{ fontSize: 16 }} />} iconPosition="start" label={`Negócios (${deals.length})`} />
           <Tab icon={<AccountBalanceIcon sx={{ fontSize: 16 }} />} iconPosition="start" label="Faturamento" />
-          <Tab icon={<GroupIcon sx={{ fontSize: 16 }} />} iconPosition="start" label="Grupo" />
+          <Tab icon={<GroupIcon sx={{ fontSize: 16 }} />} iconPosition="start" label="Grupos" />
           <Tab icon={<ContactPageIcon sx={{ fontSize: 16 }} />} iconPosition="start" label={`Contatos (${contacts.length})`} />
         </Tabs>
       </Box>
@@ -757,8 +962,18 @@ export const AccountDetailPage: React.FC = () => {
               <CardContent>
                 <SectionTitle>Dados Cadastrais</SectionTitle>
                 <Box sx={{ mt: 1 }}>
+                  {account.clientCode && (
+                    <InfoRow
+                      icon={<TagIcon sx={{ fontSize: 18 }} />}
+                      label="Código do cliente"
+                      value={account.clientCode}
+                    />
+                  )}
                   <InfoRow icon={<BusinessIcon sx={{ fontSize: 18 }} />} label="CNPJ" value={account.cnpj} />
                   <InfoRow icon={<BusinessIcon sx={{ fontSize: 18 }} />} label="Indústria" value={account.industry} />
+                  {account.segment && (
+                    <InfoRow icon={<TrendingUpIcon sx={{ fontSize: 18 }} />} label="Segmento" value={account.segment} />
+                  )}
                   <InfoRow
                     icon={<LanguageIcon sx={{ fontSize: 18 }} />}
                     label="Website"
@@ -767,6 +982,20 @@ export const AccountDetailPage: React.FC = () => {
                   />
                   <InfoRow icon={<PhoneIcon sx={{ fontSize: 18 }} />} label="Telefone" value={account.phone} />
                   <InfoRow icon={<EmailIcon sx={{ fontSize: 18 }} />} label="Domínio" value={account.domain} />
+                  {account.emailDomain && (
+                    <InfoRow icon={<EmailIcon sx={{ fontSize: 18 }} />} label="Domínio de e-mail" value={account.emailDomain} />
+                  )}
+                  {account.emailGroup && (
+                    <InfoRow icon={<EmailIcon sx={{ fontSize: 18 }} />} label="Grupo de e-mail empresa" value={account.emailGroup} />
+                  )}
+                  {account.linkedin && (
+                    <InfoRow
+                      icon={<LinkedInIcon sx={{ fontSize: 18 }} />}
+                      label="LinkedIn"
+                      value={account.linkedin}
+                      href={account.linkedin.startsWith('http') ? account.linkedin : `https://${account.linkedin}`}
+                    />
+                  )}
                   {account.enrichedAt && (
                     <InfoRow
                       icon={<CheckCircleIcon sx={{ fontSize: 18, color: 'success.main' }} />}
@@ -818,6 +1047,13 @@ export const AccountDetailPage: React.FC = () => {
                   </Box>
                   <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap', mt: 1 }}>
                     <Chip label={`Tier: ${account.tier}`} size="small" color={TIER_COLOR[account.tier]} />
+                    {account.accountStatus && (
+                      <Chip
+                        label={ACCOUNT_STATUS_LABEL[account.accountStatus]}
+                        size="small"
+                        color={ACCOUNT_STATUS_COLOR[account.accountStatus]}
+                      />
+                    )}
                     {account.targetAccount && (
                       <Chip label="Target Account" size="small" color="warning" icon={<StarIcon sx={{ fontSize: 14 }} />} />
                     )}
@@ -858,7 +1094,7 @@ export const AccountDetailPage: React.FC = () => {
                     <Typography variant="body2">{new Date(account.updatedAt).toLocaleDateString('pt-BR')}</Typography>
                   </Grid>
                   <Grid item xs={12} sm={4}>
-                    <Typography variant="caption" color="text.secondary">ID</Typography>
+                    <Typography variant="caption" color="text.secondary">ID Interno</Typography>
                     <Typography variant="body2" sx={{ fontFamily: 'monospace', fontSize: 11 }}>
                       {account.id}
                     </Typography>
@@ -874,10 +1110,17 @@ export const AccountDetailPage: React.FC = () => {
       {activeTab === 1 && (
         <Stack spacing={1.5}>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Typography variant="body2" color="text.secondary">
-              {allAddresses.length} {allAddresses.length === 1 ? 'endereço cadastrado' : 'endereços cadastrados'} ·{' '}
-              {allAddresses.filter((b) => b.isActive).length} ativo(s)
-            </Typography>
+            <Box>
+              <Typography variant="body2" color="text.secondary">
+                {allAddresses.length} {allAddresses.length === 1 ? 'endereço cadastrado' : 'endereços cadastrados'} ·{' '}
+                {allAddresses.filter((b) => b.isActive).length} ativo(s)
+              </Typography>
+              {allAddresses.some((b) => b.isBillingAddress) && (
+                <Typography variant="caption" color="success.main" sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 0.2 }}>
+                  <CheckCircleIcon sx={{ fontSize: 12 }} /> Endereço de faturamento definido
+                </Typography>
+              )}
+            </Box>
             <Tooltip title="Editar endereços na tela de edição">
               <IconButton size="small" onClick={() => setEditOpen(true)}>
                 <EditIcon sx={{ fontSize: 16 }} />
@@ -896,8 +1139,85 @@ export const AccountDetailPage: React.FC = () => {
         </Stack>
       )}
 
-      {/* ── Tab 2 — Faturamento ── */}
+      {/* ── Tab 2 — Negócios ── */}
       {activeTab === 2 && (
+        <Stack spacing={2}>
+          {/* Resumo */}
+          <Box sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap' }}>
+            <KpiCard label="Abertos" value={openDeals.length} color="primary.main" />
+            <KpiCard label="Ganhos" value={wonDeals.length} color="success.main" />
+            <KpiCard label="Perdidos" value={lostDeals.length} color="error.main" />
+            <KpiCard
+              label="Valor total (abertos)"
+              value={fmtCurrency(openDeals.reduce((s, d) => s + d.amount, 0))}
+              color="primary.main"
+            />
+          </Box>
+
+          {deals.length === 0 ? (
+            <Box sx={{ textAlign: 'center', py: 6 }}>
+              <WorkOutlineIcon sx={{ fontSize: 40, color: 'text.disabled', mb: 1 }} />
+              <Typography color="text.secondary" sx={{ mb: 2 }}>
+                Nenhum negócio vinculado a esta empresa
+              </Typography>
+              <Button variant="outlined" onClick={() => navigate('/deals')}>
+                Ver todos os negócios
+              </Button>
+            </Box>
+          ) : (
+            <Card variant="outlined">
+              <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
+                <Stack divider={<Divider />} spacing={0}>
+                  {deals.map((deal) => (
+                    <Box
+                      key={deal.id}
+                      sx={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        px: 2,
+                        py: 1.5,
+                      }}
+                    >
+                      <Box sx={{ flex: 1, minWidth: 0 }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
+                          <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                            {deal.title}
+                          </Typography>
+                          <Chip
+                            label={DEAL_STATUS_LABEL[deal.status] ?? deal.status}
+                            size="small"
+                            color={DEAL_STATUS_COLOR[deal.status] ?? 'default'}
+                            sx={{ height: 20, fontSize: 11 }}
+                          />
+                        </Box>
+                        <Typography variant="caption" color="text.secondary">
+                          {deal.stage?.name && `${deal.stage.name} · `}
+                          {fmtCurrency(deal.amount)}
+                          {deal.expectedCloseDate &&
+                            ` · Fechamento: ${new Date(deal.expectedCloseDate).toLocaleDateString('pt-BR')}`}
+                        </Typography>
+                      </Box>
+                      <Button size="small" onClick={() => navigate(`/deals/${deal.id}`)}>
+                        Ver negócio
+                      </Button>
+                    </Box>
+                  ))}
+                </Stack>
+              </CardContent>
+            </Card>
+          )}
+
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+            <Button variant="outlined" size="small" startIcon={<WorkOutlineIcon />} onClick={() => navigate('/deals')}>
+              Ver todos os negócios
+            </Button>
+          </Box>
+        </Stack>
+      )}
+
+      {/* ── Tab 3 — Faturamento ── */}
+      {activeTab === 3 && (
         <Grid container spacing={2}>
           {!bc ? (
             <Grid item xs={12}>
@@ -923,6 +1243,10 @@ export const AccountDetailPage: React.FC = () => {
                         <Typography variant="body2" sx={{ fontWeight: 600 }}>{bc.paymentTerms || '—'}</Typography>
                       </Box>
                       <Box>
+                        <Typography variant="caption" color="text.secondary">Prazo de pagamento da NF</Typography>
+                        <Typography variant="body2" sx={{ fontWeight: 600 }}>{bc.invoicePaymentTerm || '—'}</Typography>
+                      </Box>
+                      <Box>
                         <Typography variant="caption" color="text.secondary">Ciclo de faturamento</Typography>
                         <Typography variant="body2" sx={{ fontWeight: 600 }}>
                           {bc.billingCycle ? BILLING_CYCLE_LABEL[bc.billingCycle] : '—'}
@@ -939,8 +1263,21 @@ export const AccountDetailPage: React.FC = () => {
                         </Typography>
                       </Box>
                       <Box>
+                        <Typography variant="caption" color="text.secondary">Limite de emissão de NF</Typography>
+                        <Typography variant="body2" sx={{ fontWeight: 600 }}>{bc.invoiceEmissionLimit || '—'}</Typography>
+                      </Box>
+                      <Box>
                         <Typography variant="caption" color="text.secondary">Moeda</Typography>
                         <Typography variant="body2" sx={{ fontWeight: 600 }}>{bc.currency || 'BRL'}</Typography>
+                      </Box>
+                      <Box>
+                        <Typography variant="caption" color="text.secondary">Precisa de PO</Typography>
+                        <Chip
+                          label={bc.requiresPO ? 'Sim' : 'Não'}
+                          size="small"
+                          color={bc.requiresPO ? 'warning' : 'default'}
+                          sx={{ height: 22, fontSize: 12, mt: 0.3 }}
+                        />
                       </Box>
                     </Stack>
                   </CardContent>
@@ -979,6 +1316,21 @@ export const AccountDetailPage: React.FC = () => {
                         )}
                       </Box>
                       <Box>
+                        <Typography variant="caption" color="text.secondary">E-mail para envio de NF</Typography>
+                        {bc.invoiceEmail ? (
+                          <Typography
+                            variant="body2"
+                            component="a"
+                            href={`mailto:${bc.invoiceEmail}`}
+                            sx={{ display: 'block', fontWeight: 600, color: 'primary.main', textDecoration: 'none' }}
+                          >
+                            {bc.invoiceEmail}
+                          </Typography>
+                        ) : (
+                          <Typography variant="body2">—</Typography>
+                        )}
+                      </Box>
+                      <Box>
                         <Typography variant="caption" color="text.secondary">Contato financeiro</Typography>
                         <Typography variant="body2" sx={{ fontWeight: 600 }}>{bc.billingContact || '—'}</Typography>
                       </Box>
@@ -986,6 +1338,32 @@ export const AccountDetailPage: React.FC = () => {
                   </CardContent>
                 </Card>
               </Grid>
+
+              {bc.invoiceDescription && (
+                <Grid item xs={12}>
+                  <Card variant="outlined">
+                    <CardContent sx={{ py: '12px !important' }}>
+                      <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 700, display: 'block', mb: 0.5 }}>
+                        Descrição
+                      </Typography>
+                      <Typography variant="body2">{bc.invoiceDescription}</Typography>
+                    </CardContent>
+                  </Card>
+                </Grid>
+              )}
+
+              {bc.additionalInfo && (
+                <Grid item xs={12}>
+                  <Card variant="outlined">
+                    <CardContent sx={{ py: '12px !important' }}>
+                      <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 700, display: 'block', mb: 0.5 }}>
+                        Informações Complementares
+                      </Typography>
+                      <Typography variant="body2">{bc.additionalInfo}</Typography>
+                    </CardContent>
+                  </Card>
+                </Grid>
+              )}
 
               {bc.notes && (
                 <Grid item xs={12}>
@@ -1017,8 +1395,8 @@ export const AccountDetailPage: React.FC = () => {
         </Grid>
       )}
 
-      {/* ── Tab 3 — Grupo ── */}
-      {activeTab === 3 && (
+      {/* ── Tab 4 — Grupos ── */}
+      {activeTab === 4 && (
         <Stack spacing={2}>
           {account.parentAccount && (
             <Card variant="outlined">
@@ -1110,8 +1488,8 @@ export const AccountDetailPage: React.FC = () => {
         </Stack>
       )}
 
-      {/* ── Tab 4 — Contatos ── */}
-      {activeTab === 4 && (
+      {/* ── Tab 5 — Contatos ── */}
+      {activeTab === 5 && (
         <Card variant="outlined">
           <CardContent>
             {/* Header da aba com botão de adicionar */}

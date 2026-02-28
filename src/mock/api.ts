@@ -877,18 +877,29 @@ export const accountsApi = {
     const owner = users.find((user) => user.id === data.ownerId) || users[0];
     const nowIso = new Date().toISOString();
 
+    const clientCodeNum = accounts.length + 1;
+    const clientCode = `CLI-${String(clientCodeNum).padStart(4, '0')}`;
+
     const createdAccount: Account = {
       id: generateId(),
+      clientCode,
       name: data.name.trim(),
       legalName: data.legalName?.trim() || data.name.trim(),
       tradeName: data.tradeName?.trim() || undefined,
       cnpj: data.cnpj?.trim() || undefined,
       domain: data.domain?.trim() || undefined,
+      emailDomain: data.emailDomain?.trim() || undefined,
       website: data.website?.trim() || undefined,
+      linkedin: data.linkedin?.trim() || undefined,
+      emailGroup: data.emailGroup?.trim() || undefined,
       industry: data.industry?.trim() || undefined,
+      segment: data.segment || undefined,
+      accountStatus: data.accountStatus || 'prospection',
       numberOfEmployees: data.numberOfEmployees,
       annualRevenue: data.annualRevenue,
       address: data.address,
+      branches: data.branches,
+      billingConditions: data.billingConditions,
       tier: data.tier || 'SMB',
       icpScore: 60,
       targetAccount: Boolean(data.targetAccount),
