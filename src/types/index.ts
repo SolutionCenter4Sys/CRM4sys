@@ -5,22 +5,48 @@
 // CONTACT TYPES
 // ============================================================================
 
+export type WorkModel = 'hybrid' | 'remote' | 'on-site';
+
+export interface ContactCompanyLink {
+  id: string;
+  accountId?: string;
+  account?: Account;
+  companyName: string;
+  professionalEmail?: string;
+  jobTitle?: string;
+  department?: string;
+  competitors?: string;
+  departmentObjective?: string;
+  workModel?: WorkModel;
+  officeAddressId?: string;
+  isActive: boolean;
+  startDate?: string;
+  endDate?: string;
+}
+
 export interface Contact {
   id: string;
+  contactCode?: string;
   firstName: string;
   lastName: string;
-  fullName: string; // Generated field
+  fullName: string;
   email: string;
   phone?: string;
   mobilePhone?: string;
+  linkedin?: string;
+  avatar?: string;
+  birthDate?: string;
+  address?: Address;
+  companyLinks?: ContactCompanyLink[];
+  // Legacy fields kept for backward compatibility
   jobTitle?: string;
   department?: string;
   accountId?: string;
-  account?: Account; // Populated
+  account?: Account;
   ownerId: string;
-  owner?: User; // Populated
+  owner?: User;
   lifecycleStage: LifecycleStage;
-  leadScore: number; // 0-100
+  leadScore: number;
   leadSource?: string;
   tags: string[];
   customFields?: Record<string, any>;
@@ -750,6 +776,12 @@ export interface ContactFormData {
   email: string;
   phone?: string;
   mobilePhone?: string;
+  linkedin?: string;
+  avatar?: string;
+  birthDate?: string;
+  address?: Address;
+  companyLinks?: ContactCompanyLink[];
+  // Legacy
   jobTitle?: string;
   department?: string;
   accountId?: string;

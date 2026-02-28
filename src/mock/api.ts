@@ -688,18 +688,34 @@ export const contactsApi = {
 
     const owner = users.find((u) => u.id === data.ownerId);
 
+    const contactCodeNum = contacts.length + 1;
+    const contactCode = `CON-${String(contactCodeNum).padStart(4, '0')}`;
+
+    // Derive legacy accountId/jobTitle from companyLinks if present
+    const activeLink = (data.companyLinks || []).find((l) => l.isActive);
+    const resolvedAccountId = activeLink?.accountId || data.accountId;
+    const resolvedAccount = resolvedAccountId
+      ? accounts.find((a) => a.id === resolvedAccountId)
+      : account;
+
     const newContact: Contact = {
       id: generateId(),
+      contactCode,
       firstName: data.firstName,
       lastName: data.lastName,
       fullName: `${data.firstName} ${data.lastName}`,
       email: data.email,
       phone: data.phone,
       mobilePhone: data.mobilePhone,
-      jobTitle: data.jobTitle,
-      department: data.department,
-      accountId: data.accountId,
-      account,
+      linkedin: data.linkedin,
+      avatar: data.avatar,
+      birthDate: data.birthDate,
+      address: data.address,
+      companyLinks: data.companyLinks || [],
+      jobTitle: activeLink?.jobTitle || data.jobTitle,
+      department: activeLink?.department || data.department,
+      accountId: resolvedAccountId,
+      account: resolvedAccount,
       ownerId: data.ownerId || users[0].id,
       owner: owner || users[0],
       lifecycleStage: data.lifecycleStage || 'lead',
@@ -744,12 +760,20 @@ export const contactsApi = {
       }
     }
 
+    // Derive active company link for legacy fields
+    const activeLink = (data.companyLinks || contacts[index].companyLinks || []).find((l) => l.isActive);
+    const resolvedAccountId = activeLink?.accountId || data.accountId ?? contacts[index].accountId;
+
     const updatedContact: Contact = {
       ...contacts[index],
       ...data,
+      companyLinks: data.companyLinks !== undefined ? data.companyLinks : contacts[index].companyLinks,
+      jobTitle: activeLink?.jobTitle ?? (data.jobTitle !== undefined ? data.jobTitle : contacts[index].jobTitle),
+      department: activeLink?.department ?? (data.department !== undefined ? data.department : contacts[index].department),
+      accountId: resolvedAccountId,
       account:
-        data.accountId !== undefined
-          ? accounts.find((a) => a.id === data.accountId)
+        resolvedAccountId !== undefined
+          ? accounts.find((a) => a.id === resolvedAccountId)
           : contacts[index].account,
       owner:
         data.ownerId !== undefined
