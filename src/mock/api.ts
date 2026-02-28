@@ -762,7 +762,7 @@ export const contactsApi = {
 
     // Derive active company link for legacy fields
     const activeLink = (data.companyLinks || contacts[index].companyLinks || []).find((l) => l.isActive);
-    const resolvedAccountId = activeLink?.accountId || data.accountId ?? contacts[index].accountId;
+      const resolvedAccountId = activeLink?.accountId || (data.accountId ?? contacts[index].accountId);
 
     const updatedContact: Contact = {
       ...contacts[index],
