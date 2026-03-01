@@ -35,6 +35,10 @@ import {
   Payment as PaymentIcon,
   History as HistoryIcon,
   Repeat as RepeatIcon,
+  ContentCopy as DuplicateIcon,
+  Cancel as CancelIcon,
+  Delete as DeleteIcon,
+  Business as BusinessIcon,
 } from '@mui/icons-material';
 import { mockApi } from '../mock/api';
 import type {
@@ -83,7 +87,7 @@ const InvoiceDetailPage: React.FC = () => {
   const [invoice, setInvoice] = useState<Invoice | null>(null);
   const [history, setHistory] = useState<InvoiceHistoryEvent[]>([]);
   const [recurrence, setRecurrence] = useState<RecurrenceRuleForm | null>(null);
-  const [tab, setTab] = useState<'details' | 'history' | 'recurrence'>('details');
+  const [tab, setTab] = useState<'details' | 'history' | 'business' | 'recurrence'>('details');
 
   // Modal de pagamento
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
@@ -95,6 +99,44 @@ const InvoiceDetailPage: React.FC = () => {
   });
   const [submitting, setSubmitting] = useState(false);
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' as 'success' | 'error' });
+
+  const handleDuplicateInvoice = async () => {
+    if (!invoice) return;
+    try {
+      const res = await mockApi.billingInvoices.duplicate(invoice.id);
+      setSnackbar({ open: true, message: res.message || 'Fatura duplicada', severity: 'success' });
+      if (res.data?.id) {
+        navigate(`/billing/invoices/${res.data.id}`);
+      }
+    } catch (err: any) {
+      setSnackbar({ open: true, message: err.message || 'Erro ao duplicar fatura', severity: 'error' });
+    }
+  };
+
+  const handleCancelInvoice = async () => {
+    if (!invoice) return;
+    if (!confirm('Cancelar esta fatura?')) return;
+    try {
+      await mockApi.billingInvoices.cancel(invoice.id, 'Cancelamento via detalhe da fatura');
+      const refreshed = await mockApi.billingInvoices.getById(invoice.id);
+      setInvoice(refreshed.data || null);
+      setSnackbar({ open: true, message: 'Fatura cancelada', severity: 'success' });
+    } catch (err: any) {
+      setSnackbar({ open: true, message: err.message || 'Erro ao cancelar fatura', severity: 'error' });
+    }
+  };
+
+  const handleDeleteInvoice = async () => {
+    if (!invoice) return;
+    if (!confirm('Excluir esta fatura permanentemente?')) return;
+    try {
+      await mockApi.billingInvoices.remove(invoice.id);
+      setSnackbar({ open: true, message: 'Fatura excluída', severity: 'success' });
+      navigate('/billing/invoices');
+    } catch (err: any) {
+      setSnackbar({ open: true, message: err.message || 'Erro ao excluir fatura', severity: 'error' });
+    }
+  };
 
   useEffect(() => {
     const loadData = async () => {
@@ -205,19 +247,51 @@ const InvoiceDetailPage: React.FC = () => {
           </Box>
           <Stack direction="row" spacing={1} alignItems="center">
             <Chip label={statusLabelMap[invoice.status]} color={statusColorMap[invoice.status]} />
+            <Button variant="outlined" startIcon={<DuplicateIcon />} onClick={handleDuplicateInvoice}>
+              Duplicar
+            </Button>
             {invoice.status !== 'paid' && invoice.status !== 'cancelled' && (
-              <Button
-                variant="contained"
-                startIcon={<PaymentIcon />}
-                onClick={() => setPaymentModalOpen(true)}
-              >
-                Registrar Pagamento
-              </Button>
+              <>
+                <Button
+                  variant="outlined"
+                  color="error"
+                  startIcon={<CancelIcon />}
+                  onClick={handleCancelInvoice}
+                >
+                  Cancelar
+                </Button>
+                <Button
+                  variant="contained"
+                  startIcon={<PaymentIcon />}
+                  onClick={() => setPaymentModalOpen(true)}
+                >
+                  Registrar Pagamento
+                </Button>
+              </>
             )}
+            <Button variant="outlined" color="error" startIcon={<DeleteIcon />} onClick={handleDeleteInvoice}>
+              Excluir
+            </Button>
           </Stack>
         </Stack>
 
         <Grid container spacing={2}>
+          <Grid item xs={6} md={3}>
+            <Typography variant="caption" color="text.secondary">
+              Código da fatura
+            </Typography>
+            <Typography variant="body1" fontWeight={700}>
+              {invoice.invoiceCode}
+            </Typography>
+          </Grid>
+          <Grid item xs={6} md={3}>
+            <Typography variant="caption" color="text.secondary">
+              Parcela
+            </Typography>
+            <Typography variant="body1">
+              {invoice.installmentNumber}/{invoice.installmentTotal}
+            </Typography>
+          </Grid>
           <Grid item xs={6} md={3}>
             <Typography variant="caption" color="text.secondary">
               Emissão
@@ -254,6 +328,7 @@ const InvoiceDetailPage: React.FC = () => {
       <Tabs value={tab} onChange={(_, v) => setTab(v)} sx={{ mb: 2, borderBottom: 1, borderColor: 'divider' }}>
         <Tab label="Detalhes" value="details" />
         <Tab label={`Histórico (${history.length})`} value="history" icon={<HistoryIcon />} iconPosition="start" />
+        <Tab label="Negócio" value="business" icon={<BusinessIcon />} iconPosition="start" />
         <Tab label="Recorrência" value="recurrence" icon={<RepeatIcon />} iconPosition="start" />
       </Tabs>
 
@@ -287,6 +362,16 @@ const InvoiceDetailPage: React.FC = () => {
           <Divider sx={{ my: 2 }} />
           <Stack spacing={1}>
             <Stack direction="row" justifyContent="space-between">
+              <Typography>Código</Typography>
+              <Typography fontWeight={700}>{invoice.invoiceCode}</Typography>
+            </Stack>
+            <Stack direction="row" justifyContent="space-between">
+              <Typography>Parcela</Typography>
+              <Typography>
+                {invoice.installmentNumber}/{invoice.installmentTotal}
+              </Typography>
+            </Stack>
+            <Stack direction="row" justifyContent="space-between">
               <Typography>Subtotal</Typography>
               <Typography>{formatCurrency(invoice.totals.subtotal)}</Typography>
             </Stack>
@@ -310,7 +395,58 @@ const InvoiceDetailPage: React.FC = () => {
                 {formatCurrency(invoice.totals.amountOpen)}
               </Typography>
             </Stack>
+            <Divider sx={{ my: 1 }} />
+            <Stack direction="row" justifyContent="space-between">
+              <Typography>Data original da emissão</Typography>
+              <Typography>{invoice.originalIssueDate || 'Não informada'}</Typography>
+            </Stack>
+            <Stack direction="row" justifyContent="space-between">
+              <Typography>Motivo prorrogação emissão</Typography>
+              <Typography>{invoice.issuePostponementReason || 'Não informado'}</Typography>
+            </Stack>
+            <Stack direction="row" justifyContent="space-between">
+              <Typography>Data original do vencimento</Typography>
+              <Typography>{invoice.originalDueDate || 'Não informada'}</Typography>
+            </Stack>
+            <Stack direction="row" justifyContent="space-between">
+              <Typography>Motivo prorrogação vencimento</Typography>
+              <Typography>{invoice.duePostponementReason || 'Não informado'}</Typography>
+            </Stack>
           </Stack>
+          <Divider sx={{ my: 2 }} />
+          <Typography variant="h6" sx={{ mb: 1 }}>
+            Descrição sobre Nota Fiscal
+          </Typography>
+          <Grid container spacing={2}>
+            <Grid item xs={12} md={6}>
+              <Typography variant="caption" color="text.secondary">
+                Número da NF
+              </Typography>
+              <Typography variant="body2">{invoice.nfNumber || 'Não informado'}</Typography>
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <Typography variant="caption" color="text.secondary">
+                Número da NF cancelada
+              </Typography>
+              <Typography variant="body2">{invoice.cancelledNfNumber || 'Não informado'}</Typography>
+            </Grid>
+            <Grid item xs={12}>
+              <Typography variant="caption" color="text.secondary">
+                Endereço de faturamento
+              </Typography>
+              <Typography variant="body2">
+                {invoice.billingAddressSnapshot
+                  ? `${invoice.billingAddressSnapshot.street || ''}, ${invoice.billingAddressSnapshot.city || ''} - ${invoice.billingAddressSnapshot.state || ''} ${invoice.billingAddressSnapshot.zipCode || ''}`
+                  : 'Não informado'}
+              </Typography>
+            </Grid>
+            <Grid item xs={12}>
+              <Typography variant="caption" color="text.secondary">
+                Descrição
+              </Typography>
+              <Typography variant="body2">{invoice.invoiceDescription || 'Não informada'}</Typography>
+            </Grid>
+          </Grid>
         </Paper>
       )}
 
@@ -355,6 +491,25 @@ const InvoiceDetailPage: React.FC = () => {
               ))}
             </Stack>
           )}
+        </Paper>
+      )}
+
+      {tab === 'business' && (
+        <Paper sx={{ p: 2 }}>
+          <Typography variant="h6" sx={{ mb: 2 }}>
+            Negócio vinculado
+          </Typography>
+          <Stack spacing={1}>
+            <Typography variant="body2">
+              <strong>Título:</strong> {invoice.dealTitle}
+            </Typography>
+            <Typography variant="body2">
+              <strong>ID:</strong> {invoice.dealId}
+            </Typography>
+            <Button variant="outlined" sx={{ width: 'fit-content', mt: 1 }} onClick={() => navigate(`/deals/${invoice.dealId}`)}>
+              Abrir negócio
+            </Button>
+          </Stack>
         </Paper>
       )}
 
