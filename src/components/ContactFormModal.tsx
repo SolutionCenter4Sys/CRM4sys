@@ -92,6 +92,7 @@ const newCompanyLink = (): ContactCompanyLink => ({
   companyName: '',
   isActive: true,
   workModel: 'remote',
+  workAddress: '',
 });
 
 const SectionTitle: React.FC<{ children: React.ReactNode }> = ({ children }) => (
@@ -179,10 +180,21 @@ export const ContactFormModal: React.FC<ContactFormModalProps> = ({
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) {
       errors.email = 'E-mail inválido.';
     }
-    (form.companyLinks || []).forEach((link, i) => {
-      if (!link.companyName.trim()) errors[`link_${i}_company`] = 'Nome da empresa é obrigatório.';
+    const activeCompanies = (form.companyLinks || []).filter((link) => link.isActive).length;
+    if ((form.companyLinks || []).length > 0 && activeCompanies === 0) {
+      errors.companyLinks = 'Selecione ao menos uma empresa ativa para o contato.';
+    }
+    if (activeCompanies > 1) {
+      errors.companyLinks = 'Mantenha apenas uma empresa ativa por vez para evitar conflitos.';
+    }
+
+    (form.companyLinks || []).forEach((link) => {
+      if (!link.companyName.trim()) errors[`link_${link.id}_company`] = 'Nome da empresa é obrigatório.';
       if (link.professionalEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(link.professionalEmail)) {
-        errors[`link_${i}_email`] = 'E-mail profissional inválido.';
+        errors[`link_${link.id}_email`] = 'E-mail profissional inválido.';
+      }
+      if ((link.workModel === 'hybrid' || link.workModel === 'on-site') && !link.workAddress?.trim()) {
+        errors[`link_${link.id}_workAddress`] = 'Informe o endereço onde o contato atua.';
       }
     });
     setFieldErrors(errors);
@@ -215,6 +227,13 @@ export const ContactFormModal: React.FC<ContactFormModalProps> = ({
       ...prev,
       companyLinks: (prev.companyLinks || []).filter((l) => l.id !== id),
     }));
+    setFieldErrors((prev) => {
+      const next = { ...prev };
+      Object.keys(next).forEach((key) => {
+        if (key.includes(`link_${id}_`) || key === 'companyLinks') delete next[key];
+      });
+      return next;
+    });
   };
 
   const updateLink = (id: string, patch: Partial<ContactCompanyLink>) => {
@@ -222,6 +241,13 @@ export const ContactFormModal: React.FC<ContactFormModalProps> = ({
       ...prev,
       companyLinks: (prev.companyLinks || []).map((l) => (l.id === id ? { ...l, ...patch } : l)),
     }));
+    setFieldErrors((prev) => {
+      const next = { ...prev };
+      Object.keys(next).forEach((key) => {
+        if (key.includes(`link_${id}_`) || key === 'companyLinks') delete next[key];
+      });
+      return next;
+    });
   };
 
   const toggleLink = (id: string) =>
@@ -426,6 +452,7 @@ export const ContactFormModal: React.FC<ContactFormModalProps> = ({
                 <SectionTitle>Empresas de Atuação</SectionTitle>
                 <Typography variant="caption" color="text.secondary" sx={{ mt: -0.5, display: 'block' }}>
                   {(form.companyLinks || []).length} empresa(s) cadastrada(s) · {activeLinks} ativa(s)
+                  {accounts.length > 0 ? ` · ${accounts.length} empresa(s) no CRM` : ''}
                 </Typography>
               </Box>
               <Button size="small" startIcon={<AddIcon />} onClick={addCompanyLink} variant="outlined">
@@ -448,6 +475,12 @@ export const ContactFormModal: React.FC<ContactFormModalProps> = ({
                   Nenhuma empresa vinculada. Clique em "Adicionar empresa" para incluir.
                 </Typography>
               </Box>
+            )}
+
+            {fieldErrors.companyLinks && (
+              <FormHelperText error sx={{ mt: 1 }}>
+                {fieldErrors.companyLinks}
+              </FormHelperText>
             )}
 
             <Stack spacing={2}>
@@ -517,8 +550,8 @@ export const ContactFormModal: React.FC<ContactFormModalProps> = ({
                             size="small"
                             value={link.companyName}
                             onChange={(e) => updateLink(link.id, { companyName: e.target.value })}
-                            error={!!fieldErrors[`link_${idx}_company`]}
-                            helperText={fieldErrors[`link_${idx}_company`]}
+                            error={!!fieldErrors[`link_${link.id}_company`]}
+                            helperText={fieldErrors[`link_${link.id}_company`]}
                           />
                         </Grid>
                         <Grid item xs={12} sm={6}>
@@ -529,8 +562,8 @@ export const ContactFormModal: React.FC<ContactFormModalProps> = ({
                             type="email"
                             value={link.professionalEmail || ''}
                             onChange={(e) => updateLink(link.id, { professionalEmail: e.target.value })}
-                            error={!!fieldErrors[`link_${idx}_email`]}
-                            helperText={fieldErrors[`link_${idx}_email`]}
+                            error={!!fieldErrors[`link_${link.id}_email`]}
+                            helperText={fieldErrors[`link_${link.id}_email`]}
                           />
                         </Grid>
                         <Grid item xs={12} sm={6}>
@@ -565,6 +598,20 @@ export const ContactFormModal: React.FC<ContactFormModalProps> = ({
                             </Select>
                           </FormControl>
                         </Grid>
+                        {(link.workModel === 'hybrid' || link.workModel === 'on-site') && (
+                          <Grid item xs={12} sm={8}>
+                            <TextField
+                              label="Endereço de atuação *"
+                              fullWidth
+                              size="small"
+                              value={link.workAddress || ''}
+                              onChange={(e) => updateLink(link.id, { workAddress: e.target.value })}
+                              placeholder="Ex.: Av. Paulista, 1000 - Bela Vista, São Paulo"
+                              error={!!fieldErrors[`link_${link.id}_workAddress`]}
+                              helperText={fieldErrors[`link_${link.id}_workAddress`]}
+                            />
+                          </Grid>
+                        )}
                         <Grid item xs={12} sm={4}>
                           <TextField
                             label="Data de início"

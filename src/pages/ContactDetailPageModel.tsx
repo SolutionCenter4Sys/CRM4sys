@@ -12,7 +12,6 @@ import {
   FormControl,
   IconButton,
   InputAdornment,
-  InputLabel,
   List,
   ListItemButton,
   ListItemIcon,
@@ -35,13 +34,11 @@ import {
   ChevronRight as ChevronRightIcon,
   EditNoteOutlined as EditNoteOutlinedIcon,
   EmailOutlined as EmailOutlinedIcon,
-  EventOutlined as EventOutlinedIcon,
   ExpandMore as ExpandMoreIcon,
   LinkedIn as LinkedInIcon,
   LockOutlined as LockOutlinedIcon,
   MailOutline as MailOutlineIcon,
   MoreHoriz as MoreHorizIcon,
-  OpenInNew as OpenInNewIcon,
   PersonOutlined as PersonIcon,
   PhoneOutlined as PhoneOutlinedIcon,
   PostAddOutlined as PostAddOutlinedIcon,
@@ -52,11 +49,13 @@ import {
   WorkOutline as WorkIcon,
 } from '@mui/icons-material';
 import { mockApi } from '../mock/api';
+import { ContactFormModal } from '../components/ContactFormModal';
 import AccountFormModal from '../components/AccountFormModal';
 import type {
   Account,
   Activity,
   Contact,
+  ContactCompanyLink,
   ContactFormData,
   Deal,
   LifecycleStage,
@@ -78,6 +77,24 @@ const lifecycleLabel: Record<Contact['lifecycleStage'], string> = {
 const lifecycleColor: Record<Contact['lifecycleStage'], 'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'error' | 'info'> = {
   subscriber: 'default', lead: 'info', mql: 'warning', sql: 'warning',
   opportunity: 'secondary', customer: 'success', evangelist: 'success',
+};
+
+const workModelLabel: Record<string, string> = {
+  remote: 'Remoto',
+  hybrid: 'Híbrido',
+  'on-site': 'Presencial',
+};
+
+const getBirthdayAlert = (birthDate?: string): string | null => {
+  if (!birthDate) return null;
+  const today = new Date();
+  const bday = new Date(birthDate);
+  const nextBirthday = new Date(today.getFullYear(), bday.getMonth(), bday.getDate());
+  if (nextBirthday < today) nextBirthday.setFullYear(today.getFullYear() + 1);
+  const diffDays = Math.ceil((nextBirthday.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+  if (diffDays === 0) return 'Aniversário hoje! Envie uma mensagem.';
+  if (diffDays <= 7) return `Aniversário em ${diffDays} dia(s).`;
+  return null;
 };
 
 // ── Componente ──────────────────────────────────────────────────────────────
@@ -102,7 +119,7 @@ export const ContactDetailPageModel: React.FC = () => {
   const [saveSuccess, setSaveSuccess] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
   const [actionMessage, setActionMessage] = useState<string | null>(null);
-  const [saving, setSaving] = useState(false);
+  const [contactModalOpen, setContactModalOpen] = useState(isCreateMode || forceEditMode);
   const [actionsAnchorEl, setActionsAnchorEl] = useState<HTMLElement | null>(null);
   const [moreActionsAnchorEl, setMoreActionsAnchorEl] = useState<HTMLElement | null>(null);
   const [moreActionsSearch, setMoreActionsSearch] = useState('');
@@ -110,8 +127,8 @@ export const ContactDetailPageModel: React.FC = () => {
   const [activeQuickPanel, setActiveQuickPanel] = useState<'info' | null>(null);
   const [form, setForm] = useState<ContactFormData>({
     firstName: '', lastName: '', email: '', phone: '', mobilePhone: '',
-    jobTitle: '', department: '', lifecycleStage: 'lead', leadSource: '',
-    accountId: '', ownerId: '', tags: [], customFields: {},
+    linkedin: '', birthDate: '', lifecycleStage: 'lead', leadSource: '',
+    accountId: '', ownerId: '', tags: [], customFields: {}, companyLinks: [],
   });
 
   useEffect(() => {
@@ -119,6 +136,7 @@ export const ContactDetailPageModel: React.FC = () => {
     const load = async () => {
       try {
         setLoading(true); setError(null);
+        setContactModalOpen(isCreateMode || forceEditMode);
         const [accountsRes, usersRes] = await Promise.all([
           mockApi.accounts.list(), mockApi.users.list(),
         ]);
@@ -130,11 +148,12 @@ export const ContactDetailPageModel: React.FC = () => {
             ...prev,
             ownerId: usersRes.data?.[0]?.id || '',
             accountId: '',
+            companyLinks: [],
             customFields: {},
           }));
           return;
         }
-        setIsEditing(forceEditMode);
+        setIsEditing(false);
         const contactRes = await mockApi.contacts.getById(id);
         const [activityRes, dealsRes] = await Promise.all([
           mockApi.activities.listByContact(id), mockApi.deals.listByContact(id),
@@ -147,11 +166,12 @@ export const ContactDetailPageModel: React.FC = () => {
           setForm({
             firstName: loadedContact.firstName, lastName: loadedContact.lastName,
             email: loadedContact.email, phone: loadedContact.phone || '',
-            mobilePhone: loadedContact.mobilePhone || '', jobTitle: loadedContact.jobTitle || '',
-            department: loadedContact.department || '', lifecycleStage: loadedContact.lifecycleStage,
+            mobilePhone: loadedContact.mobilePhone || '', linkedin: loadedContact.linkedin || '',
+            birthDate: loadedContact.birthDate || '', address: loadedContact.address,
+            avatar: loadedContact.avatar, lifecycleStage: loadedContact.lifecycleStage,
             leadSource: loadedContact.leadSource || '', accountId: loadedContact.accountId || '',
             ownerId: loadedContact.ownerId || '', tags: loadedContact.tags || [],
-            customFields: loadedContact.customFields || {},
+            customFields: loadedContact.customFields || {}, companyLinks: loadedContact.companyLinks || [],
           });
         }
       } catch (err) {
@@ -179,19 +199,25 @@ export const ContactDetailPageModel: React.FC = () => {
   const latestActivity = groupedActivities[0]?.[1]?.[0];
 
   const displayContact: Contact = contact ?? {
+    contactCode: undefined,
     firstName: form.firstName || 'Novo', lastName: form.lastName || 'Contato',
     fullName: `${form.firstName || 'Novo'} ${form.lastName || 'Contato'}`.trim(),
     email: form.email || 'email@empresa.com', phone: form.phone, mobilePhone: form.mobilePhone,
+    linkedin: form.linkedin, birthDate: form.birthDate, address: form.address, avatar: form.avatar,
     jobTitle: form.jobTitle || 'Contato', department: form.department,
     lifecycleStage: (form.lifecycleStage || 'lead') as LifecycleStage,
     leadSource: form.leadSource, ownerId: form.ownerId || users[0]?.id || '',
     owner: users.find((u) => u.id === form.ownerId) || users[0],
     accountId: form.accountId || undefined,
     account: accounts.find((a) => a.id === form.accountId),
+    companyLinks: form.companyLinks || [],
     leadScore: 0, tags: form.tags || [],
     customFields: form.customFields || {},
     createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(),
   } as Contact;
+  const companyLinks = displayContact.companyLinks || [];
+  const activeCompany = companyLinks.find((link) => link.isActive);
+  const birthdayAlert = getBirthdayAlert(displayContact.birthDate);
 
   const aiSummary = latestActivity
     ? `Recentemente, ${displayContact.fullName} interagiu em "${latestActivity.subject}" (${latestActivity.type}). Há ${activities.length} atividade(s) registrada(s) — bom contexto para o próximo passo comercial.`
@@ -229,16 +255,6 @@ export const ContactDetailPageModel: React.FC = () => {
     if (typeof value === 'boolean') return value ? 'Sim' : 'Nao';
     const text = String(value).trim();
     return text.length > 0 ? text : fallback;
-  };
-
-  const getCustomField = (keys: string[]): unknown => {
-    const customFields = (displayContact.customFields || {}) as Record<string, unknown>;
-    for (const key of keys) {
-      if (customFields[key] !== undefined && customFields[key] !== null) {
-        return customFields[key];
-      }
-    }
-    return undefined;
   };
 
   const socialSellingFields: Array<{ label: string; key: string; multiline?: boolean; rows?: number }> = [
@@ -300,7 +316,8 @@ export const ContactDetailPageModel: React.FC = () => {
         const c = contact!;
         const created = await mockApi.contacts.create({
           firstName: `${c.firstName} (Cópia)`, lastName: c.lastName, email: `copia+${Date.now()}_${c.email}`,
-          phone: c.phone, mobilePhone: c.mobilePhone, jobTitle: c.jobTitle, department: c.department,
+          phone: c.phone, mobilePhone: c.mobilePhone, linkedin: c.linkedin, birthDate: c.birthDate, address: c.address,
+          jobTitle: c.jobTitle, department: c.department, companyLinks: c.companyLinks,
           accountId: c.accountId, ownerId: c.ownerId, lifecycleStage: c.lifecycleStage,
           leadSource: c.leadSource, tags: c.tags, customFields: c.customFields,
         });
@@ -323,28 +340,39 @@ export const ContactDetailPageModel: React.FC = () => {
     finally { setActionsAnchorEl(null); }
   };
 
-  const validate = (): string | null => {
-    if (!form.firstName?.trim()) return 'Primeiro nome obrigatório.';
-    if (!form.lastName?.trim()) return 'Sobrenome obrigatório.';
-    if (!form.email?.trim()) return 'E-mail obrigatório.';
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) return 'E-mail inválido.';
-    return null;
-  };
-
-  const handleSave = async () => {
-    const ve = validate(); if (ve) { setSaveError(ve); return; }
-    try {
-      setSaving(true); setSaveError(null); setSaveSuccess(null);
-      if (isCreateMode) {
-        const created = await mockApi.contacts.create({ ...form, accountId: form.accountId || undefined, ownerId: form.ownerId || undefined });
-        if (created.data?.id) { navigate(`/contacts/${created.data.id}`); return; }
-      } else if (id) {
-        const updated = await mockApi.contacts.update(id, { ...form, accountId: form.accountId || undefined, ownerId: form.ownerId || undefined });
-        if (updated.data) setContact(updated.data);
-        setIsEditing(false); setSaveSuccess('Contato atualizado com sucesso.');
+  const handleModalSubmit = async (data: ContactFormData) => {
+    if (isCreateMode) {
+      const created = await mockApi.contacts.create(data);
+      if (created.data?.id) {
+        navigate(`/contacts/${created.data.id}`);
       }
-    } catch (err) { setSaveError(err instanceof Error ? err.message : 'Erro ao salvar'); }
-    finally { setSaving(false); }
+      return;
+    }
+
+    if (!id) return;
+    const updated = await mockApi.contacts.update(id, data);
+    if (updated.data) {
+      setContact(updated.data);
+      setForm({
+        firstName: updated.data.firstName,
+        lastName: updated.data.lastName,
+        email: updated.data.email,
+        phone: updated.data.phone || '',
+        mobilePhone: updated.data.mobilePhone || '',
+        linkedin: updated.data.linkedin || '',
+        birthDate: updated.data.birthDate || '',
+        address: updated.data.address,
+        avatar: updated.data.avatar,
+        lifecycleStage: updated.data.lifecycleStage,
+        leadSource: updated.data.leadSource || '',
+        accountId: updated.data.accountId || '',
+        ownerId: updated.data.ownerId || '',
+        tags: updated.data.tags || [],
+        customFields: updated.data.customFields || {},
+        companyLinks: updated.data.companyLinks || [],
+      });
+      setSaveSuccess('Contato atualizado com sucesso.');
+    }
   };
 
   if (loading) return (
@@ -369,6 +397,16 @@ export const ContactDetailPageModel: React.FC = () => {
         sx={{ color: 'text.secondary', mb: 1, '&:hover': { color: 'primary.main' } }}>
         Contatos
       </Button>
+
+      {birthdayAlert && (
+        <Alert
+          severity="info"
+          sx={{ mb: 1 }}
+          action={<Button color="inherit" size="small">Enviar mensagem</Button>}
+        >
+          {birthdayAlert}
+        </Alert>
+      )}
 
       {/* Layout 3 colunas */}
       <Box sx={{
@@ -404,7 +442,7 @@ export const ContactDetailPageModel: React.FC = () => {
                 </Typography>
                 {displayContact.jobTitle && (
                   <Typography variant="body2" color="text.secondary" sx={{ mt: 0.2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    {displayContact.jobTitle}{displayContact.account?.name ? ` · ${displayContact.account.name}` : ''}
+                    {displayContact.jobTitle}{(activeCompany?.companyName || displayContact.account?.name) ? ` · ${activeCompany?.companyName || displayContact.account?.name}` : ''}
                   </Typography>
                 )}
                 <Typography variant="caption" sx={{ color: 'primary.main', fontWeight: 600, mt: 0.2, display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
@@ -473,7 +511,7 @@ export const ContactDetailPageModel: React.FC = () => {
               {[
                 { icon: <EmailOutlinedIcon sx={{ fontSize: 15 }} />, label: 'E-mail', value: displayContact.email },
                 { icon: <PhoneOutlinedIcon sx={{ fontSize: 15 }} />, label: 'Telefone', value: displayContact.mobilePhone || displayContact.phone || '--' },
-                { icon: <WorkIcon sx={{ fontSize: 15 }} />, label: 'Empresa', value: displayContact.account?.name || '--' },
+                { icon: <WorkIcon sx={{ fontSize: 15 }} />, label: 'Empresa ativa', value: activeCompany?.companyName || displayContact.account?.name || '--' },
                 { icon: <PersonIcon sx={{ fontSize: 15 }} />, label: 'Proprietário', value: displayContact.owner?.fullName || '--' },
               ].map(({ icon, label, value }) => (
                 <Box key={label} sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
@@ -492,7 +530,7 @@ export const ContactDetailPageModel: React.FC = () => {
                 sx={{ mt: 1.2 }}
                 onClick={() => {
                   setTab(0);
-                  setIsEditing(true);
+                  setContactModalOpen(true);
                 }}
               >
                 Editar contato
@@ -545,6 +583,29 @@ export const ContactDetailPageModel: React.FC = () => {
               <Box sx={{ mt: 1, display: 'grid', gap: 0.8 }}>
                 {[
                   { label: 'Fase do ciclo', value: lifecycleLabel[displayContact.lifecycleStage] },
+                  { label: 'Código do contato', value: displayContact.contactCode || 'Gerado automaticamente' },
+                  { label: 'LinkedIn', value: displayContact.linkedin || 'Nao informado' },
+                  {
+                    label: 'Aniversário',
+                    value: displayContact.birthDate
+                      ? new Date(displayContact.birthDate).toLocaleDateString('pt-BR')
+                      : 'Nao informado',
+                  },
+                  {
+                    label: 'Criado em',
+                    value: displayContact.createdAt
+                      ? new Date(displayContact.createdAt).toLocaleDateString('pt-BR')
+                      : 'Nao informado',
+                  },
+                  {
+                    label: 'Endereço',
+                    value: [
+                      displayContact.address?.street,
+                      displayContact.address?.city,
+                      displayContact.address?.state,
+                    ].filter(Boolean).join(' - ') || 'Nao informado',
+                  },
+                  { label: 'Empresa ativa', value: activeCompany?.companyName || displayContact.account?.name || 'Nao informado' },
                   { label: 'Fonte do lead', value: displayContact.leadSource || 'Nao informado' },
                   { label: 'Papel no comite', value: displayContact.buyingCommitteeRole || 'Nao informado' },
                   { label: 'Tags', value: displayContact.tags?.length ? displayContact.tags.join(', ') : 'Nao informado' },
@@ -578,23 +639,19 @@ export const ContactDetailPageModel: React.FC = () => {
               sx={{ minHeight: 36, '& .MuiTab-root': { minHeight: 36, px: 1.5, fontWeight: 600 }, '& .MuiTabs-indicator': { height: 2.5 } }}>
               <Tab label="Sobre" />
               <Tab label="Timeline" />
-              <Tab label="Receita" />
+              <Tab label="Negócios" />
+              <Tab label="Faturamento" />
               <Tab label="Comportamento Digital" />
+              <Tab label="Empresas de atuação" />
             </Tabs>
             <Box sx={{ display: 'flex', gap: 1, flexShrink: 0 }}>
-              {!isCreateMode && !isEditing && (
-                <Button size="small" variant="outlined" onClick={() => setIsEditing(true)}>Editar</Button>
-              )}
-              {(isCreateMode || isEditing) && (
-                <>
-                  {!isCreateMode && (
-                    <Button size="small" variant="text" color="inherit" onClick={() => setIsEditing(false)}>Cancelar</Button>
-                  )}
-                  <Button size="small" variant="contained" onClick={handleSave} disabled={saving}>
-                    {saving ? 'Salvando…' : isCreateMode ? 'Criar contato' : 'Salvar'}
-                  </Button>
-                </>
-              )}
+              <Button
+                size="small"
+                variant="contained"
+                onClick={() => setContactModalOpen(true)}
+              >
+                {isCreateMode ? 'Cadastrar contato' : 'Editar contato'}
+              </Button>
             </Box>
           </Box>
 
@@ -652,6 +709,39 @@ export const ContactDetailPageModel: React.FC = () => {
                     {isEditing || isCreateMode
                       ? <TextField size="small" fullWidth value={form.email} onChange={(e) => setField('email', e.target.value)} sx={{ mt: 0.5 }} />
                       : <Typography variant="body2" sx={{ fontWeight: 500, mt: 0.3, wordBreak: 'break-word' }}>{displayContact.email}</Typography>}
+                  </Box>
+
+                  <Box>
+                    <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>Código do contato</Typography>
+                    <Typography variant="body2" sx={{ fontWeight: 500, mt: 0.3 }}>
+                      {displayContact.contactCode || 'Gerado automaticamente'}
+                    </Typography>
+                  </Box>
+
+                  <Box>
+                    <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>LinkedIn</Typography>
+                    <Typography variant="body2" sx={{ fontWeight: 500, mt: 0.3, wordBreak: 'break-word' }}>
+                      {displayContact.linkedin || '--'}
+                    </Typography>
+                  </Box>
+
+                  <Box>
+                    <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>Data de nascimento</Typography>
+                    <Typography variant="body2" sx={{ fontWeight: 500, mt: 0.3 }}>
+                      {displayContact.birthDate ? new Date(displayContact.birthDate).toLocaleDateString('pt-BR') : '--'}
+                    </Typography>
+                  </Box>
+
+                  <Box sx={{ gridColumn: { sm: '1 / -1', md: '1 / -1' } }}>
+                    <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>Endereço</Typography>
+                    <Typography variant="body2" sx={{ fontWeight: 500, mt: 0.3 }}>
+                      {[
+                        displayContact.address?.street,
+                        displayContact.address?.city,
+                        displayContact.address?.state,
+                        displayContact.address?.country,
+                      ].filter(Boolean).join(' - ') || '--'}
+                    </Typography>
                   </Box>
 
                   {/* Celular */}
@@ -811,11 +901,11 @@ export const ContactDetailPageModel: React.FC = () => {
             </Box>
           </TabPanel>
 
-          {/* ── Aba: Receita ─── */}
+          {/* ── Aba: Negócios ─── */}
           <TabPanel value={tab} index={2}>
             <Box sx={{ px: 1.5 }}>
               <Box sx={{ border: '1px solid', borderColor: 'divider', borderRadius: 2, bgcolor: 'background.paper', p: 1.5 }}>
-                <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 1.5 }}>Receita associada</Typography>
+                <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 1.5 }}>Negócios associados</Typography>
                 <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 1.5 }}>
                   {[
                     { label: 'Negócios abertos', value: openDeals.length },
@@ -832,8 +922,25 @@ export const ContactDetailPageModel: React.FC = () => {
             </Box>
           </TabPanel>
 
-          {/* ── Aba: Comportamento Digital ─── */}
+          {/* ── Aba: Faturamento ─── */}
           <TabPanel value={tab} index={3}>
+            <Box sx={{ px: 1.5 }}>
+              <Box sx={{ border: '1px solid', borderColor: 'divider', borderRadius: 2, bgcolor: 'background.paper', p: 1.5 }}>
+                <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 1 }}>
+                  Faturamento
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Esta guia concentra indicadores financeiros e histórico de cobrança ligados ao contato.
+                </Typography>
+                <Button sx={{ mt: 1.5 }} size="small" variant="outlined" onClick={() => navigate('/billing/invoices')}>
+                  Ver faturas
+                </Button>
+              </Box>
+            </Box>
+          </TabPanel>
+
+          {/* ── Aba: Comportamento Digital ─── */}
+          <TabPanel value={tab} index={4}>
             <Box sx={{ px: 1.5 }}>
               <Box sx={{ border: '1px solid', borderColor: 'divider', borderRadius: 2, bgcolor: 'background.paper', p: 1.5 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8, mb: 1.5 }}>
@@ -856,6 +963,66 @@ export const ContactDetailPageModel: React.FC = () => {
               </Box>
             </Box>
           </TabPanel>
+
+          {/* ── Aba: Empresas de atuação ─── */}
+          <TabPanel value={tab} index={5}>
+            <Box sx={{ px: 1.5 }}>
+              <Box sx={{ border: '1px solid', borderColor: 'divider', borderRadius: 2, bgcolor: 'background.paper', p: 1.5 }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.2 }}>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
+                    Histórico de empresas
+                  </Typography>
+                  <Button size="small" variant="outlined" onClick={() => setContactModalOpen(true)}>
+                    Gerenciar empresas
+                  </Button>
+                </Box>
+                {companyLinks.length === 0 ? (
+                  <Typography variant="body2" color="text.secondary">
+                    Nenhuma empresa de atuação cadastrada para este contato.
+                  </Typography>
+                ) : (
+                  <Stack spacing={1}>
+                    {companyLinks.map((link: ContactCompanyLink) => (
+                      <Box
+                        key={link.id}
+                        sx={{
+                          p: 1.2,
+                          border: '1px solid',
+                          borderColor: link.isActive ? 'primary.main' : 'divider',
+                          borderRadius: 1.5,
+                          bgcolor: link.isActive ? '#F8FBFF' : 'background.default',
+                        }}
+                      >
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 1, flexWrap: 'wrap' }}>
+                          <Typography variant="body2" sx={{ fontWeight: 700 }}>
+                            {link.companyName}
+                          </Typography>
+                          <Chip
+                            size="small"
+                            color={link.isActive ? 'success' : 'default'}
+                            label={link.isActive ? 'Ativo' : 'Inativo'}
+                          />
+                        </Box>
+                        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5 }}>
+                          {link.jobTitle || 'Sem cargo'} · {link.department || 'Sem departamento'} · {workModelLabel[link.workModel || 'remote']}
+                        </Typography>
+                        {link.professionalEmail && (
+                          <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
+                            E-mail profissional: {link.professionalEmail}
+                          </Typography>
+                        )}
+                        {link.workAddress && (
+                          <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
+                            Endereço de atuação: {link.workAddress}
+                          </Typography>
+                        )}
+                      </Box>
+                    ))}
+                  </Stack>
+                )}
+              </Box>
+            </Box>
+          </TabPanel>
         </Box>
 
         {/* ── Coluna direita — Relacionamentos ─────────────────────────── */}
@@ -865,24 +1032,36 @@ export const ContactDetailPageModel: React.FC = () => {
           <Box sx={{ border: '1px solid', borderColor: 'divider', borderRadius: 2, bgcolor: 'background.paper', mb: 1.2 }}>
             <Box sx={{ px: 1.5, py: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
-                Empresas {displayContact.account ? <Chip label="1" size="small" sx={{ ml: 0.5, height: 18, fontSize: 10 }} /> : <Chip label="0" size="small" sx={{ ml: 0.5, height: 18, fontSize: 10 }} />}
+                Empresas <Chip label={companyLinks.length} size="small" sx={{ ml: 0.5, height: 18, fontSize: 10 }} />
               </Typography>
-              <IconButton size="small" onClick={() => setAccountModalOpen(true)}><AddIcon fontSize="small" /></IconButton>
+              <IconButton size="small" onClick={() => setContactModalOpen(true)}><AddIcon fontSize="small" /></IconButton>
             </Box>
             <Divider />
             <Box sx={{ p: 1.2 }}>
-              {displayContact.account ? (
-                <Box sx={{ p: 1.2, border: '1px solid', borderColor: 'divider', borderRadius: 1.5 }}>
-                  <Typography variant="body2" sx={{ fontWeight: 700, color: 'primary.main', mb: 0.3 }}>{displayContact.account.name}</Typography>
-                  {displayContact.account.domain && (
-                    <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
-                      {displayContact.account.domain}
-                    </Typography>
+              {companyLinks.length > 0 ? (
+                <Stack spacing={0.8}>
+                  {companyLinks.slice(0, 3).map((link) => (
+                    <Box key={link.id} sx={{ p: 1.2, border: '1px solid', borderColor: 'divider', borderRadius: 1.5 }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 0.5 }}>
+                        <Typography variant="body2" sx={{ fontWeight: 700, color: 'primary.main' }}>{link.companyName}</Typography>
+                        <Chip
+                          label={link.isActive ? 'Ativo' : 'Inativo'}
+                          size="small"
+                          color={link.isActive ? 'success' : 'default'}
+                          sx={{ height: 18, fontSize: 10 }}
+                        />
+                      </Box>
+                      <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
+                        {link.jobTitle || 'Sem cargo'} · {link.department || 'Sem departamento'}
+                      </Typography>
+                    </Box>
+                  ))}
+                  {companyLinks.length > 3 && (
+                    <Button size="small" onClick={() => setTab(5)} sx={{ alignSelf: 'flex-start', p: 0, fontSize: 12 }}>
+                      +{companyLinks.length - 3} empresa(s)
+                    </Button>
                   )}
-                  <Button size="small" sx={{ mt: 0.5, p: 0, minWidth: 'auto', fontSize: 12 }} endIcon={<OpenInNewIcon sx={{ fontSize: 12 }} />}>
-                    Ver empresa
-                  </Button>
-                </Box>
+                </Stack>
               ) : (
                 <Typography variant="caption" color="text.secondary">Nenhuma empresa associada.</Typography>
               )}
@@ -1000,6 +1179,18 @@ export const ContactDetailPageModel: React.FC = () => {
           ))}
         </List>
       </Popover>
+
+      <ContactFormModal
+        open={contactModalOpen}
+        mode={isCreateMode ? 'create' : 'edit'}
+        initialData={contact}
+        onClose={() => {
+          setContactModalOpen(false);
+          if (isCreateMode) navigate('/contacts');
+        }}
+        onSubmit={handleModalSubmit}
+        accounts={accounts.map((account) => ({ id: account.id, name: account.name }))}
+      />
 
       <AccountFormModal open={accountModalOpen} onClose={() => setAccountModalOpen(false)}
         onCreated={async (created) => {

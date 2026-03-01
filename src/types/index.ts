@@ -19,6 +19,7 @@ export interface ContactCompanyLink {
   departmentObjective?: string;
   workModel?: WorkModel;
   officeAddressId?: string;
+  workAddress?: string;
   isActive: boolean;
   startDate?: string;
   endDate?: string;
