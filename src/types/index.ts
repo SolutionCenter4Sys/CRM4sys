@@ -906,19 +906,34 @@ export interface InvoiceTotals {
 }
 
 export interface InvoiceFormData {
+  dealId: string;
   accountId: string;
   contactId?: string | null;
   issueDate: string; // YYYY-MM-DD
   dueDate: string; // YYYY-MM-DD
+  installmentCount?: number;
   currency: 'BRL';
   notes?: string | null;
   items: InvoiceItemForm[];
   discountValue?: number;
+  originalIssueDate?: string | null;
+  issuePostponementReason?: string | null;
+  originalDueDate?: string | null;
+  duePostponementReason?: string | null;
+  nfNumber?: string | null;
+  cancelledNfNumber?: string | null;
+  billingAddressSnapshot?: Address | null;
+  invoiceDescription?: string | null;
 }
 
 export interface Invoice {
   id: string;
   invoiceNumber: string;
+  invoiceCode: string;
+  installmentNumber: number;
+  installmentTotal: number;
+  dealId: string;
+  dealTitle: string;
   accountId: string;
   accountName: string;
   contactId?: string | null;
@@ -927,6 +942,14 @@ export interface Invoice {
   currency: 'BRL';
   issueDate: string; // YYYY-MM-DD
   dueDate: string; // YYYY-MM-DD
+  originalIssueDate?: string | null;
+  issuePostponementReason?: string | null;
+  originalDueDate?: string | null;
+  duePostponementReason?: string | null;
+  nfNumber?: string | null;
+  cancelledNfNumber?: string | null;
+  billingAddressSnapshot?: Address | null;
+  invoiceDescription?: string | null;
   items: Array<InvoiceItemForm & { id: string }>;
   totals: InvoiceTotals;
   createdAt: string; // ISO
@@ -946,6 +969,10 @@ export interface InvoiceListFilters {
 export interface InvoiceListItem {
   id: string;
   invoiceNumber: string;
+  invoiceCode: string;
+  installmentNumber: number;
+  installmentTotal: number;
+  dealTitle: string;
   accountName: string;
   status: InvoiceStatus;
   issueDate: string;

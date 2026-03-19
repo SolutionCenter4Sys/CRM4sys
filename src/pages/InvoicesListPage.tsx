@@ -31,6 +31,8 @@ import {
   Cancel as CancelIcon,
   Payment as PaymentIcon,
   Refresh as RefreshIcon,
+  ContentCopy as DuplicateIcon,
+  Delete as DeleteIcon,
 } from '@mui/icons-material';
 import { mockApi } from '../mock/api';
 import type { InvoiceListItem, InvoiceListFilters, InvoiceStatus } from '../types';
@@ -86,6 +88,27 @@ const InvoicesListPage: React.FC = () => {
       loadInvoices();
     } catch (err: any) {
       setSnackbar({ open: true, message: err.message, severity: 'error' });
+    }
+  };
+
+  const handleDuplicateInvoice = async (invoiceId: string) => {
+    try {
+      const res = await mockApi.billingInvoices.duplicate(invoiceId);
+      setSnackbar({ open: true, message: res.message || 'Fatura duplicada', severity: 'success' });
+      loadInvoices();
+    } catch (err: any) {
+      setSnackbar({ open: true, message: err.message || 'Erro ao duplicar fatura', severity: 'error' });
+    }
+  };
+
+  const handleDeleteInvoice = async (invoiceId: string) => {
+    if (!confirm('Excluir esta fatura permanentemente?')) return;
+    try {
+      await mockApi.billingInvoices.remove(invoiceId);
+      setSnackbar({ open: true, message: 'Fatura excluída', severity: 'success' });
+      loadInvoices();
+    } catch (err: any) {
+      setSnackbar({ open: true, message: err.message || 'Erro ao excluir fatura', severity: 'error' });
     }
   };
 
@@ -173,6 +196,7 @@ const InvoicesListPage: React.FC = () => {
             <TableHead>
               <TableRow>
                 <TableCell>Número</TableCell>
+                <TableCell>Negócio</TableCell>
                 <TableCell>Empresa</TableCell>
                 <TableCell>Status</TableCell>
                 <TableCell align="right">Total</TableCell>
@@ -185,7 +209,7 @@ const InvoicesListPage: React.FC = () => {
             <TableBody>
               {invoices.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={8} align="center">
+                  <TableCell colSpan={9} align="center">
                     <Typography variant="body2" color="text.secondary" sx={{ py: 3 }}>
                       Nenhuma fatura encontrada
                     </Typography>
@@ -198,7 +222,11 @@ const InvoicesListPage: React.FC = () => {
                       <Typography variant="body2" fontWeight={600}>
                         {inv.invoiceNumber}
                       </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        {inv.invoiceCode} • {inv.installmentNumber}/{inv.installmentTotal}
+                      </Typography>
                     </TableCell>
+                    <TableCell>{inv.dealTitle}</TableCell>
                     <TableCell>{inv.accountName}</TableCell>
                     <TableCell>
                       <Chip
@@ -234,6 +262,11 @@ const InvoicesListPage: React.FC = () => {
                             <VisibilityIcon fontSize="small" />
                           </IconButton>
                         </Tooltip>
+                        <Tooltip title="Duplicar">
+                          <IconButton size="small" onClick={() => handleDuplicateInvoice(inv.id)}>
+                            <DuplicateIcon fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
                         {inv.status !== 'paid' && inv.status !== 'cancelled' && (
                           <>
                             <Tooltip title="Registrar pagamento">
@@ -256,6 +289,11 @@ const InvoicesListPage: React.FC = () => {
                             </Tooltip>
                           </>
                         )}
+                        <Tooltip title="Excluir">
+                          <IconButton size="small" color="error" onClick={() => handleDeleteInvoice(inv.id)}>
+                            <DeleteIcon fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
                       </Stack>
                     </TableCell>
                   </TableRow>

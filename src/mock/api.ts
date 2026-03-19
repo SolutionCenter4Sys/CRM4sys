@@ -2340,6 +2340,13 @@ export const biConnectorsApi = {
 // ============================================================================
 
 const toDateOnly = (isoOrDate: string) => isoOrDate.slice(0, 10);
+const addMonthsKeepingDay = (dateStr: string, monthsToAdd: number) => {
+  const [year, month, day] = dateStr.split('-').map(Number);
+  const date = new Date(Date.UTC(year, month - 1, day));
+  const targetMonth = date.getUTCMonth() + monthsToAdd;
+  date.setUTCMonth(targetMonth);
+  return toDateOnly(date.toISOString());
+};
 
 const calcInvoiceTotals = (
   items: Array<{ quantity: number; unitPrice: number; taxRatePct?: number; discountValue?: number }>,
@@ -2379,6 +2386,22 @@ const pushAudit = (event: Omit<AuditEvent, 'auditId' | 'occurredAt'>) => {
   MockStorage.setAuditEvents(rows.slice(0, 500));
 };
 
+const parseInvoiceSequence = (code: string): number | null => {
+  const matched = /^INV(\d{4})(\d{4})$/.exec(code);
+  return matched ? Number(matched[2]) : null;
+};
+
+const nextInvoiceCode = (invoices: Invoice[]) => {
+  const year = new Date().getFullYear();
+  const prefix = `INV${year}`;
+  const maxSeq = invoices
+    .filter((inv) => inv.invoiceCode?.startsWith(prefix))
+    .map((inv) => parseInvoiceSequence(inv.invoiceCode))
+    .filter((v): v is number => typeof v === 'number')
+    .reduce((max, seq) => Math.max(max, seq), 0);
+  return `${prefix}${String(maxSeq + 1).padStart(4, '0')}`;
+};
+
 export const billingInvoicesApi = {
   async list(
     filters: InvoiceListFilters = {},
@@ -2393,7 +2416,9 @@ export const billingInvoicesApi = {
       invoices = invoices.filter(
         (inv) =>
           inv.invoiceNumber.toLowerCase().includes(q) ||
+          inv.invoiceCode.toLowerCase().includes(q) ||
           inv.accountName.toLowerCase().includes(q) ||
+          inv.dealTitle.toLowerCase().includes(q) ||
           (inv.contactName || '').toLowerCase().includes(q)
       );
     }
@@ -2419,6 +2444,10 @@ export const billingInvoicesApi = {
     const items: InvoiceListItem[] = slice.map((inv) => ({
       id: inv.id,
       invoiceNumber: inv.invoiceNumber,
+      invoiceCode: inv.invoiceCode,
+      installmentNumber: inv.installmentNumber,
+      installmentTotal: inv.installmentTotal,
+      dealTitle: inv.dealTitle,
       accountName: inv.accountName,
       status: inv.status,
       issueDate: inv.issueDate,
@@ -2447,14 +2476,22 @@ export const billingInvoicesApi = {
 
   async create(payload: InvoiceFormData): Promise<ApiResponse<Invoice>> {
     await delay(260);
+    if (!payload.dealId) throw new Error('Negócio é obrigatório para criar fatura');
     const invoices = MockStorage.getInvoices();
     const accounts = MockStorage.getAccounts();
+    const deals = MockStorage.getDeals();
     const contacts = MockStorage.getContacts();
-    const account = accounts.find((a) => a.id === payload.accountId);
+    const deal = deals.find((d) => d.id === payload.dealId);
+    if (!deal) throw new Error('Negócio não encontrado');
+    const account = accounts.find((a) => a.id === deal.accountId);
     if (!account) throw new Error('Empresa não encontrada');
+    if (payload.accountId && payload.accountId !== account.id) {
+      throw new Error('A empresa da fatura deve ser a mesma empresa do negócio selecionado');
+    }
     const contact = payload.contactId ? contacts.find((c) => c.id === payload.contactId) : undefined;
 
-    const nextSeq = invoices.length + 1;
+    const installmentCount = Math.max(1, Number(payload.installmentCount || 1));
+    const invoiceCode = nextInvoiceCode(invoices);
     const nowIso = new Date().toISOString();
     const items = (payload.items || []).map((it) => ({
       id: generateId(),
@@ -2465,41 +2502,75 @@ export const billingInvoicesApi = {
       discountValue: it.discountValue,
     }));
     const totals = calcInvoiceTotals(items, Number(payload.discountValue || 0), 0);
+    const createdInvoices: Invoice[] = [];
 
-    const invoice: Invoice = {
-      id: generateId(),
-      invoiceNumber: `INV-2026-${String(nextSeq).padStart(4, '0')}`,
-      accountId: account.id,
-      accountName: account.name,
-      contactId: payload.contactId || null,
-      contactName: contact?.fullName || null,
-      status: 'open',
-      currency: 'BRL',
-      issueDate: payload.issueDate,
-      dueDate: payload.dueDate,
-      items,
-      totals,
-      createdAt: nowIso,
-      updatedAt: nowIso,
-    };
-    invoice.status = computeInvoiceStatus(invoice);
+    for (let installmentNumber = 1; installmentNumber <= installmentCount; installmentNumber++) {
+      const issueDate =
+        installmentNumber === 1
+          ? payload.issueDate
+          : addMonthsKeepingDay(payload.issueDate, installmentNumber - 1);
+      const dueDate =
+        installmentNumber === 1 ? payload.dueDate : addMonthsKeepingDay(payload.dueDate, installmentNumber - 1);
 
-    invoices.unshift(invoice);
+      const invoice: Invoice = {
+        id: generateId(),
+        invoiceNumber: `${invoiceCode}-${String(installmentNumber).padStart(2, '0')}`,
+        invoiceCode,
+        installmentNumber,
+        installmentTotal: installmentCount,
+        dealId: deal.id,
+        dealTitle: deal.title,
+        accountId: account.id,
+        accountName: account.name,
+        contactId: payload.contactId || null,
+        contactName: contact?.fullName || null,
+        status: 'open',
+        currency: 'BRL',
+        issueDate,
+        dueDate,
+        originalIssueDate: payload.originalIssueDate || payload.issueDate,
+        issuePostponementReason: payload.issuePostponementReason || null,
+        originalDueDate: payload.originalDueDate || payload.dueDate,
+        duePostponementReason: payload.duePostponementReason || null,
+        nfNumber: payload.nfNumber || null,
+        cancelledNfNumber: payload.cancelledNfNumber || null,
+        billingAddressSnapshot: payload.billingAddressSnapshot || account.address || null,
+        invoiceDescription: payload.invoiceDescription || account.billingConditions?.invoiceDescription || null,
+        items,
+        totals,
+        createdAt: nowIso,
+        updatedAt: nowIso,
+      };
+      invoice.status = computeInvoiceStatus(invoice);
+      invoices.unshift(invoice);
+      createdInvoices.push(invoice);
+    }
     MockStorage.setInvoices(invoices);
 
+    const summaryText =
+      createdInvoices.length > 1
+        ? `${createdInvoices.length} faturas criadas a partir do código ${invoiceCode}`
+        : `Fatura criada ${createdInvoices[0].invoiceNumber}`;
     pushAudit({
       entityType: 'invoice',
-      entityId: invoice.id,
+      entityId: createdInvoices[0].id,
       action: 'create',
       severity: 'info',
-      summary: `Fatura criada ${invoice.invoiceNumber}`,
+      summary: summaryText,
       actorUserId: mockData.users[0].id,
       actorName: mockData.users[0].fullName,
       actorIp: '127.0.0.1',
       diffs: [],
     });
 
-    return { isSuccess: true, data: invoice, message: 'Fatura criada com sucesso' };
+    return {
+      isSuccess: true,
+      data: createdInvoices[0],
+      message:
+        createdInvoices.length > 1
+          ? `${createdInvoices.length} parcelas criadas com sucesso`
+          : 'Fatura criada com sucesso',
+    };
   },
 
   async cancel(invoiceId: string, reason?: string): Promise<ApiResponse<Invoice>> {
@@ -2508,6 +2579,7 @@ export const billingInvoicesApi = {
     const index = invoices.findIndex((inv) => inv.id === invoiceId);
     if (index === -1) throw new Error('Fatura não encontrada');
     const nowIso = new Date().toISOString();
+    const previousStatus = invoices[index].status;
     invoices[index] = { ...invoices[index], status: 'cancelled', updatedAt: nowIso };
     MockStorage.setInvoices(invoices);
 
@@ -2519,7 +2591,7 @@ export const billingInvoicesApi = {
       title: 'Fatura cancelada',
       description: reason || null,
       amount: null,
-      previousStatus: 'open',
+      previousStatus,
       newStatus: 'cancelled',
       createdByName: mockData.users[0].fullName,
       createdAt: nowIso,
@@ -2535,10 +2607,73 @@ export const billingInvoicesApi = {
       actorUserId: mockData.users[0].id,
       actorName: mockData.users[0].fullName,
       actorIp: '127.0.0.1',
-      diffs: [{ field: 'status', before: 'open', after: 'cancelled', isSensitive: false }],
+      diffs: [{ field: 'status', before: previousStatus, after: 'cancelled', isSensitive: false }],
     });
 
     return { isSuccess: true, data: invoices[index], message: 'Fatura cancelada' };
+  },
+
+  async duplicate(invoiceId: string): Promise<ApiResponse<Invoice>> {
+    await delay(180);
+    const source = MockStorage.getInvoices().find((inv) => inv.id === invoiceId);
+    if (!source) throw new Error('Fatura não encontrada');
+    const duplicated = await this.create({
+      dealId: source.dealId,
+      accountId: source.accountId,
+      contactId: source.contactId || null,
+      issueDate: source.issueDate,
+      dueDate: source.dueDate,
+      installmentCount: 1,
+      currency: 'BRL',
+      notes: `Duplicada da fatura ${source.invoiceNumber}`,
+      items: source.items.map((it) => ({
+        description: it.description,
+        quantity: it.quantity,
+        unitPrice: it.unitPrice,
+        taxRatePct: it.taxRatePct,
+        discountValue: it.discountValue,
+      })),
+      originalIssueDate: source.originalIssueDate || source.issueDate,
+      issuePostponementReason: source.issuePostponementReason || null,
+      originalDueDate: source.originalDueDate || source.dueDate,
+      duePostponementReason: source.duePostponementReason || null,
+      nfNumber: null,
+      cancelledNfNumber: null,
+      billingAddressSnapshot: source.billingAddressSnapshot || null,
+      invoiceDescription: source.invoiceDescription || null,
+      discountValue: source.totals.discountTotal,
+    });
+    return {
+      isSuccess: true,
+      data: duplicated.data,
+      message: 'Fatura duplicada com sucesso',
+    };
+  },
+
+  async remove(invoiceId: string): Promise<ApiResponse<void>> {
+    await delay(180);
+    const invoices = MockStorage.getInvoices();
+    const found = invoices.find((inv) => inv.id === invoiceId);
+    if (!found) throw new Error('Fatura não encontrada');
+
+    MockStorage.setInvoices(invoices.filter((inv) => inv.id !== invoiceId));
+    MockStorage.setRecurrenceRules(MockStorage.getRecurrenceRules().filter((r) => r.invoiceId !== invoiceId));
+    MockStorage.setAllocations(MockStorage.getAllocations().filter((a) => a.invoiceId !== invoiceId));
+    MockStorage.setInvoiceHistoryEvents(MockStorage.getInvoiceHistoryEvents().filter((h) => h.invoiceId !== invoiceId));
+
+    pushAudit({
+      entityType: 'invoice',
+      entityId: invoiceId,
+      action: 'delete',
+      severity: 'warning',
+      summary: `Fatura excluída (${found.invoiceNumber})`,
+      actorUserId: mockData.users[0].id,
+      actorName: mockData.users[0].fullName,
+      actorIp: '127.0.0.1',
+      diffs: [],
+    });
+
+    return { isSuccess: true, message: 'Fatura excluída com sucesso' };
   },
 
   async getRecurrenceRule(invoiceId: string): Promise<ApiResponse<RecurrenceRuleForm | null>> {
