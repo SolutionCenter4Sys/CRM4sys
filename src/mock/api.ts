@@ -1,7 +1,7 @@
 // CRM B2B Tech Foursys - Mock API Service
 // Simula chamadas HTTP com localStorage e delays realistas
 
-import { mockData } from './data';
+import { mockData, mockCampaigns, mockMarketingEmails, mockAdAccounts, mockAdAudiences, mockAds, mockEventIntegrations, mockMarketingEvents } from './data';
 import type {
   Contact,
   Account,
@@ -107,6 +107,13 @@ import type {
   ProjectSummaryKpis,
   Integration,
   SsoConfig,
+  Campaign,
+  MarketingEmail,
+  Ad,
+  AdAccount,
+  AdAudience,
+  MarketingEvent,
+  EventIntegration,
 } from '../types';
 
 // ============================================================================
@@ -3978,6 +3985,115 @@ export const customerSuccessApi = {
 };
 
 // ============================================================================
+// EP09 — MARKETING
+// ============================================================================
+
+export const marketingCampaignsApi = {
+  async list(filters: { search?: string; status?: string; type?: string } = {}): Promise<ApiResponse<Campaign[]>> {
+    await delay(200);
+    let campaigns = [...mockCampaigns];
+    if (filters.search) {
+      const q = filters.search.toLowerCase();
+      campaigns = campaigns.filter(c => c.name.toLowerCase().includes(q) || c.description.toLowerCase().includes(q));
+    }
+    if (filters.status && filters.status !== 'all') {
+      campaigns = campaigns.filter(c => c.status === filters.status);
+    }
+    if (filters.type && filters.type !== 'all') {
+      campaigns = campaigns.filter(c => c.type === filters.type);
+    }
+    return { isSuccess: true, data: campaigns, message: 'OK' };
+  },
+  async getById(id: string): Promise<ApiResponse<Campaign | null>> {
+    await delay(150);
+    const campaign = mockCampaigns.find(c => c.id === id) || null;
+    return { isSuccess: !!campaign, data: campaign, message: campaign ? 'OK' : 'Campanha não encontrada' };
+  },
+};
+
+export const marketingEmailsApi = {
+  async list(filters: { search?: string; status?: string; templateType?: string; campaignId?: string } = {}): Promise<ApiResponse<MarketingEmail[]>> {
+    await delay(200);
+    let emails = [...mockMarketingEmails];
+    if (filters.search) {
+      const q = filters.search.toLowerCase();
+      emails = emails.filter(e => e.subject.toLowerCase().includes(q) || e.recipientListName.toLowerCase().includes(q));
+    }
+    if (filters.status && filters.status !== 'all') {
+      emails = emails.filter(e => e.status === filters.status);
+    }
+    if (filters.templateType && filters.templateType !== 'all') {
+      emails = emails.filter(e => e.templateType === filters.templateType);
+    }
+    if (filters.campaignId) {
+      emails = emails.filter(e => e.campaignId === filters.campaignId);
+    }
+    return { isSuccess: true, data: emails, message: 'OK' };
+  },
+  async getById(id: string): Promise<ApiResponse<MarketingEmail | null>> {
+    await delay(150);
+    const email = mockMarketingEmails.find(e => e.id === id) || null;
+    return { isSuccess: !!email, data: email, message: email ? 'OK' : 'Email não encontrado' };
+  },
+};
+
+export const marketingAdsApi = {
+  async list(filters: { search?: string; status?: string; platform?: string; campaignId?: string } = {}): Promise<ApiResponse<Ad[]>> {
+    await delay(200);
+    let ads = [...mockAds];
+    if (filters.search) {
+      const q = filters.search.toLowerCase();
+      ads = ads.filter(a => a.name.toLowerCase().includes(q));
+    }
+    if (filters.status && filters.status !== 'all') {
+      ads = ads.filter(a => a.status === filters.status);
+    }
+    if (filters.platform && filters.platform !== 'all') {
+      ads = ads.filter(a => a.platform === filters.platform);
+    }
+    if (filters.campaignId) {
+      ads = ads.filter(a => a.campaignId === filters.campaignId);
+    }
+    return { isSuccess: true, data: ads, message: 'OK' };
+  },
+  async listAccounts(): Promise<ApiResponse<AdAccount[]>> {
+    await delay(150);
+    return { isSuccess: true, data: [...mockAdAccounts], message: 'OK' };
+  },
+  async listAudiences(): Promise<ApiResponse<AdAudience[]>> {
+    await delay(150);
+    return { isSuccess: true, data: [...mockAdAudiences], message: 'OK' };
+  },
+};
+
+export const marketingEventsApi = {
+  async list(filters: { search?: string; status?: string; type?: string } = {}): Promise<ApiResponse<MarketingEvent[]>> {
+    await delay(200);
+    let events = [...mockMarketingEvents];
+    if (filters.search) {
+      const q = filters.search.toLowerCase();
+      events = events.filter(e => e.name.toLowerCase().includes(q) || e.description.toLowerCase().includes(q));
+    }
+    if (filters.status && filters.status !== 'all') {
+      events = events.filter(e => e.status === filters.status);
+    }
+    if (filters.type && filters.type !== 'all') {
+      events = events.filter(e => e.type === filters.type);
+    }
+    return { isSuccess: true, data: events, message: 'OK' };
+  },
+  async listIntegrations(): Promise<ApiResponse<EventIntegration[]>> {
+    await delay(150);
+    return { isSuccess: true, data: [...mockEventIntegrations], message: 'OK' };
+  },
+  async getById(id: string): Promise<ApiResponse<MarketingEvent | null>> {
+    await delay(150);
+    const event = mockMarketingEvents.find(e => e.id === id) || null;
+    return { isSuccess: !!event, data: event, message: event ? 'OK' : 'Evento não encontrado' };
+  },
+};
+
+// ============================================================================
 // UTILITY
 // ============================================================================
 
@@ -4010,6 +4126,10 @@ export const mockApi = {
   projects: projectsApi,
   integrations: integrationsApi,
   sso: ssoApi,
+  marketingCampaigns: marketingCampaignsApi,
+  marketingEmails: marketingEmailsApi,
+  marketingAds: marketingAdsApi,
+  marketingEvents: marketingEventsApi,
   resetData: () => MockStorage.reset(),
 };
 

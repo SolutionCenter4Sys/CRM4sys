@@ -1995,3 +1995,286 @@ export interface AccessExportRecord {
   sizeBytes: number | null;
   generatedBy: string;
 }
+
+// ============================================================================
+// EP09 — MARKETING
+// ============================================================================
+
+export type CampaignStatus = 'draft' | 'active' | 'paused' | 'completed';
+export type CampaignType = 'email' | 'social' | 'event' | 'multi_channel' | 'ads' | 'content';
+export type AttributionModel = 'first_touch' | 'last_touch' | 'linear' | 'full_path';
+
+export interface CampaignKPIs {
+  contactsReached: number;
+  newContacts: number;
+  emailsSent: number;
+  emailOpenRate: number;
+  emailClickRate: number;
+  adsImpressions: number;
+  adsClicks: number;
+  adsCTR: number;
+  eventsHeld: number;
+  eventAttendees: number;
+  leadsGenerated: number;
+  dealsCreated: number;
+  revenueInfluenced: number;
+  closedDeals: number;
+  roi: number;
+}
+
+export interface CampaignMember {
+  contactId: string;
+  contactName: string;
+  memberStatus: 'sent' | 'responded' | 'attended' | 'converted';
+  addedAt: string;
+}
+
+export interface CampaignTask {
+  id: string;
+  title: string;
+  assignee: string;
+  dueDate: string;
+  completed: boolean;
+}
+
+export interface Campaign {
+  id: string;
+  name: string;
+  type: CampaignType;
+  status: CampaignStatus;
+  description: string;
+  startDate: string;
+  endDate: string | null;
+  budget: number;
+  actualSpend: number;
+  ownerId: string;
+  ownerName: string;
+  parentCampaignId: string | null;
+  parentCampaignName: string | null;
+  attributionModel: AttributionModel;
+  goals: string[];
+  kpis: CampaignKPIs;
+  members: CampaignMember[];
+  tasks: CampaignTask[];
+  associatedEmails: string[];
+  associatedAds: string[];
+  associatedEvents: string[];
+  tags: string[];
+  aiSummary: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type MarketingEmailStatus = 'draft' | 'scheduled' | 'sending' | 'sent' | 'failed';
+export type EmailTemplateType = 'simple' | 'informative' | 'promotional' | 'event' | 'newsletter';
+export type EngagementPrediction = 'high' | 'medium' | 'low' | 'unknown';
+
+export interface EmailMetrics {
+  sent: number;
+  delivered: number;
+  opened: number;
+  uniqueOpens: number;
+  clicked: number;
+  uniqueClicks: number;
+  bounced: number;
+  softBounced: number;
+  hardBounced: number;
+  unsubscribed: number;
+  spamReports: number;
+  openRate: number;
+  clickRate: number;
+  clickToOpenRate: number;
+  bounceRate: number;
+  unsubscribeRate: number;
+  deliveryRate: number;
+}
+
+export interface ABTestVariant {
+  id: string;
+  variantName: string;
+  subject: string;
+  senderName: string;
+  sendPercentage: number;
+  metrics: EmailMetrics;
+  isWinner: boolean;
+}
+
+export interface EmailClickMapLink {
+  url: string;
+  label: string;
+  clicks: number;
+  uniqueClicks: number;
+  clickRate: number;
+}
+
+export interface MarketingEmail {
+  id: string;
+  subject: string;
+  previewText: string;
+  templateType: EmailTemplateType;
+  status: MarketingEmailStatus;
+  campaignId: string | null;
+  campaignName: string | null;
+  senderName: string;
+  senderEmail: string;
+  replyTo: string;
+  recipientListName: string;
+  recipientCount: number;
+  scheduledAt: string | null;
+  sentAt: string | null;
+  timezone: string;
+  isABTest: boolean;
+  abTestVariants: ABTestVariant[] | null;
+  abTestWinnerCriteria: 'open_rate' | 'click_rate' | null;
+  abTestSampleSize: number | null;
+  engagementPrediction: EngagementPrediction;
+  clickMap: EmailClickMapLink[];
+  personalizationTokens: string[];
+  metrics: EmailMetrics;
+  revenueAttributed: number;
+  tags: string[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type AdPlatform = 'google' | 'meta' | 'linkedin' | 'tiktok';
+export type AdStatus = 'draft' | 'active' | 'paused' | 'completed';
+export type AdType = 'search' | 'display' | 'social' | 'video' | 'carousel';
+export type AdJourneyStage = 'awareness' | 'consideration' | 'decision';
+
+export interface AdAccount {
+  id: string;
+  platform: AdPlatform;
+  accountName: string;
+  accountExternalId: string;
+  connected: boolean;
+  lastSync: string | null;
+  currency: string;
+  totalSpend: number;
+  totalConversions: number;
+}
+
+export interface AdAudience {
+  id: string;
+  name: string;
+  type: 'crm_list' | 'retargeting' | 'lookalike' | 'custom';
+  platform: AdPlatform;
+  size: number;
+  syncStatus: 'synced' | 'syncing' | 'error';
+  lastSynced: string | null;
+  sourceDescription: string;
+}
+
+export interface AdMetrics {
+  impressions: number;
+  reach: number;
+  clicks: number;
+  conversions: number;
+  leads: number;
+  spend: number;
+  ctr: number;
+  cpc: number;
+  cpm: number;
+  cpa: number;
+  cpl: number;
+  roas: number;
+  frequency: number;
+}
+
+export interface AdAttribution {
+  model: AttributionModel;
+  contactsCreated: number;
+  dealsCreated: number;
+  revenueAttributed: number;
+}
+
+export interface Ad {
+  id: string;
+  name: string;
+  platform: AdPlatform;
+  type: AdType;
+  status: AdStatus;
+  journeyStage: AdJourneyStage;
+  campaignId: string | null;
+  campaignName: string | null;
+  accountId: string;
+  audienceId: string | null;
+  audienceName: string | null;
+  budget: number;
+  budgetPacing: 'on_track' | 'underspend' | 'overspend';
+  metrics: AdMetrics;
+  attribution: AdAttribution;
+  startDate: string;
+  endDate: string | null;
+  targetAudience: string;
+  creativePreview: string | null;
+  tags: string[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type EventType = 'webinar' | 'conference' | 'workshop' | 'meetup' | 'tradeshow';
+export type EventStatus = 'draft' | 'scheduled' | 'live' | 'completed' | 'cancelled';
+export type AttendeeStatus = 'registered' | 'confirmed' | 'attended' | 'no_show' | 'cancelled';
+
+export interface EventIntegration {
+  id: string;
+  platform: 'zoom' | 'teams' | 'eventbrite' | 'google_meet';
+  name: string;
+  description: string;
+  connected: boolean;
+  installCount: string;
+  logoColor: string;
+}
+
+export interface EventAttendee {
+  id: string;
+  contactId: string;
+  contactName: string;
+  contactEmail: string;
+  status: AttendeeStatus;
+  registeredAt: string;
+  checkedInAt: string | null;
+  engagementScore: number | null;
+  source: string;
+}
+
+export interface EventAutomation {
+  id: string;
+  trigger: 'registration' | 'reminder_24h' | 'reminder_1h' | 'post_event' | 'no_show';
+  actionType: 'email' | 'task' | 'notification';
+  description: string;
+  enabled: boolean;
+}
+
+export interface MarketingEvent {
+  id: string;
+  name: string;
+  type: EventType;
+  status: EventStatus;
+  description: string;
+  campaignId: string | null;
+  campaignName: string | null;
+  date: string;
+  startTime: string;
+  endTime: string;
+  timezone: string;
+  location: string | null;
+  virtualUrl: string | null;
+  isVirtual: boolean;
+  capacity: number;
+  registrations: number;
+  attendees: number;
+  noShows: number;
+  attendanceRate: number;
+  integrationPlatform: string | null;
+  speakerName: string | null;
+  speakerTitle: string | null;
+  costPerAttendee: number;
+  revenueInfluenced: number;
+  eventAttendees: EventAttendee[];
+  automations: EventAutomation[];
+  tags: string[];
+  createdAt: string;
+  updatedAt: string;
+}

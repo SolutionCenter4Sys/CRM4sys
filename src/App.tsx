@@ -77,6 +77,10 @@ import {
   MoreHoriz as MoreHorizIcon,
   Close as CloseIcon,
   NewReleasesOutlined as NewReleasesOutlinedIcon,
+  CampaignOutlined as CampaignOutlinedIcon,
+  EmailOutlined as EmailOutlinedIcon,
+  AdsClickOutlined as AdsClickOutlinedIcon,
+  EventOutlined as EventOutlinedIcon,
 } from '@mui/icons-material';
 import { createAppTheme } from './styles/theme';
 import CommandPalette from './components/CommandPalette';
@@ -134,6 +138,11 @@ const importProjectsPage = () => import('./pages/ProjectsPage');
 const importProjectDetailPage = () => import('./pages/ProjectDetailPage');
 const importIntegrationsPage = () => import('./pages/IntegrationsPage');
 const importSsoConfigPage = () => import('./pages/SsoConfigPage');
+const importCampaignsListPage = () => import('./pages/CampaignsListPage');
+const importCampaignDetailPage = () => import('./pages/CampaignDetailPage');
+const importMarketingEmailsPage = () => import('./pages/MarketingEmailsPage');
+const importAdsPage = () => import('./pages/AdsPage');
+const importMarketingEventsPage = () => import('./pages/MarketingEventsPage');
 
 const DashboardExecutivePage = lazy(importDashboardExecutivePage);
 const DashboardAnalyticsPage = lazy(importDashboardAnalyticsPage);
@@ -180,6 +189,11 @@ const ProjectsPage = lazy(importProjectsPage);
 const ProjectDetailPage = lazy(importProjectDetailPage);
 const IntegrationsPage = lazy(importIntegrationsPage);
 const SsoConfigPage = lazy(importSsoConfigPage);
+const CampaignsListPage = lazy(importCampaignsListPage);
+const CampaignDetailPage = lazy(importCampaignDetailPage);
+const MarketingEmailsPage = lazy(importMarketingEmailsPage);
+const AdsPage = lazy(importAdsPage);
+const MarketingEventsPage = lazy(importMarketingEventsPage);
 
 const preloadedRoutes = new Set<string>();
 
@@ -417,19 +431,30 @@ const SidebarContent: React.FC<SidebarContentProps> = ({
 }) => {
   const [financialAnchorEl, setFinancialAnchorEl] = useState<HTMLElement | null>(null);
   const financialOpen = Boolean(financialAnchorEl);
+  const [marketingAnchorEl, setMarketingAnchorEl] = useState<HTMLElement | null>(null);
+  const marketingOpen = Boolean(marketingAnchorEl);
   const [newFeaturesAnchorEl, setNewFeaturesAnchorEl] = useState<HTMLElement | null>(null);
   const newFeaturesOpen = Boolean(newFeaturesAnchorEl);
 
   const close = (el: null) => { setSettingsAnchorEl(el); onNavClick?.(); };
   const closeFinancial = () => { setFinancialAnchorEl(null); onNavClick?.(); };
+  const closeMarketing = () => { setMarketingAnchorEl(null); onNavClick?.(); };
   const closeNewFeatures = () => { setNewFeaturesAnchorEl(null); onNavClick?.(); };
 
   const isFinancialActive = ['/billing'].some((p) => isActiveRoute(p));
+  const isMarketingActive = ['/marketing'].some((p) => isActiveRoute(p));
   const isNewFeaturesActive = ['/leads', '/contracts', '/billing/collections/rules', '/billing/gateways', '/products', '/projects', '/cs', '/nurture', '/reports/scheduled', '/exports', '/bi/connectors', '/settings/integrations', '/settings/sso'].some((p) => isActiveRoute(p));
 
   const financialItems = [
     { label: 'Faturas', sublabel: 'Emitir e gerenciar faturas', to: '/billing/invoices', icon: <ReceiptLongOutlinedIcon fontSize="small" />, prefetchKey: 'billing-invoices', importer: importInvoicesListPage },
     { label: 'Recebíveis', sublabel: 'Dashboard de recebimentos', to: '/billing/receivables', icon: <RequestQuoteIcon fontSize="small" />, prefetchKey: 'receivables-dashboard', importer: importReceivablesDashboardPage },
+  ];
+
+  const marketingItems = [
+    { label: 'Campanhas', sublabel: 'Gerir campanhas multicanal', to: '/marketing/campaigns', icon: <CampaignOutlinedIcon fontSize="small" />, prefetchKey: 'marketing-campaigns', importer: importCampaignsListPage },
+    { label: 'E-mails', sublabel: 'Email marketing e templates', to: '/marketing/emails', icon: <EmailOutlinedIcon fontSize="small" />, prefetchKey: 'marketing-emails', importer: importMarketingEmailsPage },
+    { label: 'Anúncios', sublabel: 'Ads digitais e audiências CRM', to: '/marketing/ads', icon: <AdsClickOutlinedIcon fontSize="small" />, prefetchKey: 'marketing-ads', importer: importAdsPage },
+    { label: 'Eventos', sublabel: 'Webinars, eventos e registros', to: '/marketing/events', icon: <EventOutlinedIcon fontSize="small" />, prefetchKey: 'marketing-events', importer: importMarketingEventsPage },
   ];
 
   const newFeaturesItems = [
@@ -463,6 +488,77 @@ const SidebarContent: React.FC<SidebarContentProps> = ({
       <Divider sx={{ width: 28, borderColor: 'rgba(255,255,255,0.4)' }} />
 
       <Tooltip title="Propostas"><IconButton component={NavLink} to="/proposals" onClick={onNavClick} onMouseEnter={() => prefetchRoute('proposals', importProposalsPage)} sx={{ color: 'inherit', bgcolor: isActiveRoute('/proposals') ? 'rgba(255,255,255,0.18)' : 'transparent' }}><DescriptionOutlinedIcon /></IconButton></Tooltip>
+
+      {/* 📣 Ícone Marketing com flyout */}
+      <Tooltip title="Marketing" placement="right">
+        <IconButton
+          onClick={(e) => setMarketingAnchorEl(e.currentTarget)}
+          sx={{
+            color: 'inherit',
+            bgcolor: isMarketingActive || marketingOpen ? 'rgba(255,255,255,0.18)' : 'transparent',
+            border: isMarketingActive ? '1px solid rgba(255,255,255,0.35)' : '1px solid transparent',
+            transition: 'all 0.15s',
+          }}
+        >
+          <CampaignOutlinedIcon />
+        </IconButton>
+      </Tooltip>
+
+      <Popover
+        open={marketingOpen}
+        anchorEl={marketingAnchorEl}
+        onClose={() => setMarketingAnchorEl(null)}
+        anchorOrigin={{ vertical: 'center', horizontal: 'right' }}
+        transformOrigin={{ vertical: 'center', horizontal: 'left' }}
+        PaperProps={{
+          sx: {
+            ml: 1,
+            borderRadius: 2.5,
+            minWidth: 280,
+            boxShadow: '0 8px 32px rgba(0,0,0,0.18)',
+            overflow: 'hidden',
+          },
+        }}
+      >
+        <Box sx={{ px: 2, py: 1.5, background: 'linear-gradient(135deg, #B45309 0%, #F59E0B 100%)', color: '#fff' }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <CampaignOutlinedIcon sx={{ fontSize: 18 }} />
+            <Typography variant="subtitle2" sx={{ fontWeight: 700, fontSize: 13 }}>Marketing</Typography>
+          </Box>
+          <Typography variant="caption" sx={{ opacity: 0.75, fontSize: 11 }}>
+            Campanhas, e-mails, anúncios e eventos
+          </Typography>
+        </Box>
+
+        <MenuList dense sx={{ py: 0.5 }}>
+          {marketingItems.map((item, idx) => (
+            <React.Fragment key={item.to}>
+              <MenuItem
+                component={NavLink}
+                to={item.to}
+                onClick={closeMarketing}
+                onMouseEnter={() => prefetchRoute(item.prefetchKey, item.importer)}
+                selected={isActiveRoute(item.to)}
+                sx={{
+                  py: 1.2,
+                  px: 2,
+                  '&.Mui-selected': { bgcolor: 'primary.50', color: 'primary.main' },
+                  '&:hover': { bgcolor: 'action.hover' },
+                }}
+              >
+                <ListItemIcon sx={{ color: isActiveRoute(item.to) ? 'primary.main' : 'text.secondary', minWidth: 36 }}>
+                  {item.icon}
+                </ListItemIcon>
+                <Box>
+                  <Typography variant="body2" sx={{ fontWeight: 600, lineHeight: 1.2 }}>{item.label}</Typography>
+                  <Typography variant="caption" color="text.secondary" sx={{ fontSize: 11 }}>{item.sublabel}</Typography>
+                </Box>
+              </MenuItem>
+              {idx < marketingItems.length - 1 && <Divider sx={{ mx: 1.5 }} />}
+            </React.Fragment>
+          ))}
+        </MenuList>
+      </Popover>
 
       {/* 💰 Ícone Financeiro com flyout */}
       <Tooltip title="Financeiro" placement="right">
@@ -739,6 +835,15 @@ const MobileNavDrawer: React.FC<MobileNavDrawerProps> = ({
         { label: 'Contatos', to: '/contacts', icon: <ContactsOutlinedIcon fontSize="small" /> },
         { label: 'Negócios', to: '/deals', icon: <WorkOutlineIcon fontSize="small" /> },
         { label: 'Atividades', to: '/activities', icon: <TimelineOutlinedIcon fontSize="small" /> },
+      ],
+    },
+    {
+      title: 'Marketing',
+      items: [
+        { label: 'Campanhas', to: '/marketing/campaigns', icon: <CampaignOutlinedIcon fontSize="small" /> },
+        { label: 'E-mails', to: '/marketing/emails', icon: <EmailOutlinedIcon fontSize="small" /> },
+        { label: 'Anúncios', to: '/marketing/ads', icon: <AdsClickOutlinedIcon fontSize="small" /> },
+        { label: 'Eventos', to: '/marketing/events', icon: <EventOutlinedIcon fontSize="small" /> },
       ],
     },
     {
@@ -1183,6 +1288,11 @@ const AppLayout: React.FC = () => {
                 <Route path="/projects/:id" element={<ProjectDetailPage />} />
                 <Route path="/settings/integrations" element={<IntegrationsPage />} />
                 <Route path="/settings/sso" element={<SsoConfigPage />} />
+                <Route path="/marketing/campaigns" element={<CampaignsListPage />} />
+                <Route path="/marketing/campaigns/:id" element={<CampaignDetailPage />} />
+                <Route path="/marketing/emails" element={<MarketingEmailsPage />} />
+                <Route path="/marketing/ads" element={<AdsPage />} />
+                <Route path="/marketing/events" element={<MarketingEventsPage />} />
                 <Route path="*" element={<Navigate to="/dashboard" replace />} />
               </Routes>
             </Suspense>

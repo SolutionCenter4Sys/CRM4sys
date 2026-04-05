@@ -39,6 +39,14 @@ import type {
   AccessElevationRequest,
   AccessAuditEvent,
   AccessExportRecord,
+  Campaign,
+  MarketingEmail,
+  EmailMetrics,
+  Ad,
+  AdAccount,
+  AdAudience,
+  MarketingEvent,
+  EventIntegration,
 } from '../types';
 
 // ============================================================================
@@ -2796,6 +2804,435 @@ export const mockAccountHealthHistory: Record<string, AccountHealthHistory[]> = 
 };
 
 // ============================================================================
+// MOCK CAMPAIGNS
+// ============================================================================
+
+export const mockCampaigns: Campaign[] = [
+  {
+    id: 'camp-001',
+    name: 'Lançamento SaaS Q1 2026',
+    type: 'multi_channel',
+    status: 'active',
+    description: 'Campanha multicanal para lançamento da nova versão da plataforma SaaS.',
+    startDate: '2026-01-15',
+    endDate: '2026-03-31',
+    budget: 150000,
+    actualSpend: 87500,
+    ownerId: '550e8400-e29b-41d4-a716-446655440001',
+    ownerName: 'Carlos Silva',
+    parentCampaignId: null,
+    parentCampaignName: null,
+    attributionModel: 'linear',
+    goals: ['Gerar 500 leads qualificados', 'Aumentar awareness em 30%', 'Fechar 15 deals'],
+    kpis: { contactsReached: 12500, newContacts: 3200, emailsSent: 8500, emailOpenRate: 32.5, emailClickRate: 8.2, adsImpressions: 450000, adsClicks: 12800, adsCTR: 2.84, eventsHeld: 2, eventAttendees: 380, leadsGenerated: 420, dealsCreated: 18, revenueInfluenced: 680000, closedDeals: 8, roi: 353 },
+    members: [
+      { contactId: 'c1', contactName: 'Ana Rodrigues', memberStatus: 'converted', addedAt: '2026-01-15T10:00:00Z' },
+      { contactId: 'c2', contactName: 'Pedro Santos', memberStatus: 'responded', addedAt: '2026-01-16T09:00:00Z' },
+      { contactId: 'c3', contactName: 'Maria Oliveira', memberStatus: 'attended', addedAt: '2026-01-20T14:00:00Z' },
+    ],
+    tasks: [
+      { id: 'task-1', title: 'Criar landing page', assignee: 'Carlos Silva', dueDate: '2026-01-20', completed: true },
+      { id: 'task-2', title: 'Configurar automação de emails', assignee: 'Ana Rodrigues', dueDate: '2026-01-25', completed: true },
+      { id: 'task-3', title: 'Revisar criativos de ads', assignee: 'Pedro Santos', dueDate: '2026-02-01', completed: false },
+    ],
+    associatedEmails: ['mkt-email-001', 'mkt-email-002', 'mkt-email-003'],
+    associatedAds: ['ad-001', 'ad-002', 'ad-003'],
+    associatedEvents: ['evt-001'],
+    tags: ['saas', 'lancamento', 'q1-2026'],
+    aiSummary: 'Campanha multicanal com excelente desempenho. ROI de 353% impulsionado por email marketing (32.5% open rate) e ads no Google/LinkedIn. 420 de 500 leads meta atingidos (84%). Recomendação: aumentar investimento em LinkedIn Ads que apresenta melhor CPA.',
+    createdAt: '2026-01-10T08:00:00Z',
+    updatedAt: '2026-03-15T16:30:00Z',
+  },
+  {
+    id: 'camp-002',
+    name: 'Webinar Series - Cloud Migration',
+    type: 'event',
+    status: 'active',
+    description: 'Série de webinars sobre migração para nuvem direcionada a CTOs e CIOs.',
+    startDate: '2026-02-01',
+    endDate: '2026-04-30',
+    budget: 45000,
+    actualSpend: 22000,
+    ownerId: '550e8400-e29b-41d4-a716-446655440001',
+    ownerName: 'Carlos Silva',
+    parentCampaignId: 'camp-001',
+    parentCampaignName: 'Lançamento SaaS Q1 2026',
+    attributionModel: 'first_touch',
+    goals: ['Realizar 4 webinars', 'Captar 200 registros por evento'],
+    kpis: { contactsReached: 3200, newContacts: 850, emailsSent: 2400, emailOpenRate: 38.2, emailClickRate: 12.5, adsImpressions: 85000, adsClicks: 2400, adsCTR: 2.82, eventsHeld: 2, eventAttendees: 310, leadsGenerated: 180, dealsCreated: 5, revenueInfluenced: 220000, closedDeals: 2, roi: 388 },
+    members: [
+      { contactId: 'c4', contactName: 'Roberto Lima', memberStatus: 'attended', addedAt: '2026-02-01T10:00:00Z' },
+      { contactId: 'c5', contactName: 'Fernanda Costa', memberStatus: 'converted', addedAt: '2026-02-05T09:00:00Z' },
+    ],
+    tasks: [
+      { id: 'task-4', title: 'Preparar slides webinar 3', assignee: 'Carlos Silva', dueDate: '2026-03-15', completed: false },
+      { id: 'task-5', title: 'Confirmar palestrante externo', assignee: 'Ana Rodrigues', dueDate: '2026-03-10', completed: true },
+    ],
+    associatedEmails: ['mkt-email-004', 'mkt-email-005'],
+    associatedAds: ['ad-004'],
+    associatedEvents: ['evt-002', 'evt-003'],
+    tags: ['webinar', 'cloud', 'enterprise'],
+    aiSummary: 'Série de webinars com alta taxa de engajamento (38.2% open rate em convites). 2 de 4 webinars realizados com 310 participantes totais. Taxa de conversão de registro para participação: 78%.',
+    createdAt: '2026-01-25T10:00:00Z',
+    updatedAt: '2026-03-10T12:00:00Z',
+  },
+  {
+    id: 'camp-003',
+    name: 'Black Friday Tech 2025',
+    type: 'ads',
+    status: 'completed',
+    description: 'Campanha de Black Friday com foco em desconto para novas assinaturas.',
+    startDate: '2025-11-15',
+    endDate: '2025-12-05',
+    budget: 80000,
+    actualSpend: 78500,
+    ownerId: '550e8400-e29b-41d4-a716-446655440001',
+    ownerName: 'Carlos Silva',
+    parentCampaignId: null,
+    parentCampaignName: null,
+    attributionModel: 'last_touch',
+    goals: ['Gerar 300 trials', 'Converter 50 assinaturas pagas'],
+    kpis: { contactsReached: 28000, newContacts: 5200, emailsSent: 15000, emailOpenRate: 28.1, emailClickRate: 6.8, adsImpressions: 1200000, adsClicks: 38000, adsCTR: 3.17, eventsHeld: 0, eventAttendees: 0, leadsGenerated: 680, dealsCreated: 45, revenueInfluenced: 520000, closedDeals: 38, roi: 562 },
+    members: [],
+    tasks: [],
+    associatedEmails: ['mkt-email-006'],
+    associatedAds: ['ad-005', 'ad-006'],
+    associatedEvents: [],
+    tags: ['black-friday', 'promocao', 'saas'],
+    aiSummary: 'Campanha de Black Friday com ROI excepcional de 562%. Ads no Meta geraram o maior volume de leads (420), enquanto Google Search teve melhor conversão (4.2% CTR). Total de 38 deals fechados de 45 criados (84% win rate).',
+    createdAt: '2025-11-01T08:00:00Z',
+    updatedAt: '2025-12-10T18:00:00Z',
+  },
+  {
+    id: 'camp-004',
+    name: 'Nurture Leads Inbound Q2',
+    type: 'email',
+    status: 'draft',
+    description: 'Sequência de nutrição para leads inbound do trimestre.',
+    startDate: '2026-04-01',
+    endDate: '2026-06-30',
+    budget: 25000,
+    actualSpend: 0,
+    ownerId: '550e8400-e29b-41d4-a716-446655440001',
+    ownerName: 'Carlos Silva',
+    parentCampaignId: null,
+    parentCampaignName: null,
+    attributionModel: 'linear',
+    goals: ['Nutrir 1000 leads', 'Converter 100 MQLs em SQLs'],
+    kpis: { contactsReached: 0, newContacts: 0, emailsSent: 0, emailOpenRate: 0, emailClickRate: 0, adsImpressions: 0, adsClicks: 0, adsCTR: 0, eventsHeld: 0, eventAttendees: 0, leadsGenerated: 0, dealsCreated: 0, revenueInfluenced: 0, closedDeals: 0, roi: 0 },
+    members: [],
+    tasks: [
+      { id: 'task-6', title: 'Definir segmentos de audiência', assignee: 'Ana Rodrigues', dueDate: '2026-03-25', completed: false },
+      { id: 'task-7', title: 'Criar templates de email', assignee: 'Carlos Silva', dueDate: '2026-03-28', completed: false },
+    ],
+    associatedEmails: [],
+    associatedAds: [],
+    associatedEvents: [],
+    tags: ['nurture', 'inbound', 'q2-2026'],
+    aiSummary: null,
+    createdAt: '2026-03-20T10:00:00Z',
+    updatedAt: '2026-03-20T10:00:00Z',
+  },
+  {
+    id: 'camp-005',
+    name: 'Evento Presencial - Tech Summit SP',
+    type: 'event',
+    status: 'completed',
+    description: 'Participação como patrocinador no Tech Summit São Paulo.',
+    startDate: '2025-10-10',
+    endDate: '2025-10-12',
+    budget: 120000,
+    actualSpend: 115000,
+    ownerId: '550e8400-e29b-41d4-a716-446655440001',
+    ownerName: 'Carlos Silva',
+    parentCampaignId: null,
+    parentCampaignName: null,
+    attributionModel: 'full_path',
+    goals: ['Gerar 200 leads no estande', 'Realizar 2 palestras'],
+    kpis: { contactsReached: 5500, newContacts: 1800, emailsSent: 3200, emailOpenRate: 42.0, emailClickRate: 15.3, adsImpressions: 200000, adsClicks: 5600, adsCTR: 2.8, eventsHeld: 1, eventAttendees: 450, leadsGenerated: 320, dealsCreated: 22, revenueInfluenced: 890000, closedDeals: 12, roi: 674 },
+    members: [],
+    tasks: [],
+    associatedEmails: ['mkt-email-007'],
+    associatedAds: ['ad-007'],
+    associatedEvents: ['evt-004'],
+    tags: ['evento-presencial', 'tech-summit', 'sao-paulo'],
+    aiSummary: 'Tech Summit SP superou todas as metas. ROI de 674% com 320 leads captados (60% acima da meta). Os follow-ups pós-evento tiveram 42% de abertura. 12 deals já fechados com receita influenciada de R$ 890K.',
+    createdAt: '2025-09-15T10:00:00Z',
+    updatedAt: '2025-11-15T18:00:00Z',
+  },
+  {
+    id: 'camp-006',
+    name: 'Social Media Awareness H1',
+    type: 'social',
+    status: 'paused',
+    description: 'Campanha de awareness em redes sociais para o primeiro semestre.',
+    startDate: '2026-01-01',
+    endDate: '2026-06-30',
+    budget: 60000,
+    actualSpend: 28000,
+    ownerId: '550e8400-e29b-41d4-a716-446655440001',
+    ownerName: 'Carlos Silva',
+    parentCampaignId: null,
+    parentCampaignName: null,
+    attributionModel: 'first_touch',
+    goals: ['Aumentar seguidores em 20%', 'Gerar 1000 visitantes via social'],
+    kpis: { contactsReached: 45000, newContacts: 2100, emailsSent: 0, emailOpenRate: 0, emailClickRate: 0, adsImpressions: 680000, adsClicks: 18500, adsCTR: 2.72, eventsHeld: 0, eventAttendees: 0, leadsGenerated: 280, dealsCreated: 8, revenueInfluenced: 180000, closedDeals: 3, roi: 200 },
+    members: [],
+    tasks: [],
+    associatedEmails: [],
+    associatedAds: ['ad-008'],
+    associatedEvents: [],
+    tags: ['social-media', 'awareness', 'h1-2026'],
+    aiSummary: 'Campanha pausada em março para revisão de estratégia. Resultados parciais: 280 leads gerados, ROI de 200%. LinkedIn performou melhor que Meta em qualidade de leads (CPL 40% menor).',
+    createdAt: '2025-12-20T10:00:00Z',
+    updatedAt: '2026-03-05T14:00:00Z',
+  },
+];
+
+// ============================================================================
+// MOCK MARKETING EMAILS
+// ============================================================================
+
+const zeroMetrics: EmailMetrics = { sent: 0, delivered: 0, opened: 0, uniqueOpens: 0, clicked: 0, uniqueClicks: 0, bounced: 0, softBounced: 0, hardBounced: 0, unsubscribed: 0, spamReports: 0, openRate: 0, clickRate: 0, clickToOpenRate: 0, bounceRate: 0, unsubscribeRate: 0, deliveryRate: 0 };
+
+export const mockMarketingEmails: MarketingEmail[] = [
+  {
+    id: 'mkt-email-001', subject: 'Conheça a nova plataforma SaaS - Transforme sua operação', previewText: 'Descubra como nossa plataforma pode revolucionar...', templateType: 'promotional', status: 'sent', campaignId: 'camp-001', campaignName: 'Lançamento SaaS Q1 2026', senderName: 'Foursys Marketing', senderEmail: 'marketing@foursys.com.br', replyTo: 'contato@foursys.com.br', recipientListName: 'Base Ativa - Decisores TI', recipientCount: 3500, scheduledAt: '2026-01-20T09:00:00Z', sentAt: '2026-01-20T09:00:00Z', timezone: 'America/Sao_Paulo', isABTest: true,
+    abTestVariants: [
+      { id: 'var-a', variantName: 'A', subject: 'Conheça a nova plataforma SaaS - Transforme sua operação', senderName: 'Foursys Marketing', sendPercentage: 50, metrics: { sent: 1750, delivered: 1715, opened: 612, uniqueOpens: 580, clicked: 168, uniqueClicks: 145, bounced: 35, softBounced: 20, hardBounced: 15, unsubscribed: 8, spamReports: 1, openRate: 35.7, clickRate: 9.8, clickToOpenRate: 27.4, bounceRate: 2.0, unsubscribeRate: 0.46, deliveryRate: 98.0 }, isWinner: true },
+      { id: 'var-b', variantName: 'B', subject: '🚀 Nova plataforma SaaS: agende sua demo gratuita', senderName: 'Carlos Silva - Foursys', sendPercentage: 50, metrics: { sent: 1750, delivered: 1710, opened: 530, uniqueOpens: 502, clicked: 142, uniqueClicks: 128, bounced: 40, softBounced: 25, hardBounced: 15, unsubscribed: 12, spamReports: 2, openRate: 31.0, clickRate: 8.3, clickToOpenRate: 26.8, bounceRate: 2.3, unsubscribeRate: 0.70, deliveryRate: 97.7 }, isWinner: false },
+    ],
+    abTestWinnerCriteria: 'open_rate', abTestSampleSize: 30, engagementPrediction: 'high',
+    clickMap: [
+      { url: '/demo', label: 'Agendar Demo', clicks: 185, uniqueClicks: 162, clickRate: 5.3 },
+      { url: '/features', label: 'Ver Funcionalidades', clicks: 95, uniqueClicks: 82, clickRate: 2.7 },
+      { url: '/pricing', label: 'Ver Preços', clicks: 30, uniqueClicks: 29, clickRate: 0.9 },
+    ],
+    personalizationTokens: ['{{first_name}}', '{{company}}', '{{industry}}'],
+    metrics: { sent: 3500, delivered: 3425, opened: 1142, uniqueOpens: 1082, clicked: 310, uniqueClicks: 273, bounced: 75, softBounced: 45, hardBounced: 30, unsubscribed: 20, spamReports: 3, openRate: 33.3, clickRate: 9.0, clickToOpenRate: 27.1, bounceRate: 2.1, unsubscribeRate: 0.58, deliveryRate: 97.9 },
+    revenueAttributed: 125000, tags: ['lancamento', 'saas'], createdAt: '2026-01-18T10:00:00Z', updatedAt: '2026-01-22T14:00:00Z',
+  },
+  {
+    id: 'mkt-email-002', subject: 'Case de Sucesso: Como a TechCorp migrou para nuvem em 30 dias', previewText: 'Veja como nosso cliente reduziu custos em 40%...', templateType: 'informative', status: 'sent', campaignId: 'camp-001', campaignName: 'Lançamento SaaS Q1 2026', senderName: 'Foursys Marketing', senderEmail: 'marketing@foursys.com.br', replyTo: 'contato@foursys.com.br', recipientListName: 'Leads Qualificados', recipientCount: 1800, scheduledAt: '2026-02-05T10:00:00Z', sentAt: '2026-02-05T10:00:00Z', timezone: 'America/Sao_Paulo', isABTest: false, abTestVariants: null, abTestWinnerCriteria: null, abTestSampleSize: null, engagementPrediction: 'high',
+    clickMap: [
+      { url: '/case-study/techcorp', label: 'Ler Case Completo', clicks: 245, uniqueClicks: 218, clickRate: 13.6 },
+      { url: '/demo', label: 'Solicitar Demo', clicks: 62, uniqueClicks: 58, clickRate: 3.4 },
+    ],
+    personalizationTokens: ['{{first_name}}'],
+    metrics: { sent: 1800, delivered: 1764, opened: 652, uniqueOpens: 615, clicked: 307, uniqueClicks: 276, bounced: 36, softBounced: 22, hardBounced: 14, unsubscribed: 5, spamReports: 0, openRate: 36.9, clickRate: 17.4, clickToOpenRate: 47.1, bounceRate: 2.0, unsubscribeRate: 0.28, deliveryRate: 98.0 },
+    revenueAttributed: 85000, tags: ['case-study', 'cloud'], createdAt: '2026-02-03T09:00:00Z', updatedAt: '2026-02-07T12:00:00Z',
+  },
+  {
+    id: 'mkt-email-003', subject: 'Newsletter Foursys - Março 2026', previewText: 'Novidades, eventos e insights do mês...', templateType: 'newsletter', status: 'sent', campaignId: 'camp-001', campaignName: 'Lançamento SaaS Q1 2026', senderName: 'Foursys', senderEmail: 'newsletter@foursys.com.br', replyTo: 'contato@foursys.com.br', recipientListName: 'Newsletter Subscribers', recipientCount: 5200, scheduledAt: '2026-03-01T08:00:00Z', sentAt: '2026-03-01T08:00:00Z', timezone: 'America/Sao_Paulo', isABTest: false, abTestVariants: null, abTestWinnerCriteria: null, abTestSampleSize: null, engagementPrediction: 'medium',
+    clickMap: [
+      { url: '/blog/trends-2026', label: 'Tendências 2026', clicks: 320, uniqueClicks: 298, clickRate: 6.1 },
+      { url: '/events', label: 'Próximos Eventos', clicks: 185, uniqueClicks: 172, clickRate: 3.6 },
+      { url: '/careers', label: 'Vagas Abertas', clicks: 92, uniqueClicks: 88, clickRate: 1.8 },
+    ],
+    personalizationTokens: ['{{first_name}}'],
+    metrics: { sent: 5200, delivered: 5096, opened: 1478, uniqueOpens: 1380, clicked: 597, uniqueClicks: 558, bounced: 104, softBounced: 68, hardBounced: 36, unsubscribed: 42, spamReports: 5, openRate: 29.0, clickRate: 11.7, clickToOpenRate: 40.4, bounceRate: 2.0, unsubscribeRate: 0.82, deliveryRate: 98.0 },
+    revenueAttributed: 0, tags: ['newsletter', 'mensal'], createdAt: '2026-02-28T10:00:00Z', updatedAt: '2026-03-03T08:00:00Z',
+  },
+  {
+    id: 'mkt-email-004', subject: 'Webinar: Migração para Nuvem sem Downtime - Inscreva-se!', previewText: 'Aprenda com especialistas como migrar...', templateType: 'event', status: 'sent', campaignId: 'camp-002', campaignName: 'Webinar Series - Cloud Migration', senderName: 'Foursys Events', senderEmail: 'eventos@foursys.com.br', replyTo: 'eventos@foursys.com.br', recipientListName: 'CTOs e CIOs', recipientCount: 1200, scheduledAt: '2026-02-10T09:00:00Z', sentAt: '2026-02-10T09:00:00Z', timezone: 'America/Sao_Paulo', isABTest: false, abTestVariants: null, abTestWinnerCriteria: null, abTestSampleSize: null, engagementPrediction: 'high',
+    clickMap: [
+      { url: '/webinar/register', label: 'Inscrever-se', clicks: 198, uniqueClicks: 185, clickRate: 16.5 },
+    ],
+    personalizationTokens: ['{{first_name}}', '{{company}}'],
+    metrics: { sent: 1200, delivered: 1176, opened: 482, uniqueOpens: 448, clicked: 198, uniqueClicks: 185, bounced: 24, softBounced: 16, hardBounced: 8, unsubscribed: 3, spamReports: 0, openRate: 40.8, clickRate: 16.8, clickToOpenRate: 41.3, bounceRate: 2.0, unsubscribeRate: 0.25, deliveryRate: 98.0 },
+    revenueAttributed: 45000, tags: ['webinar', 'convite'], createdAt: '2026-02-08T10:00:00Z', updatedAt: '2026-02-12T08:00:00Z',
+  },
+  {
+    id: 'mkt-email-005', subject: 'Lembrete: Webinar amanhã às 14h - Cloud Migration', previewText: 'Não perca! Seu webinar é amanhã...', templateType: 'simple', status: 'sent', campaignId: 'camp-002', campaignName: 'Webinar Series - Cloud Migration', senderName: 'Foursys Events', senderEmail: 'eventos@foursys.com.br', replyTo: 'eventos@foursys.com.br', recipientListName: 'Inscritos Webinar #1', recipientCount: 185, scheduledAt: '2026-02-19T09:00:00Z', sentAt: '2026-02-19T09:00:00Z', timezone: 'America/Sao_Paulo', isABTest: false, abTestVariants: null, abTestWinnerCriteria: null, abTestSampleSize: null, engagementPrediction: 'high',
+    clickMap: [
+      { url: '/webinar/join', label: 'Acessar Webinar', clicks: 142, uniqueClicks: 138, clickRate: 76.2 },
+    ],
+    personalizationTokens: ['{{first_name}}'],
+    metrics: { sent: 185, delivered: 184, opened: 158, uniqueOpens: 152, clicked: 142, uniqueClicks: 138, bounced: 1, softBounced: 1, hardBounced: 0, unsubscribed: 0, spamReports: 0, openRate: 85.9, clickRate: 77.2, clickToOpenRate: 89.9, bounceRate: 0.5, unsubscribeRate: 0, deliveryRate: 99.5 },
+    revenueAttributed: 0, tags: ['webinar', 'lembrete'], createdAt: '2026-02-18T16:00:00Z', updatedAt: '2026-02-19T10:00:00Z',
+  },
+  {
+    id: 'mkt-email-006', subject: '🔥 Black Friday: 50% OFF na plataforma SaaS', previewText: 'Oferta imperdível por tempo limitado...', templateType: 'promotional', status: 'sent', campaignId: 'camp-003', campaignName: 'Black Friday Tech 2025', senderName: 'Foursys Ofertas', senderEmail: 'ofertas@foursys.com.br', replyTo: 'vendas@foursys.com.br', recipientListName: 'Base Completa', recipientCount: 15000, scheduledAt: '2025-11-25T06:00:00Z', sentAt: '2025-11-25T06:00:00Z', timezone: 'America/Sao_Paulo', isABTest: true,
+    abTestVariants: [
+      { id: 'var-c', variantName: 'A', subject: '🔥 Black Friday: 50% OFF na plataforma SaaS', senderName: 'Foursys Ofertas', sendPercentage: 50, metrics: { sent: 7500, delivered: 7350, opened: 2352, uniqueOpens: 2205, clicked: 735, uniqueClicks: 662, bounced: 150, softBounced: 95, hardBounced: 55, unsubscribed: 45, spamReports: 8, openRate: 32.0, clickRate: 10.0, clickToOpenRate: 31.2, bounceRate: 2.0, unsubscribeRate: 0.6, deliveryRate: 98.0 }, isWinner: true },
+      { id: 'var-d', variantName: 'B', subject: 'Última chance: desconto exclusivo Black Friday', senderName: 'Foursys Ofertas', sendPercentage: 50, metrics: { sent: 7500, delivered: 7350, opened: 1985, uniqueOpens: 1838, clicked: 588, uniqueClicks: 530, bounced: 150, softBounced: 100, hardBounced: 50, unsubscribed: 52, spamReports: 10, openRate: 27.0, clickRate: 8.0, clickToOpenRate: 29.6, bounceRate: 2.0, unsubscribeRate: 0.7, deliveryRate: 98.0 }, isWinner: false },
+    ],
+    abTestWinnerCriteria: 'click_rate', abTestSampleSize: 20, engagementPrediction: 'high',
+    clickMap: [
+      { url: '/black-friday', label: 'Ver Oferta', clicks: 1050, uniqueClicks: 945, clickRate: 7.0 },
+      { url: '/pricing', label: 'Comparar Planos', clicks: 215, uniqueClicks: 195, clickRate: 1.4 },
+      { url: '/trial', label: 'Iniciar Trial', clicks: 58, uniqueClicks: 52, clickRate: 0.4 },
+    ],
+    personalizationTokens: ['{{first_name}}', '{{company}}'],
+    metrics: { sent: 15000, delivered: 14700, opened: 4337, uniqueOpens: 4043, clicked: 1323, uniqueClicks: 1192, bounced: 300, softBounced: 195, hardBounced: 105, unsubscribed: 97, spamReports: 18, openRate: 29.5, clickRate: 9.0, clickToOpenRate: 30.5, bounceRate: 2.0, unsubscribeRate: 0.66, deliveryRate: 98.0 },
+    revenueAttributed: 380000, tags: ['black-friday', 'promocao'], createdAt: '2025-11-22T10:00:00Z', updatedAt: '2025-11-28T18:00:00Z',
+  },
+  {
+    id: 'mkt-email-007', subject: 'Obrigado por visitar nosso estande no Tech Summit!', previewText: 'Foi um prazer te receber...', templateType: 'simple', status: 'sent', campaignId: 'camp-005', campaignName: 'Evento Presencial - Tech Summit SP', senderName: 'Carlos Silva', senderEmail: 'carlos.silva@foursys.com.br', replyTo: 'carlos.silva@foursys.com.br', recipientListName: 'Leads Tech Summit', recipientCount: 320, scheduledAt: '2025-10-14T09:00:00Z', sentAt: '2025-10-14T09:00:00Z', timezone: 'America/Sao_Paulo', isABTest: false, abTestVariants: null, abTestWinnerCriteria: null, abTestSampleSize: null, engagementPrediction: 'high',
+    clickMap: [
+      { url: '/demo', label: 'Agendar Demo', clicks: 85, uniqueClicks: 78, clickRate: 26.6 },
+      { url: '/materials', label: 'Materiais do Evento', clicks: 112, uniqueClicks: 105, clickRate: 35.0 },
+    ],
+    personalizationTokens: ['{{first_name}}', '{{company}}'],
+    metrics: { sent: 320, delivered: 318, opened: 245, uniqueOpens: 232, clicked: 197, uniqueClicks: 183, bounced: 2, softBounced: 1, hardBounced: 1, unsubscribed: 1, spamReports: 0, openRate: 77.0, clickRate: 62.0, clickToOpenRate: 80.4, bounceRate: 0.6, unsubscribeRate: 0.3, deliveryRate: 99.4 },
+    revenueAttributed: 210000, tags: ['tech-summit', 'follow-up'], createdAt: '2025-10-13T16:00:00Z', updatedAt: '2025-10-16T10:00:00Z',
+  },
+  {
+    id: 'mkt-email-008', subject: 'Convite: Workshop de Automação de Processos', previewText: 'Participe do nosso workshop exclusivo...', templateType: 'event', status: 'scheduled', campaignId: null, campaignName: null, senderName: 'Foursys Events', senderEmail: 'eventos@foursys.com.br', replyTo: 'eventos@foursys.com.br', recipientListName: 'Gestores de TI', recipientCount: 2200, scheduledAt: '2026-04-10T09:00:00Z', sentAt: null, timezone: 'America/Sao_Paulo', isABTest: false, abTestVariants: null, abTestWinnerCriteria: null, abTestSampleSize: null, engagementPrediction: 'medium',
+    clickMap: [], personalizationTokens: ['{{first_name}}', '{{company}}'],
+    metrics: { ...zeroMetrics }, revenueAttributed: 0, tags: ['workshop', 'convite'], createdAt: '2026-04-01T10:00:00Z', updatedAt: '2026-04-01T10:00:00Z',
+  },
+  {
+    id: 'mkt-email-009', subject: 'Guia Completo: Segurança na Nuvem em 2026', previewText: 'Baixe nosso guia gratuito...', templateType: 'informative', status: 'scheduled', campaignId: null, campaignName: null, senderName: 'Foursys Marketing', senderEmail: 'marketing@foursys.com.br', replyTo: 'contato@foursys.com.br', recipientListName: 'Leads - Segurança', recipientCount: 1500, scheduledAt: '2026-04-15T10:00:00Z', sentAt: null, timezone: 'America/Sao_Paulo', isABTest: false, abTestVariants: null, abTestWinnerCriteria: null, abTestSampleSize: null, engagementPrediction: 'high',
+    clickMap: [], personalizationTokens: ['{{first_name}}'],
+    metrics: { ...zeroMetrics }, revenueAttributed: 0, tags: ['guia', 'seguranca', 'cloud'], createdAt: '2026-04-02T10:00:00Z', updatedAt: '2026-04-02T10:00:00Z',
+  },
+  {
+    id: 'mkt-email-010', subject: 'Pesquisa de Satisfação - Sua opinião importa!', previewText: 'Nos ajude a melhorar nossos serviços...', templateType: 'simple', status: 'draft', campaignId: null, campaignName: null, senderName: 'Foursys', senderEmail: 'pesquisa@foursys.com.br', replyTo: 'pesquisa@foursys.com.br', recipientListName: 'Clientes Ativos', recipientCount: 800, scheduledAt: null, sentAt: null, timezone: 'America/Sao_Paulo', isABTest: false, abTestVariants: null, abTestWinnerCriteria: null, abTestSampleSize: null, engagementPrediction: 'unknown',
+    clickMap: [], personalizationTokens: ['{{first_name}}', '{{company}}'],
+    metrics: { ...zeroMetrics }, revenueAttributed: 0, tags: ['pesquisa', 'nps'], createdAt: '2026-04-03T10:00:00Z', updatedAt: '2026-04-03T10:00:00Z',
+  },
+];
+
+// ============================================================================
+// MOCK AD ACCOUNTS
+// ============================================================================
+
+export const mockAdAccounts: AdAccount[] = [
+  { id: 'adacc-001', platform: 'google', accountName: 'Foursys - Google Ads', accountExternalId: '123-456-7890', connected: true, lastSync: '2026-04-05T08:30:00Z', currency: 'BRL', totalSpend: 185000, totalConversions: 1250 },
+  { id: 'adacc-002', platform: 'meta', accountName: 'Foursys - Meta Business', accountExternalId: 'act_9876543210', connected: true, lastSync: '2026-04-05T07:45:00Z', currency: 'BRL', totalSpend: 142000, totalConversions: 980 },
+  { id: 'adacc-003', platform: 'linkedin', accountName: 'Foursys Technology - LinkedIn', accountExternalId: '501234567', connected: true, lastSync: '2026-04-04T22:00:00Z', currency: 'BRL', totalSpend: 95000, totalConversions: 420 },
+  { id: 'adacc-004', platform: 'tiktok', accountName: '', accountExternalId: '', connected: false, lastSync: null, currency: 'BRL', totalSpend: 0, totalConversions: 0 },
+];
+
+// ============================================================================
+// MOCK AD AUDIENCES
+// ============================================================================
+
+export const mockAdAudiences: AdAudience[] = [
+  { id: 'aud-001', name: 'Decisores TI - Enterprise', type: 'crm_list', platform: 'linkedin', size: 8500, syncStatus: 'synced', lastSynced: '2026-04-05T06:00:00Z', sourceDescription: 'Lista CRM: Contatos com cargo CTO/CIO/VP de TI em empresas 500+' },
+  { id: 'aud-002', name: 'Visitantes Demo Page', type: 'retargeting', platform: 'google', size: 12300, syncStatus: 'synced', lastSynced: '2026-04-05T06:00:00Z', sourceDescription: 'Visitantes que acessaram /demo nos últimos 30 dias' },
+  { id: 'aud-003', name: 'Lookalike - Clientes Ativos', type: 'lookalike', platform: 'meta', size: 2500000, syncStatus: 'synced', lastSynced: '2026-04-04T18:00:00Z', sourceDescription: 'Público semelhante baseado nos 200 melhores clientes' },
+  { id: 'aud-004', name: 'Leads Webinar - Retargeting', type: 'retargeting', platform: 'meta', size: 4200, syncStatus: 'syncing', lastSynced: null, sourceDescription: 'Leads registrados em webinars que não converteram' },
+];
+
+// ============================================================================
+// MOCK ADS
+// ============================================================================
+
+export const mockAds: Ad[] = [
+  { id: 'ad-001', name: 'SaaS Launch - Google Search Brand', platform: 'google', type: 'search', status: 'active', journeyStage: 'decision', campaignId: 'camp-001', campaignName: 'Lançamento SaaS Q1 2026', accountId: 'adacc-001', audienceId: 'aud-002', audienceName: 'Visitantes Demo Page', budget: 25000, budgetPacing: 'on_track', metrics: { impressions: 85000, reach: 42000, clicks: 3800, conversions: 245, leads: 180, spend: 18500, ctr: 4.47, cpc: 4.87, cpm: 217.65, cpa: 75.51, cpl: 102.78, roas: 8.2, frequency: 2.0 }, attribution: { model: 'linear', contactsCreated: 180, dealsCreated: 8, revenueAttributed: 152000 }, startDate: '2026-01-20', endDate: '2026-03-31', targetAudience: 'Profissionais de TI buscando soluções SaaS', creativePreview: 'Anúncio de texto - Busca de marca e termos relacionados', tags: ['search', 'brand'], createdAt: '2026-01-18T10:00:00Z', updatedAt: '2026-04-01T08:00:00Z' },
+  { id: 'ad-002', name: 'SaaS Launch - LinkedIn Decision Makers', platform: 'linkedin', type: 'social', status: 'active', journeyStage: 'consideration', campaignId: 'camp-001', campaignName: 'Lançamento SaaS Q1 2026', accountId: 'adacc-003', audienceId: 'aud-001', audienceName: 'Decisores TI - Enterprise', budget: 30000, budgetPacing: 'underspend', metrics: { impressions: 120000, reach: 35000, clicks: 2800, conversions: 120, leads: 95, spend: 22000, ctr: 2.33, cpc: 7.86, cpm: 183.33, cpa: 183.33, cpl: 231.58, roas: 5.8, frequency: 3.4 }, attribution: { model: 'linear', contactsCreated: 95, dealsCreated: 5, revenueAttributed: 128000 }, startDate: '2026-01-20', endDate: '2026-03-31', targetAudience: 'CTOs, CIOs e VPs de TI', creativePreview: 'Sponsored Content - Carrossel de features da plataforma', tags: ['linkedin', 'enterprise'], createdAt: '2026-01-18T10:00:00Z', updatedAt: '2026-04-01T08:00:00Z' },
+  { id: 'ad-003', name: 'SaaS Launch - Meta Awareness', platform: 'meta', type: 'social', status: 'active', journeyStage: 'awareness', campaignId: 'camp-001', campaignName: 'Lançamento SaaS Q1 2026', accountId: 'adacc-002', audienceId: 'aud-003', audienceName: 'Lookalike - Clientes Ativos', budget: 20000, budgetPacing: 'overspend', metrics: { impressions: 245000, reach: 180000, clicks: 6200, conversions: 85, leads: 145, spend: 22000, ctr: 2.53, cpc: 3.55, cpm: 89.80, cpa: 258.82, cpl: 151.72, roas: 3.1, frequency: 1.4 }, attribution: { model: 'linear', contactsCreated: 145, dealsCreated: 3, revenueAttributed: 68000 }, startDate: '2026-01-20', endDate: '2026-03-31', targetAudience: 'Público semelhante aos melhores clientes', creativePreview: 'Video Ad - Demo da plataforma (30s)', tags: ['meta', 'awareness', 'video'], createdAt: '2026-01-18T10:00:00Z', updatedAt: '2026-04-01T08:00:00Z' },
+  { id: 'ad-004', name: 'Webinar Cloud - LinkedIn Invite', platform: 'linkedin', type: 'social', status: 'active', journeyStage: 'consideration', campaignId: 'camp-002', campaignName: 'Webinar Series - Cloud Migration', accountId: 'adacc-003', audienceId: 'aud-001', audienceName: 'Decisores TI - Enterprise', budget: 8000, budgetPacing: 'on_track', metrics: { impressions: 85000, reach: 28000, clicks: 2400, conversions: 180, leads: 160, spend: 6500, ctr: 2.82, cpc: 2.71, cpm: 76.47, cpa: 36.11, cpl: 40.63, roas: 12.5, frequency: 3.0 }, attribution: { model: 'first_touch', contactsCreated: 160, dealsCreated: 5, revenueAttributed: 82000 }, startDate: '2026-02-01', endDate: '2026-04-30', targetAudience: 'CTOs e CIOs interessados em cloud', creativePreview: 'Event Ad - Convite para webinar com foto do palestrante', tags: ['linkedin', 'webinar'], createdAt: '2026-01-28T10:00:00Z', updatedAt: '2026-04-01T08:00:00Z' },
+  { id: 'ad-005', name: 'Black Friday - Google Search', platform: 'google', type: 'search', status: 'completed', journeyStage: 'decision', campaignId: 'camp-003', campaignName: 'Black Friday Tech 2025', accountId: 'adacc-001', audienceId: null, audienceName: null, budget: 35000, budgetPacing: 'on_track', metrics: { impressions: 520000, reach: 280000, clicks: 18500, conversions: 380, leads: 420, spend: 34000, ctr: 3.56, cpc: 1.84, cpm: 65.38, cpa: 89.47, cpl: 80.95, roas: 7.6, frequency: 1.9 }, attribution: { model: 'last_touch', contactsCreated: 420, dealsCreated: 25, revenueAttributed: 258000 }, startDate: '2025-11-15', endDate: '2025-12-05', targetAudience: 'Buscas por SaaS, ERP, CRM com desconto', creativePreview: 'Anúncio de texto - Black Friday com countdown', tags: ['black-friday', 'search'], createdAt: '2025-11-10T10:00:00Z', updatedAt: '2025-12-06T08:00:00Z' },
+  { id: 'ad-006', name: 'Black Friday - Meta Retargeting', platform: 'meta', type: 'display', status: 'completed', journeyStage: 'decision', campaignId: 'camp-003', campaignName: 'Black Friday Tech 2025', accountId: 'adacc-002', audienceId: null, audienceName: null, budget: 40000, budgetPacing: 'on_track', metrics: { impressions: 680000, reach: 320000, clicks: 19500, conversions: 260, leads: 260, spend: 38500, ctr: 2.87, cpc: 1.97, cpm: 56.62, cpa: 148.08, cpl: 148.08, roas: 5.4, frequency: 2.1 }, attribution: { model: 'last_touch', contactsCreated: 260, dealsCreated: 18, revenueAttributed: 208000 }, startDate: '2025-11-15', endDate: '2025-12-05', targetAudience: 'Retargeting visitantes do site últimos 60 dias', creativePreview: 'Banner dinâmico - Countdown Black Friday + depoimentos', tags: ['black-friday', 'retargeting'], createdAt: '2025-11-10T10:00:00Z', updatedAt: '2025-12-06T08:00:00Z' },
+  { id: 'ad-007', name: 'Tech Summit SP - Awareness', platform: 'meta', type: 'video', status: 'completed', journeyStage: 'awareness', campaignId: 'camp-005', campaignName: 'Evento Presencial - Tech Summit SP', accountId: 'adacc-002', audienceId: null, audienceName: null, budget: 15000, budgetPacing: 'on_track', metrics: { impressions: 200000, reach: 150000, clicks: 5600, conversions: 120, leads: 85, spend: 14200, ctr: 2.80, cpc: 2.54, cpm: 71.00, cpa: 118.33, cpl: 167.06, roas: 4.2, frequency: 1.3 }, attribution: { model: 'full_path', contactsCreated: 85, dealsCreated: 4, revenueAttributed: 60000 }, startDate: '2025-09-20', endDate: '2025-10-10', targetAudience: 'Profissionais de TI em São Paulo', creativePreview: 'Video Ad - Convite Tech Summit SP (15s)', tags: ['tech-summit', 'video'], createdAt: '2025-09-18T10:00:00Z', updatedAt: '2025-10-11T08:00:00Z' },
+  { id: 'ad-008', name: 'Social Awareness - LinkedIn Thought Leadership', platform: 'linkedin', type: 'social', status: 'paused', journeyStage: 'awareness', campaignId: 'camp-006', campaignName: 'Social Media Awareness H1', accountId: 'adacc-003', audienceId: null, audienceName: null, budget: 20000, budgetPacing: 'underspend', metrics: { impressions: 180000, reach: 95000, clicks: 4800, conversions: 65, leads: 120, spend: 12000, ctr: 2.67, cpc: 2.50, cpm: 66.67, cpa: 184.62, cpl: 100.00, roas: 3.5, frequency: 1.9 }, attribution: { model: 'first_touch', contactsCreated: 120, dealsCreated: 3, revenueAttributed: 42000 }, startDate: '2026-01-01', endDate: '2026-06-30', targetAudience: 'Profissionais de TI e gestão', creativePreview: 'Artigo patrocinado - Thought leadership sobre tendências tech', tags: ['linkedin', 'thought-leadership'], createdAt: '2025-12-28T10:00:00Z', updatedAt: '2026-03-05T14:00:00Z' },
+];
+
+// ============================================================================
+// MOCK EVENT INTEGRATIONS
+// ============================================================================
+
+export const mockEventIntegrations: EventIntegration[] = [
+  { id: 'int-zoom', platform: 'zoom', name: 'Zoom', description: 'Use Zoom para webinars, reuniões e eventos virtuais. Sincronize participantes automaticamente.', connected: true, installCount: '57 mil instalações', logoColor: '#2D8CFF' },
+  { id: 'int-teams', platform: 'teams', name: 'Microsoft Teams', description: 'Integre com Teams para webinars corporativos. Sincronize dados de participação automaticamente.', connected: true, installCount: '32 mil instalações', logoColor: '#6264A7' },
+  { id: 'int-eventbrite', platform: 'eventbrite', name: 'Eventbrite', description: 'Gerencie eventos presenciais e virtuais com Eventbrite. Sincronize registros e check-ins.', connected: false, installCount: '18 mil instalações', logoColor: '#F05537' },
+  { id: 'int-meet', platform: 'google_meet', name: 'Google Meet', description: 'Integre com Google Meet para videoconferências e webinars simples.', connected: false, installCount: '12 mil instalações', logoColor: '#00897B' },
+];
+
+// ============================================================================
+// MOCK MARKETING EVENTS
+// ============================================================================
+
+export const mockMarketingEvents: MarketingEvent[] = [
+  {
+    id: 'evt-001', name: 'Webinar: IA Aplicada ao CRM - Transforme seus Resultados', type: 'webinar', status: 'completed', description: 'Webinar sobre aplicações práticas de IA no CRM para aumentar vendas e retenção.', campaignId: 'camp-001', campaignName: 'Lançamento SaaS Q1 2026', date: '2026-02-20', startTime: '14:00', endTime: '15:30', timezone: 'America/Sao_Paulo', location: null, virtualUrl: 'https://zoom.us/j/123456789', isVirtual: true, capacity: 300, registrations: 245, attendees: 188, noShows: 57, attendanceRate: 76.7, integrationPlatform: 'zoom', speakerName: 'Dr. Ricardo Mendes', speakerTitle: 'Head of AI - Foursys',
+    costPerAttendee: 85.00, revenueInfluenced: 180000,
+    eventAttendees: [
+      { id: 'att-001', contactId: 'c1', contactName: 'Ana Rodrigues', contactEmail: 'ana@techcorp.com.br', status: 'attended', registeredAt: '2026-02-10T10:00:00Z', checkedInAt: '2026-02-20T13:55:00Z', engagementScore: 92, source: 'Email' },
+      { id: 'att-002', contactId: 'c2', contactName: 'Pedro Santos', contactEmail: 'pedro@innovatech.com.br', status: 'attended', registeredAt: '2026-02-12T09:00:00Z', checkedInAt: '2026-02-20T14:02:00Z', engagementScore: 78, source: 'LinkedIn' },
+      { id: 'att-003', contactId: 'c3', contactName: 'Maria Oliveira', contactEmail: 'maria@bigcorp.com.br', status: 'no_show', registeredAt: '2026-02-15T14:00:00Z', checkedInAt: null, engagementScore: null, source: 'Landing Page' },
+      { id: 'att-004', contactId: 'c4', contactName: 'Roberto Lima', contactEmail: 'roberto@startup.io', status: 'attended', registeredAt: '2026-02-18T11:00:00Z', checkedInAt: '2026-02-20T13:58:00Z', engagementScore: 65, source: 'Email' },
+    ],
+    automations: [
+      { id: 'auto-1', trigger: 'registration', actionType: 'email', description: 'Enviar confirmação de inscrição com link do Zoom', enabled: true },
+      { id: 'auto-2', trigger: 'reminder_24h', actionType: 'email', description: 'Lembrete 24h antes com agenda e materiais', enabled: true },
+      { id: 'auto-3', trigger: 'reminder_1h', actionType: 'email', description: 'Lembrete 1h antes com link direto', enabled: true },
+      { id: 'auto-4', trigger: 'post_event', actionType: 'email', description: 'Enviar gravação e materiais para participantes', enabled: true },
+      { id: 'auto-5', trigger: 'no_show', actionType: 'email', description: 'Enviar gravação e oferta de reagendamento para ausentes', enabled: true },
+    ],
+    tags: ['webinar', 'ia', 'crm'], createdAt: '2026-02-01T10:00:00Z', updatedAt: '2026-02-22T16:00:00Z',
+  },
+  {
+    id: 'evt-002', name: 'Webinar: Migração para Nuvem sem Downtime', type: 'webinar', status: 'completed', description: 'Como realizar migração cloud com zero tempo de inatividade.', campaignId: 'camp-002', campaignName: 'Webinar Series - Cloud Migration', date: '2026-02-20', startTime: '14:00', endTime: '15:00', timezone: 'America/Sao_Paulo', location: null, virtualUrl: 'https://zoom.us/j/987654321', isVirtual: true, capacity: 200, registrations: 185, attendees: 142, noShows: 43, attendanceRate: 76.8, integrationPlatform: 'zoom', speakerName: 'Eng. Marcos Tavares', speakerTitle: 'Cloud Architect - Foursys',
+    costPerAttendee: 42.00, revenueInfluenced: 120000,
+    eventAttendees: [
+      { id: 'att-005', contactId: 'c5', contactName: 'Fernanda Costa', contactEmail: 'fernanda@empresa.com', status: 'attended', registeredAt: '2026-02-08T10:00:00Z', checkedInAt: '2026-02-20T13:55:00Z', engagementScore: 88, source: 'Email' },
+      { id: 'att-006', contactId: 'c6', contactName: 'Lucas Almeida', contactEmail: 'lucas@corp.com.br', status: 'no_show', registeredAt: '2026-02-15T16:00:00Z', checkedInAt: null, engagementScore: null, source: 'Landing Page' },
+    ],
+    automations: [
+      { id: 'auto-6', trigger: 'registration', actionType: 'email', description: 'Confirmação de inscrição', enabled: true },
+      { id: 'auto-7', trigger: 'reminder_24h', actionType: 'email', description: 'Lembrete 24h', enabled: true },
+      { id: 'auto-8', trigger: 'post_event', actionType: 'email', description: 'Enviar gravação', enabled: true },
+      { id: 'auto-9', trigger: 'no_show', actionType: 'email', description: 'Follow-up no-show', enabled: false },
+    ],
+    tags: ['webinar', 'cloud', 'migration'], createdAt: '2026-02-01T10:00:00Z', updatedAt: '2026-02-22T12:00:00Z',
+  },
+  {
+    id: 'evt-003', name: 'Webinar: Segurança em Ambientes Multi-Cloud', type: 'webinar', status: 'scheduled', description: 'Best practices de segurança para ambientes multi-cloud.', campaignId: 'camp-002', campaignName: 'Webinar Series - Cloud Migration', date: '2026-04-15', startTime: '14:00', endTime: '15:00', timezone: 'America/Sao_Paulo', location: null, virtualUrl: 'https://zoom.us/j/111222333', isVirtual: true, capacity: 250, registrations: 98, attendees: 0, noShows: 0, attendanceRate: 0, integrationPlatform: 'zoom', speakerName: 'Dra. Juliana Ferreira', speakerTitle: 'CISO - Foursys',
+    costPerAttendee: 0, revenueInfluenced: 0,
+    eventAttendees: [
+      { id: 'att-007', contactId: 'c1', contactName: 'Ana Rodrigues', contactEmail: 'ana@techcorp.com.br', status: 'registered', registeredAt: '2026-04-01T10:00:00Z', checkedInAt: null, engagementScore: null, source: 'Email' },
+      { id: 'att-008', contactId: 'c7', contactName: 'Gustavo Mendes', contactEmail: 'gustavo@securecorp.com', status: 'confirmed', registeredAt: '2026-04-02T14:00:00Z', checkedInAt: null, engagementScore: null, source: 'LinkedIn' },
+    ],
+    automations: [
+      { id: 'auto-10', trigger: 'registration', actionType: 'email', description: 'Confirmação de inscrição', enabled: true },
+      { id: 'auto-11', trigger: 'reminder_24h', actionType: 'email', description: 'Lembrete 24h', enabled: true },
+      { id: 'auto-12', trigger: 'reminder_1h', actionType: 'email', description: 'Lembrete 1h', enabled: true },
+      { id: 'auto-13', trigger: 'post_event', actionType: 'email', description: 'Enviar gravação', enabled: true },
+      { id: 'auto-14', trigger: 'no_show', actionType: 'email', description: 'Follow-up no-show', enabled: true },
+    ],
+    tags: ['webinar', 'seguranca', 'multi-cloud'], createdAt: '2026-03-20T10:00:00Z', updatedAt: '2026-04-05T08:00:00Z',
+  },
+  {
+    id: 'evt-004', name: 'Tech Summit São Paulo 2025', type: 'conference', status: 'completed', description: 'Maior evento de tecnologia do ano. Foursys como patrocinadora platinum.', campaignId: 'camp-005', campaignName: 'Evento Presencial - Tech Summit SP', date: '2025-10-10', startTime: '09:00', endTime: '18:00', timezone: 'America/Sao_Paulo', location: 'Centro de Convenções São Paulo Expo', virtualUrl: null, isVirtual: false, capacity: 500, registrations: 480, attendees: 450, noShows: 30, attendanceRate: 93.8, integrationPlatform: null, speakerName: 'Carlos Silva', speakerTitle: 'CEO - Foursys',
+    costPerAttendee: 255.56, revenueInfluenced: 890000,
+    eventAttendees: [],
+    automations: [
+      { id: 'auto-15', trigger: 'registration', actionType: 'email', description: 'Confirmação + badge digital', enabled: true },
+      { id: 'auto-16', trigger: 'post_event', actionType: 'email', description: 'Follow-up com materiais', enabled: true },
+    ],
+    tags: ['conference', 'presencial', 'tech-summit'], createdAt: '2025-09-01T10:00:00Z', updatedAt: '2025-10-15T18:00:00Z',
+  },
+  {
+    id: 'evt-005', name: 'Workshop: Automação de Processos com Low-Code', type: 'workshop', status: 'scheduled', description: 'Workshop hands-on sobre automação de processos usando plataformas low-code.', campaignId: null, campaignName: null, date: '2026-04-22', startTime: '10:00', endTime: '12:00', timezone: 'America/Sao_Paulo', location: null, virtualUrl: 'https://teams.microsoft.com/l/meetup-join/abc123', isVirtual: true, capacity: 50, registrations: 38, attendees: 0, noShows: 0, attendanceRate: 0, integrationPlatform: 'teams', speakerName: 'Eng. Patricia Souza', speakerTitle: 'Tech Lead - Foursys',
+    costPerAttendee: 0, revenueInfluenced: 0,
+    eventAttendees: [
+      { id: 'att-009', contactId: 'c2', contactName: 'Pedro Santos', contactEmail: 'pedro@innovatech.com.br', status: 'confirmed', registeredAt: '2026-04-05T10:00:00Z', checkedInAt: null, engagementScore: null, source: 'Email' },
+    ],
+    automations: [
+      { id: 'auto-17', trigger: 'registration', actionType: 'email', description: 'Confirmação + pré-requisitos', enabled: true },
+      { id: 'auto-18', trigger: 'reminder_24h', actionType: 'email', description: 'Lembrete com link do Teams', enabled: true },
+    ],
+    tags: ['workshop', 'low-code', 'automacao'], createdAt: '2026-04-01T10:00:00Z', updatedAt: '2026-04-05T08:00:00Z',
+  },
+  {
+    id: 'evt-006', name: 'Meetup: DevOps & SRE - Melhores Práticas', type: 'meetup', status: 'live', description: 'Meetup da comunidade DevOps com palestras sobre observabilidade e SRE.', campaignId: null, campaignName: null, date: '2026-04-05', startTime: '19:00', endTime: '21:00', timezone: 'America/Sao_Paulo', location: 'Foursys HQ - Av. Paulista, 1234', virtualUrl: 'https://zoom.us/j/444555666', isVirtual: false, capacity: 80, registrations: 72, attendees: 58, noShows: 14, attendanceRate: 80.6, integrationPlatform: 'zoom', speakerName: 'Vários palestrantes', speakerTitle: 'Comunidade DevOps SP',
+    costPerAttendee: 35.00, revenueInfluenced: 45000,
+    eventAttendees: [
+      { id: 'att-010', contactId: 'c4', contactName: 'Roberto Lima', contactEmail: 'roberto@startup.io', status: 'attended', registeredAt: '2026-03-28T10:00:00Z', checkedInAt: '2026-04-05T18:50:00Z', engagementScore: 85, source: 'Direto' },
+    ],
+    automations: [
+      { id: 'auto-19', trigger: 'registration', actionType: 'email', description: 'Confirmação + mapa do local', enabled: true },
+      { id: 'auto-20', trigger: 'post_event', actionType: 'email', description: 'Slides e fotos do meetup', enabled: true },
+    ],
+    tags: ['meetup', 'devops', 'sre', 'presencial'], createdAt: '2026-03-15T10:00:00Z', updatedAt: '2026-04-05T19:30:00Z',
+  },
+];
+
+// ============================================================================
 // EXPORT ALL MOCK DATA
 // ============================================================================
 
@@ -2849,6 +3286,13 @@ export const mockData = {
   csAlerts: mockCsAlerts,
   csPlaybooks: mockCsPlaybooks,
   accountHealthHistory: mockAccountHealthHistory,
+  campaigns: mockCampaigns,
+  marketingEmails: mockMarketingEmails,
+  adAccounts: mockAdAccounts,
+  adAudiences: mockAdAudiences,
+  ads: mockAds,
+  eventIntegrations: mockEventIntegrations,
+  marketingEvents: mockMarketingEvents,
 };
 
 export default mockData;
