@@ -4,11 +4,21 @@ import {
   Avatar,
   Box,
   Button,
+  Chip,
   CircularProgress,
+  Dialog,
+  DialogContent,
+  DialogTitle,
   Divider,
+  IconButton,
   InputAdornment,
   Paper,
   Stack,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
   TextField,
   ToggleButton,
   ToggleButtonGroup,
@@ -23,9 +33,11 @@ import {
   TrendingUp as DealsIcon,
   Group as ContactsIcon,
   Business as BusinessIcon,
+  RequestQuote as RequestQuoteIcon,
+  Close as CloseIcon,
 } from '@mui/icons-material';
 import { mockApi } from '../mock/api';
-import type { Account } from '../types';
+import type { Account, RateCard } from '../types';
 import AccountFormModal from '../components/AccountFormModal';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -42,7 +54,7 @@ type ViewMode = 'grid' | 'list';
 
 // ── AccountCard (grid) ────────────────────────────────────────────────────────
 
-const AccountCard: React.FC<{ account: Account; onClick: () => void }> = ({ account, onClick }) => {
+const AccountCard: React.FC<{ account: Account; onClick: () => void; onRateCard: (accountId: string) => void }> = ({ account, onClick, onRateCard }) => {
   const color = avatarColor(account.name);
 
   return (
@@ -65,7 +77,6 @@ const AccountCard: React.FC<{ account: Account; onClick: () => void }> = ({ acco
         height: '100%',
       }}
     >
-      {/* Top row: avatar + name */}
       <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.5 }}>
         <Avatar
           sx={{
@@ -104,13 +115,25 @@ const AccountCard: React.FC<{ account: Account; onClick: () => void }> = ({ acco
           <Typography variant="caption" color="text.secondary">deals</Typography>
         </Box>
       </Stack>
+
+      <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 'auto' }}>
+        <Button
+          size="small"
+          variant="text"
+          startIcon={<RequestQuoteIcon sx={{ fontSize: 14 }} />}
+          onClick={(e) => { e.stopPropagation(); onRateCard(account.id); }}
+          sx={{ fontSize: 11, textTransform: 'none', color: 'text.secondary', '&:hover': { color: 'primary.main' } }}
+        >
+          Rate Card
+        </Button>
+      </Box>
     </Paper>
   );
 };
 
 // ── AccountRow (list) ─────────────────────────────────────────────────────────
 
-const AccountRow: React.FC<{ account: Account; onClick: () => void }> = ({ account, onClick }) => {
+const AccountRow: React.FC<{ account: Account; onClick: () => void; onRateCard: (accountId: string) => void }> = ({ account, onClick, onRateCard }) => {
   const color = avatarColor(account.name);
   return (
     <Box
@@ -146,6 +169,15 @@ const AccountRow: React.FC<{ account: Account; onClick: () => void }> = ({ accou
         <DealsIcon sx={{ fontSize: 12, color: 'text.disabled', ml: 0.5 }} />
         <Typography variant="caption" color="text.secondary">{account.openDealsCount ?? 0}</Typography>
       </Box>
+
+      <Button
+        size="small"
+        variant="text"
+        onClick={(e) => { e.stopPropagation(); onRateCard(account.id); }}
+        sx={{ fontSize: 11, textTransform: 'none', color: 'text.secondary', minWidth: 'auto', '&:hover': { color: 'primary.main' } }}
+      >
+        Rate Card
+      </Button>
     </Box>
   );
 };
@@ -159,6 +191,9 @@ export const AccountsListPage: React.FC = () => {
   const [search, setSearch] = useState('');
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
   const [createModalOpen, setCreateModalOpen] = useState(false);
+  const [rateCardOpen, setRateCardOpen] = useState(false);
+  const [selectedRateCard, setSelectedRateCard] = useState<RateCard | null>(null);
+  const [rateCardsLoading, setRateCardsLoading] = useState(false);
 
   const loadAccounts = useCallback(async () => {
     setLoading(true);
@@ -168,6 +203,18 @@ export const AccountsListPage: React.FC = () => {
   }, []);
 
   useEffect(() => { loadAccounts(); }, []);
+
+  const handleOpenRateCard = async (accountId: string) => {
+    setRateCardsLoading(true);
+    setRateCardOpen(true);
+    const res = await mockApi.rateCards.listByAccount(accountId);
+    if (res.isSuccess && res.data && res.data.length > 0) {
+      setSelectedRateCard(res.data[0]);
+    } else {
+      setSelectedRateCard(null);
+    }
+    setRateCardsLoading(false);
+  };
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -293,6 +340,7 @@ export const AccountsListPage: React.FC = () => {
               key={account.id}
               account={account}
               onClick={() => navigate(`/accounts/${account.id}`)}
+              onRateCard={handleOpenRateCard}
             />
           ))}
         </Box>
@@ -311,6 +359,7 @@ export const AccountsListPage: React.FC = () => {
               <AccountRow
                 account={account}
                 onClick={() => navigate(`/accounts/${account.id}`)}
+                onRateCard={handleOpenRateCard}
               />
               {idx < filtered.length - 1 && <Divider />}
             </React.Fragment>
@@ -327,6 +376,82 @@ export const AccountsListPage: React.FC = () => {
           navigate(`/accounts/${account.id}`);
         }}
       />
+
+      <Dialog
+        open={rateCardOpen}
+        onClose={() => setRateCardOpen(false)}
+        maxWidth="lg"
+        fullWidth
+        PaperProps={{ sx: { borderRadius: 3 } }}
+      >
+        <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Box>
+            <Typography variant="h6" sx={{ fontWeight: 700 }}>
+              {selectedRateCard ? `Rate Card — ${selectedRateCard.accountName}` : 'Rate Card'}
+            </Typography>
+            {selectedRateCard && (
+              <Typography variant="caption" color="text.secondary">
+                Versão {selectedRateCard.version} · Vigência: {new Date(selectedRateCard.validFrom).toLocaleDateString('pt-BR')}
+                {selectedRateCard.validUntil ? ` até ${new Date(selectedRateCard.validUntil).toLocaleDateString('pt-BR')}` : ''}
+                {selectedRateCard.approvedBy && ` · Aprovado por ${selectedRateCard.approvedBy}`}
+              </Typography>
+            )}
+          </Box>
+          <IconButton onClick={() => setRateCardOpen(false)} size="small">
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent dividers>
+          {rateCardsLoading ? (
+            <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+              <CircularProgress />
+            </Box>
+          ) : !selectedRateCard ? (
+            <Box sx={{ textAlign: 'center', py: 4 }}>
+              <Typography color="text.secondary">Nenhum Rate Card homologado para esta empresa.</Typography>
+            </Box>
+          ) : (
+            <Table size="small">
+              <TableHead>
+                <TableRow>
+                  <TableCell sx={{ fontWeight: 700 }}>Perfil</TableCell>
+                  <TableCell sx={{ fontWeight: 700 }}>Categoria</TableCell>
+                  <TableCell align="right" sx={{ fontWeight: 700 }}>Júnior</TableCell>
+                  <TableCell align="right" sx={{ fontWeight: 700 }}>Pleno</TableCell>
+                  <TableCell align="right" sx={{ fontWeight: 700 }}>Sênior</TableCell>
+                  <TableCell align="right" sx={{ fontWeight: 700 }}>Especialista</TableCell>
+                  <TableCell align="right" sx={{ fontWeight: 700 }}>Un.</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {selectedRateCard.entries.map((entry) => (
+                  <TableRow key={entry.id} hover>
+                    <TableCell sx={{ fontWeight: 600 }}>{entry.profileName}</TableCell>
+                    <TableCell>
+                      <Chip label={entry.category} size="small" variant="outlined" />
+                    </TableCell>
+                    <TableCell align="right" sx={{ color: entry.rates.junior === 0 ? 'text.disabled' : 'inherit' }}>
+                      {entry.rates.junior === 0 ? '—' : `R$ ${entry.rates.junior}`}
+                    </TableCell>
+                    <TableCell align="right" sx={{ color: entry.rates.pleno === 0 ? 'text.disabled' : 'inherit' }}>
+                      {entry.rates.pleno === 0 ? '—' : `R$ ${entry.rates.pleno}`}
+                    </TableCell>
+                    <TableCell align="right" sx={{ color: entry.rates.senior === 0 ? 'text.disabled' : 'inherit' }}>
+                      {entry.rates.senior === 0 ? '—' : `R$ ${entry.rates.senior}`}
+                    </TableCell>
+                    <TableCell align="right" sx={{ color: entry.rates.especialista === 0 ? 'text.disabled' : 'inherit' }}>
+                      {entry.rates.especialista === 0 ? '—' : `R$ ${entry.rates.especialista}`}
+                    </TableCell>
+                    <TableCell align="right">
+                      <Typography variant="caption" color="text.secondary">/{entry.unit}</Typography>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+        </DialogContent>
+      </Dialog>
     </Box>
   );
 };

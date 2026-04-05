@@ -47,6 +47,7 @@ import type {
   AdAudience,
   MarketingEvent,
   EventIntegration,
+  RateCard,
 } from '../types';
 
 // ============================================================================
@@ -3233,6 +3234,107 @@ export const mockMarketingEvents: MarketingEvent[] = [
 ];
 
 // ============================================================================
+// MOCK RATE CARDS
+// ============================================================================
+
+export const mockRateCards: RateCard[] = [
+  {
+    id: 'rc-001',
+    accountId: '660e8400-e29b-41d4-a716-446655440001',
+    accountName: 'Foursys Tecnologia',
+    version: '2026.1',
+    status: 'active',
+    validFrom: '2026-01-01',
+    validUntil: '2026-12-31',
+    entries: [
+      { id: 'rce-001', profileName: 'Desenvolvedor Full Stack', category: 'Desenvolvimento', rates: { junior: 85, pleno: 120, senior: 165, especialista: 210 }, currency: 'BRL', unit: 'hora', validFrom: '2026-01-01', validUntil: null },
+      { id: 'rce-002', profileName: 'Desenvolvedor Front-end', category: 'Desenvolvimento', rates: { junior: 80, pleno: 115, senior: 155, especialista: 200 }, currency: 'BRL', unit: 'hora', validFrom: '2026-01-01', validUntil: null },
+      { id: 'rce-003', profileName: 'Desenvolvedor Back-end', category: 'Desenvolvimento', rates: { junior: 82, pleno: 118, senior: 160, especialista: 205 }, currency: 'BRL', unit: 'hora', validFrom: '2026-01-01', validUntil: null },
+      { id: 'rce-004', profileName: 'Desenvolvedor Mobile', category: 'Desenvolvimento', rates: { junior: 88, pleno: 125, senior: 170, especialista: 220 }, currency: 'BRL', unit: 'hora', validFrom: '2026-01-01', validUntil: null },
+      { id: 'rce-005', profileName: 'Engenheiro de Dados', category: 'Dados & IA', rates: { junior: 90, pleno: 130, senior: 180, especialista: 240 }, currency: 'BRL', unit: 'hora', validFrom: '2026-01-01', validUntil: null },
+      { id: 'rce-006', profileName: 'Cientista de Dados', category: 'Dados & IA', rates: { junior: 95, pleno: 140, senior: 190, especialista: 250 }, currency: 'BRL', unit: 'hora', validFrom: '2026-01-01', validUntil: null },
+      { id: 'rce-007', profileName: 'Analista de QA', category: 'Qualidade', rates: { junior: 70, pleno: 100, senior: 140, especialista: 180 }, currency: 'BRL', unit: 'hora', validFrom: '2026-01-01', validUntil: null },
+      { id: 'rce-008', profileName: 'DevOps / SRE', category: 'Infraestrutura', rates: { junior: 90, pleno: 130, senior: 175, especialista: 230 }, currency: 'BRL', unit: 'hora', validFrom: '2026-01-01', validUntil: null },
+      { id: 'rce-009', profileName: 'Tech Lead', category: 'Gestão Técnica', rates: { junior: 0, pleno: 150, senior: 200, especialista: 260 }, currency: 'BRL', unit: 'hora', validFrom: '2026-01-01', validUntil: null },
+      { id: 'rce-010', profileName: 'Scrum Master', category: 'Gestão Técnica', rates: { junior: 0, pleno: 130, senior: 170, especialista: 210 }, currency: 'BRL', unit: 'hora', validFrom: '2026-01-01', validUntil: null },
+      { id: 'rce-011', profileName: 'UX/UI Designer', category: 'Design', rates: { junior: 75, pleno: 110, senior: 150, especialista: 195 }, currency: 'BRL', unit: 'hora', validFrom: '2026-01-01', validUntil: null },
+      { id: 'rce-012', profileName: 'Arquiteto de Soluções', category: 'Arquitetura', rates: { junior: 0, pleno: 0, senior: 220, especialista: 300 }, currency: 'BRL', unit: 'hora', validFrom: '2026-01-01', validUntil: null },
+    ],
+    approvedBy: 'Carlos Silva',
+    approvedAt: '2025-12-20T10:00:00Z',
+    createdAt: '2025-12-15T10:00:00Z',
+    updatedAt: '2025-12-20T10:00:00Z',
+  },
+  {
+    id: 'rc-002',
+    accountId: '660e8400-e29b-41d4-a716-446655440002',
+    accountName: 'Tech Corp Solutions',
+    version: '2026.1',
+    status: 'active',
+    validFrom: '2026-01-01',
+    validUntil: '2026-06-30',
+    entries: [
+      { id: 'rce-020', profileName: 'Desenvolvedor Full Stack', category: 'Desenvolvimento', rates: { junior: 90, pleno: 130, senior: 175, especialista: 225 }, currency: 'BRL', unit: 'hora', validFrom: '2026-01-01', validUntil: null },
+      { id: 'rce-021', profileName: 'Desenvolvedor Front-end', category: 'Desenvolvimento', rates: { junior: 85, pleno: 120, senior: 165, especialista: 210 }, currency: 'BRL', unit: 'hora', validFrom: '2026-01-01', validUntil: null },
+      { id: 'rce-022', profileName: 'Analista de QA', category: 'Qualidade', rates: { junior: 75, pleno: 105, senior: 145, especialista: 185 }, currency: 'BRL', unit: 'hora', validFrom: '2026-01-01', validUntil: null },
+      { id: 'rce-023', profileName: 'DevOps / SRE', category: 'Infraestrutura', rates: { junior: 95, pleno: 135, senior: 185, especialista: 240 }, currency: 'BRL', unit: 'hora', validFrom: '2026-01-01', validUntil: null },
+      { id: 'rce-024', profileName: 'Scrum Master', category: 'Gestão Técnica', rates: { junior: 0, pleno: 135, senior: 175, especialista: 215 }, currency: 'BRL', unit: 'hora', validFrom: '2026-01-01', validUntil: null },
+      { id: 'rce-025', profileName: 'UX/UI Designer', category: 'Design', rates: { junior: 78, pleno: 112, senior: 155, especialista: 200 }, currency: 'BRL', unit: 'hora', validFrom: '2026-01-01', validUntil: null },
+    ],
+    approvedBy: 'Ana Costa',
+    approvedAt: '2025-12-28T14:00:00Z',
+    createdAt: '2025-12-22T10:00:00Z',
+    updatedAt: '2025-12-28T14:00:00Z',
+  },
+  {
+    id: 'rc-003',
+    accountId: '660e8400-e29b-41d4-a716-446655440003',
+    accountName: 'StartupX Inovação',
+    version: '2025.2',
+    status: 'active',
+    validFrom: '2025-07-01',
+    validUntil: '2026-06-30',
+    entries: [
+      { id: 'rce-030', profileName: 'Desenvolvedor Full Stack', category: 'Desenvolvimento', rates: { junior: 75, pleno: 105, senior: 145, especialista: 185 }, currency: 'BRL', unit: 'hora', validFrom: '2025-07-01', validUntil: null },
+      { id: 'rce-031', profileName: 'Desenvolvedor Mobile', category: 'Desenvolvimento', rates: { junior: 80, pleno: 110, senior: 150, especialista: 195 }, currency: 'BRL', unit: 'hora', validFrom: '2025-07-01', validUntil: null },
+      { id: 'rce-032', profileName: 'UX/UI Designer', category: 'Design', rates: { junior: 70, pleno: 100, senior: 140, especialista: 180 }, currency: 'BRL', unit: 'hora', validFrom: '2025-07-01', validUntil: null },
+      { id: 'rce-033', profileName: 'Analista de QA', category: 'Qualidade', rates: { junior: 65, pleno: 90, senior: 125, especialista: 160 }, currency: 'BRL', unit: 'hora', validFrom: '2025-07-01', validUntil: null },
+    ],
+    approvedBy: 'Pedro Oliveira',
+    approvedAt: '2025-06-25T10:00:00Z',
+    createdAt: '2025-06-20T10:00:00Z',
+    updatedAt: '2025-06-25T10:00:00Z',
+  },
+  {
+    id: 'rc-004',
+    accountId: '660e8400-e29b-41d4-a716-446655440004',
+    accountName: 'BigCo Enterprises',
+    version: '2026.1',
+    status: 'active',
+    validFrom: '2026-01-01',
+    validUntil: '2026-12-31',
+    entries: [
+      { id: 'rce-040', profileName: 'Desenvolvedor Full Stack', category: 'Desenvolvimento', rates: { junior: 95, pleno: 140, senior: 190, especialista: 250 }, currency: 'BRL', unit: 'hora', validFrom: '2026-01-01', validUntil: null },
+      { id: 'rce-041', profileName: 'Desenvolvedor Front-end', category: 'Desenvolvimento', rates: { junior: 90, pleno: 130, senior: 175, especialista: 230 }, currency: 'BRL', unit: 'hora', validFrom: '2026-01-01', validUntil: null },
+      { id: 'rce-042', profileName: 'Desenvolvedor Back-end', category: 'Desenvolvimento', rates: { junior: 92, pleno: 135, senior: 180, especialista: 240 }, currency: 'BRL', unit: 'hora', validFrom: '2026-01-01', validUntil: null },
+      { id: 'rce-043', profileName: 'Engenheiro de Dados', category: 'Dados & IA', rates: { junior: 100, pleno: 145, senior: 200, especialista: 270 }, currency: 'BRL', unit: 'hora', validFrom: '2026-01-01', validUntil: null },
+      { id: 'rce-044', profileName: 'Cientista de Dados', category: 'Dados & IA', rates: { junior: 105, pleno: 155, senior: 210, especialista: 280 }, currency: 'BRL', unit: 'hora', validFrom: '2026-01-01', validUntil: null },
+      { id: 'rce-045', profileName: 'Analista de QA', category: 'Qualidade', rates: { junior: 80, pleno: 115, senior: 155, especialista: 200 }, currency: 'BRL', unit: 'hora', validFrom: '2026-01-01', validUntil: null },
+      { id: 'rce-046', profileName: 'DevOps / SRE', category: 'Infraestrutura', rates: { junior: 100, pleno: 145, senior: 195, especialista: 255 }, currency: 'BRL', unit: 'hora', validFrom: '2026-01-01', validUntil: null },
+      { id: 'rce-047', profileName: 'Tech Lead', category: 'Gestão Técnica', rates: { junior: 0, pleno: 165, senior: 220, especialista: 290 }, currency: 'BRL', unit: 'hora', validFrom: '2026-01-01', validUntil: null },
+      { id: 'rce-048', profileName: 'Scrum Master', category: 'Gestão Técnica', rates: { junior: 0, pleno: 145, senior: 185, especialista: 235 }, currency: 'BRL', unit: 'hora', validFrom: '2026-01-01', validUntil: null },
+      { id: 'rce-049', profileName: 'Arquiteto de Soluções', category: 'Arquitetura', rates: { junior: 0, pleno: 0, senior: 250, especialista: 340 }, currency: 'BRL', unit: 'hora', validFrom: '2026-01-01', validUntil: null },
+      { id: 'rce-050', profileName: 'UX/UI Designer', category: 'Design', rates: { junior: 85, pleno: 125, senior: 170, especialista: 220 }, currency: 'BRL', unit: 'hora', validFrom: '2026-01-01', validUntil: null },
+      { id: 'rce-051', profileName: 'Gerente de Projetos', category: 'Gestão Técnica', rates: { junior: 0, pleno: 155, senior: 210, especialista: 275 }, currency: 'BRL', unit: 'hora', validFrom: '2026-01-01', validUntil: null },
+    ],
+    approvedBy: 'Roberto Lima',
+    approvedAt: '2025-12-18T10:00:00Z',
+    createdAt: '2025-12-10T10:00:00Z',
+    updatedAt: '2025-12-18T10:00:00Z',
+  },
+];
+
+// ============================================================================
 // EXPORT ALL MOCK DATA
 // ============================================================================
 
@@ -3276,6 +3378,7 @@ export const mockData = {
   accessExportHistory: mockAccessExportHistory,
   products: mockProducts,
   proposals: mockProposals,
+  rateCards: mockRateCards,
   contracts: mockContracts,
   projects: mockProjects,
   integrations: mockIntegrations,

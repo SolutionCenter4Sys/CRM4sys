@@ -50,6 +50,7 @@ import {
   LinkedIn as LinkedInIcon,
   Tag as TagIcon,
   TrendingUp as TrendingUpIcon,
+  RequestQuote as RequestQuoteIcon,
 } from '@mui/icons-material';
 import { mockApi } from '../mock/api';
 import type {
@@ -62,6 +63,7 @@ import type {
   User,
   MarketSegment,
   AccountStatus,
+  RateCard,
 } from '../types';
 
 // ── helpers ─────────────────────────────────────────────────────────────────
@@ -636,6 +638,7 @@ export const AccountDetailPage: React.FC = () => {
   const [account, setAccount] = useState<Account | null>(null);
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [deals, setDeals] = useState<Deal[]>([]);
+  const [rateCards, setRateCards] = useState<RateCard[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [activeTab, setActiveTab] = useState(0);
   const [editOpen, setEditOpen] = useState(false);
@@ -662,6 +665,9 @@ export const AccountDetailPage: React.FC = () => {
       setUsers(usersRes.data || []);
       const allDeals = dealsRes.data || [];
       setDeals(allDeals.filter((d) => d.accountId === id));
+      mockApi.rateCards.listByAccount(id).then(res => {
+        if (res.isSuccess && res.data) setRateCards(res.data);
+      });
       setLoading(false);
     };
     load();
@@ -748,7 +754,7 @@ export const AccountDetailPage: React.FC = () => {
   const wonDeals = deals.filter((d) => d.status === 'won');
   const lostDeals = deals.filter((d) => d.status === 'lost');
 
-  // Tab indices: 0=Geral, 1=Endereços, 2=Negócios, 3=Faturamento, 4=Grupos, 5=Organograma, 6=Contatos
+  // Tab indices: 0=Geral, 1=Endereços, 2=Negócios, 3=Faturamento, 4=Rate Card, 5=Grupos, 6=Organograma, 7=Contatos
 
   return (
     <Box sx={{ p: { xs: 2, md: 3 }, maxWidth: 1100, mx: 'auto' }}>
@@ -909,6 +915,7 @@ export const AccountDetailPage: React.FC = () => {
           <Tab icon={<PlaceIcon sx={{ fontSize: 16 }} />} iconPosition="start" label={`Endereços (${allAddresses.length})`} />
           <Tab icon={<WorkOutlineIcon sx={{ fontSize: 16 }} />} iconPosition="start" label={`Negócios (${deals.length})`} />
           <Tab icon={<AccountBalanceIcon sx={{ fontSize: 16 }} />} iconPosition="start" label="Faturamento" />
+          <Tab icon={<RequestQuoteIcon sx={{ fontSize: 16 }} />} iconPosition="start" label="Rate Card" />
           <Tab icon={<GroupIcon sx={{ fontSize: 16 }} />} iconPosition="start" label="Grupos" />
           <Tab icon={<AccountTreeIcon sx={{ fontSize: 16 }} />} iconPosition="start" label="Organograma" />
           <Tab icon={<ContactPageIcon sx={{ fontSize: 16 }} />} iconPosition="start" label={`Contatos (${contacts.length})`} />
@@ -1338,8 +1345,98 @@ export const AccountDetailPage: React.FC = () => {
         </Grid>
       )}
 
-      {/* ── Tab 4 — Grupos ── */}
+      {/* ── Tab 4 — Rate Card ── */}
       {activeTab === 4 && (
+        <Card variant="outlined">
+          <CardContent>
+            {rateCards.length === 0 ? (
+              <Box sx={{ textAlign: 'center', py: 5 }}>
+                <RequestQuoteIcon sx={{ fontSize: 44, color: 'text.disabled', mb: 1 }} />
+                <Typography color="text.secondary" sx={{ mb: 1 }}>
+                  Nenhum Rate Card homologado para esta empresa.
+                </Typography>
+              </Box>
+            ) : (
+              rateCards.map((rc) => (
+                <Box key={rc.id} sx={{ mb: 3, '&:last-child': { mb: 0 } }}>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                    <Box>
+                      <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
+                        Rate Card v{rc.version}
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        Vigência: {new Date(rc.validFrom).toLocaleDateString('pt-BR')}
+                        {rc.validUntil ? ` até ${new Date(rc.validUntil).toLocaleDateString('pt-BR')}` : ' (sem prazo)'}
+                        {rc.approvedBy && ` · Aprovado por ${rc.approvedBy}`}
+                      </Typography>
+                    </Box>
+                    <Chip
+                      label={rc.status === 'active' ? 'Ativo' : rc.status === 'draft' ? 'Rascunho' : 'Expirado'}
+                      size="small"
+                      color={rc.status === 'active' ? 'success' : rc.status === 'draft' ? 'default' : 'error'}
+                    />
+                  </Box>
+
+                  {(() => {
+                    const categories = Array.from(new Set(rc.entries.map(e => e.category)));
+                    return categories.map((cat) => (
+                      <Box key={cat} sx={{ mb: 2.5, '&:last-child': { mb: 0 } }}>
+                        <Typography variant="caption" sx={{ fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5, color: 'text.secondary', display: 'block', mb: 1 }}>
+                          {cat}
+                        </Typography>
+                        <Box sx={{ border: '1px solid', borderColor: 'divider', borderRadius: 2, overflow: 'hidden' }}>
+                          <Box sx={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr 1fr 80px', bgcolor: 'action.hover', px: 2, py: 1 }}>
+                            <Typography variant="caption" sx={{ fontWeight: 700 }}>Perfil</Typography>
+                            <Typography variant="caption" sx={{ fontWeight: 700, textAlign: 'right' }}>Júnior</Typography>
+                            <Typography variant="caption" sx={{ fontWeight: 700, textAlign: 'right' }}>Pleno</Typography>
+                            <Typography variant="caption" sx={{ fontWeight: 700, textAlign: 'right' }}>Sênior</Typography>
+                            <Typography variant="caption" sx={{ fontWeight: 700, textAlign: 'right' }}>Especialista</Typography>
+                            <Typography variant="caption" sx={{ fontWeight: 700, textAlign: 'right' }}>Unidade</Typography>
+                          </Box>
+                          {rc.entries.filter(e => e.category === cat).map((entry) => (
+                            <Box
+                              key={entry.id}
+                              sx={{
+                                display: 'grid',
+                                gridTemplateColumns: '2fr 1fr 1fr 1fr 1fr 80px',
+                                px: 2,
+                                py: 1,
+                                borderTop: '1px solid',
+                                borderColor: 'divider',
+                                '&:hover': { bgcolor: 'action.hover' },
+                              }}
+                            >
+                              <Typography variant="body2" sx={{ fontWeight: 600 }}>{entry.profileName}</Typography>
+                              <Typography variant="body2" sx={{ textAlign: 'right', color: entry.rates.junior === 0 ? 'text.disabled' : 'text.primary' }}>
+                                {entry.rates.junior === 0 ? '—' : `R$ ${entry.rates.junior}`}
+                              </Typography>
+                              <Typography variant="body2" sx={{ textAlign: 'right', color: entry.rates.pleno === 0 ? 'text.disabled' : 'text.primary' }}>
+                                {entry.rates.pleno === 0 ? '—' : `R$ ${entry.rates.pleno}`}
+                              </Typography>
+                              <Typography variant="body2" sx={{ textAlign: 'right', color: entry.rates.senior === 0 ? 'text.disabled' : 'text.primary' }}>
+                                {entry.rates.senior === 0 ? '—' : `R$ ${entry.rates.senior}`}
+                              </Typography>
+                              <Typography variant="body2" sx={{ textAlign: 'right', color: entry.rates.especialista === 0 ? 'text.disabled' : 'text.primary' }}>
+                                {entry.rates.especialista === 0 ? '—' : `R$ ${entry.rates.especialista}`}
+                              </Typography>
+                              <Typography variant="caption" sx={{ textAlign: 'right', color: 'text.secondary' }}>
+                                /{entry.unit}
+                              </Typography>
+                            </Box>
+                          ))}
+                        </Box>
+                      </Box>
+                    ));
+                  })()}
+                </Box>
+              ))
+            )}
+          </CardContent>
+        </Card>
+      )}
+
+      {/* ── Tab 5 — Grupos ── */}
+      {activeTab === 5 && (
         <Stack spacing={2}>
           {account.parentAccount && (
             <Card variant="outlined">
@@ -1431,8 +1528,8 @@ export const AccountDetailPage: React.FC = () => {
         </Stack>
       )}
 
-      {/* ── Tab 5 — Organograma ── */}
-      {activeTab === 5 && (
+      {/* ── Tab 6 — Organograma ── */}
+      {activeTab === 6 && (
         <Card variant="outlined">
           <CardContent>
             <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 2 }}>
@@ -1571,8 +1668,8 @@ export const AccountDetailPage: React.FC = () => {
         </Card>
       )}
 
-      {/* ── Tab 6 — Contatos ── */}
-      {activeTab === 6 && (
+      {/* ── Tab 7 — Contatos ── */}
+      {activeTab === 7 && (
         <Card variant="outlined">
           <CardContent>
             {/* Header da aba com botão de adicionar */}

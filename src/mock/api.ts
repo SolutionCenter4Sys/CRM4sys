@@ -1,7 +1,7 @@
 // CRM B2B Tech Foursys - Mock API Service
 // Simula chamadas HTTP com localStorage e delays realistas
 
-import { mockData, mockCampaigns, mockMarketingEmails, mockAdAccounts, mockAdAudiences, mockAds, mockEventIntegrations, mockMarketingEvents } from './data';
+import { mockData, mockCampaigns, mockMarketingEmails, mockAdAccounts, mockAdAudiences, mockAds, mockEventIntegrations, mockMarketingEvents, mockRateCards } from './data';
 import type {
   Contact,
   Account,
@@ -114,6 +114,7 @@ import type {
   AdAudience,
   MarketingEvent,
   EventIntegration,
+  RateCard,
 } from '../types';
 
 // ============================================================================
@@ -4094,6 +4095,27 @@ export const marketingEventsApi = {
 };
 
 // ============================================================================
+// RATE CARDS
+// ============================================================================
+
+export const rateCardsApi = {
+  async listByAccount(accountId: string): Promise<ApiResponse<RateCard[]>> {
+    await delay(150);
+    const cards = mockRateCards.filter(rc => rc.accountId === accountId);
+    return { isSuccess: true, data: cards, message: 'OK' };
+  },
+  async getById(id: string): Promise<ApiResponse<RateCard | null>> {
+    await delay(100);
+    const card = mockRateCards.find(rc => rc.id === id) || null;
+    return { isSuccess: !!card, data: card, message: card ? 'OK' : 'Rate Card não encontrado' };
+  },
+  async list(): Promise<ApiResponse<RateCard[]>> {
+    await delay(150);
+    return { isSuccess: true, data: [...mockRateCards], message: 'OK' };
+  },
+};
+
+// ============================================================================
 // UTILITY
 // ============================================================================
 
@@ -4122,6 +4144,7 @@ export const mockApi = {
   customerSuccess: customerSuccessApi,
   products: productsApi,
   proposals: proposalsApi,
+  rateCards: rateCardsApi,
   contracts: contractsApi,
   projects: projectsApi,
   integrations: integrationsApi,

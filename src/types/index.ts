@@ -179,6 +179,35 @@ export interface Account {
 
 export type AccountTier = 'SMB' | 'MidMarket' | 'Enterprise';
 
+export type SeniorityLevel = 'junior' | 'pleno' | 'senior' | 'especialista';
+
+export interface RateCardEntry {
+  id: string;
+  profileName: string;
+  category: string;
+  rates: Record<SeniorityLevel, number>;
+  currency: string;
+  unit: 'hora' | 'mes';
+  validFrom: string;
+  validUntil: string | null;
+  notes?: string;
+}
+
+export interface RateCard {
+  id: string;
+  accountId: string;
+  accountName: string;
+  version: string;
+  status: 'active' | 'draft' | 'expired';
+  validFrom: string;
+  validUntil: string | null;
+  entries: RateCardEntry[];
+  approvedBy: string | null;
+  approvedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface Address {
   street?: string;
   complement?: string;
