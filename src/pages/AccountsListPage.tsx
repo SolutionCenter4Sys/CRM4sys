@@ -4,10 +4,8 @@ import {
   Avatar,
   Box,
   Button,
-  Chip,
   CircularProgress,
   Divider,
-  IconButton,
   InputAdornment,
   Paper,
   Stack,
@@ -25,31 +23,12 @@ import {
   TrendingUp as DealsIcon,
   Group as ContactsIcon,
   Business as BusinessIcon,
-  Star as StarIcon,
 } from '@mui/icons-material';
 import { mockApi } from '../mock/api';
 import type { Account } from '../types';
 import AccountFormModal from '../components/AccountFormModal';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
-
-type TierKey = 'Strategic' | 'Enterprise' | 'MidMarket' | 'SMB' | string;
-
-const TIER_CONFIG: Record<string, { color: string; bg: string; label: string }> = {
-  Strategic:  { color: '#7C3AED', bg: 'rgba(124,58,237,0.1)',  label: 'Strategic'  },
-  Enterprise: { color: '#2563EB', bg: 'rgba(37,99,235,0.1)',   label: 'Enterprise' },
-  MidMarket:  { color: '#0891B2', bg: 'rgba(8,145,178,0.1)',   label: 'MidMarket'  },
-  SMB:        { color: '#16A34A', bg: 'rgba(22,163,74,0.1)',   label: 'SMB'        },
-};
-
-const tierCfg = (tier: string) =>
-  TIER_CONFIG[tier] ?? { color: '#64748B', bg: 'rgba(100,116,139,0.1)', label: tier };
-
-const icpColor = (score: number) =>
-  score >= 80 ? '#16A34A' : score >= 60 ? '#D97706' : '#DC2626';
-
-const icpBg = (score: number) =>
-  score >= 80 ? 'rgba(22,163,74,0.1)' : score >= 60 ? 'rgba(217,119,6,0.1)' : 'rgba(220,38,38,0.08)';
 
 /** Gera cor de avatar baseada na inicial da empresa */
 const AVATAR_COLORS = [
@@ -60,38 +39,10 @@ const avatarColor = (name: string) =>
   AVATAR_COLORS[name.charCodeAt(0) % AVATAR_COLORS.length];
 
 type ViewMode = 'grid' | 'list';
-type TierFilter = 'all' | TierKey;
-
-// ── ICP Ring ──────────────────────────────────────────────────────────────────
-
-const IcpRing: React.FC<{ score: number; size?: number }> = ({ score, size = 36 }) => {
-  const r = (size - 6) / 2;
-  const circ = 2 * Math.PI * r;
-  const filled = (score / 100) * circ;
-  const color = icpColor(score);
-  return (
-    <Box sx={{ position: 'relative', width: size, height: size, flexShrink: 0 }}>
-      <svg width={size} height={size} style={{ transform: 'rotate(-90deg)' }}>
-        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="currentColor"
-          strokeWidth={3} style={{ color: 'rgba(0,0,0,0.08)' }} />
-        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={color}
-          strokeWidth={3} strokeLinecap="round"
-          strokeDasharray={`${filled} ${circ - filled}`} />
-      </svg>
-      <Typography sx={{
-        position: 'absolute', inset: 0, display: 'flex', alignItems: 'center',
-        justifyContent: 'center', fontSize: 10, fontWeight: 800, color,
-      }}>
-        {score}
-      </Typography>
-    </Box>
-  );
-};
 
 // ── AccountCard (grid) ────────────────────────────────────────────────────────
 
 const AccountCard: React.FC<{ account: Account; onClick: () => void }> = ({ account, onClick }) => {
-  const tc = tierCfg(account.tier || '');
   const color = avatarColor(account.name);
 
   return (
@@ -114,7 +65,7 @@ const AccountCard: React.FC<{ account: Account; onClick: () => void }> = ({ acco
         height: '100%',
       }}
     >
-      {/* Top row: avatar + name + tier */}
+      {/* Top row: avatar + name */}
       <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.5 }}>
         <Avatar
           sx={{
@@ -130,16 +81,9 @@ const AccountCard: React.FC<{ account: Account; onClick: () => void }> = ({ acco
           {account.name.charAt(0).toUpperCase()}
         </Avatar>
         <Box sx={{ flex: 1, minWidth: 0 }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 0.5, mb: 0.2 }}>
-            <Typography variant="body2" sx={{ fontWeight: 800, lineHeight: 1.2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-              {account.name}
-            </Typography>
-            <Chip
-              label={tc.label}
-              size="small"
-              sx={{ height: 20, fontSize: 10, fontWeight: 700, bgcolor: tc.bg, color: tc.color, border: 'none', flexShrink: 0 }}
-            />
-          </Box>
+          <Typography variant="body2" sx={{ fontWeight: 800, lineHeight: 1.2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', mb: 0.2 }}>
+            {account.name}
+          </Typography>
           <Typography variant="caption" color="text.secondary" sx={{ display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
             {account.industry || '—'} · {account.domain || '—'}
           </Typography>
@@ -148,24 +92,18 @@ const AccountCard: React.FC<{ account: Account; onClick: () => void }> = ({ acco
 
       <Divider />
 
-      {/* KPIs + ICP */}
-      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Stack direction="row" spacing={2}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-            <ContactsIcon sx={{ fontSize: 13, color: 'text.disabled' }} />
-            <Typography variant="caption" sx={{ fontWeight: 600 }}>{account.contactCount ?? 0}</Typography>
-            <Typography variant="caption" color="text.secondary">contatos</Typography>
-          </Box>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-            <DealsIcon sx={{ fontSize: 13, color: 'text.disabled' }} />
-            <Typography variant="caption" sx={{ fontWeight: 600 }}>{account.openDealsCount ?? 0}</Typography>
-            <Typography variant="caption" color="text.secondary">deals</Typography>
-          </Box>
-        </Stack>
-        <Tooltip title={`ICP Score: ${account.icpScore}`}>
-          <Box><IcpRing score={account.icpScore} /></Box>
-        </Tooltip>
-      </Box>
+      <Stack direction="row" spacing={2}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+          <ContactsIcon sx={{ fontSize: 13, color: 'text.disabled' }} />
+          <Typography variant="caption" sx={{ fontWeight: 600 }}>{account.contactCount ?? 0}</Typography>
+          <Typography variant="caption" color="text.secondary">contatos</Typography>
+        </Box>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+          <DealsIcon sx={{ fontSize: 13, color: 'text.disabled' }} />
+          <Typography variant="caption" sx={{ fontWeight: 600 }}>{account.openDealsCount ?? 0}</Typography>
+          <Typography variant="caption" color="text.secondary">deals</Typography>
+        </Box>
+      </Stack>
     </Paper>
   );
 };
@@ -173,7 +111,6 @@ const AccountCard: React.FC<{ account: Account; onClick: () => void }> = ({ acco
 // ── AccountRow (list) ─────────────────────────────────────────────────────────
 
 const AccountRow: React.FC<{ account: Account; onClick: () => void }> = ({ account, onClick }) => {
-  const tc = tierCfg(account.tier || '');
   const color = avatarColor(account.name);
   return (
     <Box
@@ -203,27 +140,11 @@ const AccountRow: React.FC<{ account: Account; onClick: () => void }> = ({ accou
         </Typography>
       </Box>
 
-      <Chip
-        label={tc.label}
-        size="small"
-        sx={{ height: 20, fontSize: 10, fontWeight: 700, bgcolor: tc.bg, color: tc.color, border: 'none', flexShrink: 0 }}
-      />
-
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, minWidth: 80 }}>
         <ContactsIcon sx={{ fontSize: 12, color: 'text.disabled' }} />
         <Typography variant="caption" color="text.secondary">{account.contactCount ?? 0}</Typography>
         <DealsIcon sx={{ fontSize: 12, color: 'text.disabled', ml: 0.5 }} />
         <Typography variant="caption" color="text.secondary">{account.openDealsCount ?? 0}</Typography>
-      </Box>
-
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, flexShrink: 0 }}>
-        <Box sx={{
-          width: 6, height: 6, borderRadius: '50%',
-          bgcolor: icpColor(account.icpScore),
-        }} />
-        <Typography variant="caption" sx={{ fontWeight: 700, color: icpColor(account.icpScore) }}>
-          ICP {account.icpScore}
-        </Typography>
       </Box>
     </Box>
   );
@@ -236,7 +157,6 @@ export const AccountsListPage: React.FC = () => {
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
-  const [tierFilter, setTierFilter] = useState<TierFilter>('all');
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
   const [createModalOpen, setCreateModalOpen] = useState(false);
 
@@ -249,28 +169,18 @@ export const AccountsListPage: React.FC = () => {
 
   useEffect(() => { loadAccounts(); }, []);
 
-  const tiers = useMemo(() => {
-    const set = new Set(accounts.map((a) => a.tier).filter(Boolean));
-    return Array.from(set) as string[];
-  }, [accounts]);
-
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
-    return accounts.filter((a) => {
-      const matchesTier = tierFilter === 'all' || a.tier === tierFilter;
-      const matchesSearch =
-        !q ||
-        a.name.toLowerCase().includes(q) ||
-        a.domain?.toLowerCase().includes(q) ||
-        a.industry?.toLowerCase().includes(q);
-      return matchesTier && matchesSearch;
-    });
-  }, [accounts, search, tierFilter]);
+    if (!q) return accounts;
+    return accounts.filter((a) =>
+      a.name.toLowerCase().includes(q) ||
+      a.domain?.toLowerCase().includes(q) ||
+      a.industry?.toLowerCase().includes(q),
+    );
+  }, [accounts, search]);
 
   // KPIs
   const totalDeals = useMemo(() => accounts.reduce((s, a) => s + (a.openDealsCount ?? 0), 0), [accounts]);
-  const avgIcp = useMemo(() => accounts.length === 0 ? 0 : Math.round(accounts.reduce((s, a) => s + a.icpScore, 0) / accounts.length), [accounts]);
-  const enterpriseCount = useMemo(() => accounts.filter((a) => a.tier === 'Enterprise' || a.tier === 'Strategic').length, [accounts]);
 
   return (
     <Box sx={{ p: { xs: 2, md: 3 } }}>
@@ -280,7 +190,7 @@ export const AccountsListPage: React.FC = () => {
         <Box>
           <Typography variant="h5" sx={{ fontWeight: 800, mb: 0.2 }}>Empresas</Typography>
           <Typography variant="body2" color="text.secondary">
-            Portfólio de contas com fit de ICP e cobertura comercial.
+            Portfólio de contas e cobertura comercial.
           </Typography>
         </Box>
         <Button variant="contained" startIcon={<AddIcon />} onClick={() => setCreateModalOpen(true)}>
@@ -292,9 +202,7 @@ export const AccountsListPage: React.FC = () => {
       <Box sx={{ display: 'flex', gap: 1.5, mb: 3, flexWrap: 'wrap' }}>
         {[
           { icon: <BusinessIcon sx={{ fontSize: 16 }} />, label: 'Total', value: accounts.length, color: undefined },
-          { icon: <StarIcon sx={{ fontSize: 16 }} />,    label: 'Enterprise+', value: enterpriseCount, color: '#7C3AED' },
           { icon: <DealsIcon sx={{ fontSize: 16 }} />,   label: 'Deals abertos', value: totalDeals, color: '#2563EB' },
-          { icon: <ContactsIcon sx={{ fontSize: 16 }} />,label: 'ICP médio', value: `${avgIcp}`, color: icpColor(avgIcp) },
         ].map((kpi) => (
           <Paper
             key={kpi.label}
@@ -327,33 +235,6 @@ export const AccountsListPage: React.FC = () => {
           }}
         />
 
-        {/* Filtros de tier */}
-        <Box sx={{ display: 'flex', gap: 0.6, flexWrap: 'wrap' }}>
-          {(['all', ...tiers] as Array<'all' | string>).map((t) => {
-            const cfg = t === 'all' ? null : tierCfg(t);
-            const active = tierFilter === t;
-            return (
-              <Chip
-                key={t}
-                label={t === 'all' ? 'Todos' : cfg!.label}
-                size="small"
-                onClick={() => setTierFilter(t as TierFilter)}
-                sx={{
-                  cursor: 'pointer',
-                  height: 26,
-                  fontWeight: 700,
-                  fontSize: 11,
-                  bgcolor: active ? (cfg ? cfg.bg : 'action.selected') : 'transparent',
-                  color: active ? (cfg ? cfg.color : 'text.primary') : 'text.secondary',
-                  border: '1px solid',
-                  borderColor: active ? (cfg ? cfg.color : 'divider') : 'divider',
-                  '&:hover': { opacity: 0.85 },
-                }}
-              />
-            );
-          })}
-        </Box>
-
         {/* View toggle */}
         <ToggleButtonGroup
           value={viewMode}
@@ -373,7 +254,6 @@ export const AccountsListPage: React.FC = () => {
       {/* ── Contador de resultados ── */}
       <Typography variant="caption" color="text.secondary" sx={{ mb: 1.5, display: 'block' }}>
         {filtered.length} {filtered.length === 1 ? 'empresa encontrada' : 'empresas encontradas'}
-        {tierFilter !== 'all' && ` · filtro: ${tierCfg(tierFilter).label}`}
       </Typography>
 
       {/* ── Conteúdo ── */}
@@ -386,14 +266,14 @@ export const AccountsListPage: React.FC = () => {
         <Box sx={{ textAlign: 'center', py: 10 }}>
           <Typography sx={{ fontSize: 48, mb: 1 }}>🏢</Typography>
           <Typography variant="h6" sx={{ fontWeight: 700, mb: 0.5 }}>
-            {search || tierFilter !== 'all' ? 'Nenhuma empresa encontrada' : 'Sem empresas ainda'}
+            {search ? 'Nenhuma empresa encontrada' : 'Sem empresas ainda'}
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-            {search || tierFilter !== 'all'
-              ? 'Tente ajustar os filtros ou a busca.'
+            {search
+              ? 'Tente ajustar a busca.'
               : 'Cadastre a primeira empresa para começar.'}
           </Typography>
-          {!search && tierFilter === 'all' && (
+          {!search && (
             <Button variant="contained" startIcon={<AddIcon />} onClick={() => setCreateModalOpen(true)}>
               Nova Empresa
             </Button>
@@ -423,9 +303,7 @@ export const AccountsListPage: React.FC = () => {
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, px: 2, py: 1, bgcolor: 'action.hover' }}>
             <Box sx={{ width: 32, flexShrink: 0 }} />
             <Typography variant="caption" sx={{ fontWeight: 700, flex: 2, color: 'text.secondary', textTransform: 'uppercase', letterSpacing: 0.5, fontSize: 10 }}>Empresa</Typography>
-            <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary', textTransform: 'uppercase', letterSpacing: 0.5, fontSize: 10, minWidth: 90 }}>Tier</Typography>
             <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary', textTransform: 'uppercase', letterSpacing: 0.5, fontSize: 10, minWidth: 80 }}>Contatos / Deals</Typography>
-            <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary', textTransform: 'uppercase', letterSpacing: 0.5, fontSize: 10, minWidth: 70 }}>ICP</Typography>
           </Box>
           <Divider />
           {filtered.map((account, idx) => (

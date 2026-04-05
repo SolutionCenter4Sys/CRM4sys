@@ -17,8 +17,8 @@ import {
   FormControlLabel,
   Grid,
   IconButton,
-  LinearProgress,
   MenuItem,
+  Paper,
   Stack,
   Switch,
   Tab,
@@ -28,6 +28,7 @@ import {
   Typography,
 } from '@mui/material';
 import {
+  AccountTree as AccountTreeIcon,
   ArrowBack as ArrowBackIcon,
   Edit as EditIcon,
   Business as BusinessIcon,
@@ -42,7 +43,6 @@ import {
   WorkOutline as WorkOutlineIcon,
   CheckCircleOutline as CheckCircleIcon,
   ErrorOutline as ErrorOutlineIcon,
-  Star as StarIcon,
   Place as PlaceIcon,
   AccountBalance as AccountBalanceIcon,
   Apartment as ApartmentIcon,
@@ -729,7 +729,6 @@ export const AccountDetailPage: React.FC = () => {
   }
 
   const bc = account.billingConditions;
-  const icpColor = account.icpScore >= 80 ? 'success' : account.icpScore >= 60 ? 'warning' : 'error';
 
   // Sede + filiais unificadas para a aba de endereços
   const allAddresses: Branch[] = [
@@ -749,7 +748,7 @@ export const AccountDetailPage: React.FC = () => {
   const wonDeals = deals.filter((d) => d.status === 'won');
   const lostDeals = deals.filter((d) => d.status === 'lost');
 
-  // Tab indices: 0=Geral, 1=Endereços, 2=Negócios, 3=Faturamento, 4=Grupos, 5=Contatos
+  // Tab indices: 0=Geral, 1=Endereços, 2=Negócios, 3=Faturamento, 4=Grupos, 5=Organograma, 6=Contatos
 
   return (
     <Box sx={{ p: { xs: 2, md: 3 }, maxWidth: 1100, mx: 'auto' }}>
@@ -798,12 +797,6 @@ export const AccountDetailPage: React.FC = () => {
                 <Typography variant="h5" sx={{ fontWeight: 700, lineHeight: 1.2 }}>
                   {account.name}
                 </Typography>
-                <Chip
-                  label={account.tier}
-                  color={TIER_COLOR[account.tier]}
-                  size="small"
-                  sx={{ fontWeight: 700 }}
-                />
                 {account.accountStatus && (
                   <Chip
                     label={ACCOUNT_STATUS_LABEL[account.accountStatus]}
@@ -811,11 +804,6 @@ export const AccountDetailPage: React.FC = () => {
                     size="small"
                     variant="outlined"
                   />
-                )}
-                {account.targetAccount && (
-                  <Tooltip title="Conta alvo (Target Account)">
-                    <StarIcon sx={{ fontSize: 18, color: 'warning.main' }} />
-                  </Tooltip>
                 )}
               </Box>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap', mt: 0.3 }}>
@@ -878,34 +866,6 @@ export const AccountDetailPage: React.FC = () => {
               </Box>
             </Box>
 
-            {/* ICP Score */}
-            <Box sx={{ textAlign: 'center', minWidth: 80 }}>
-              <Box sx={{ position: 'relative', display: 'inline-flex' }}>
-                <CircularProgress
-                  variant="determinate"
-                  value={account.icpScore}
-                  size={60}
-                  thickness={5}
-                  color={icpColor}
-                />
-                <Box
-                  sx={{
-                    position: 'absolute',
-                    inset: 0,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
-                >
-                  <Typography variant="body2" sx={{ fontWeight: 700 }}>
-                    {account.icpScore}
-                  </Typography>
-                </Box>
-              </Box>
-              <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.3 }}>
-                ICP Score
-              </Typography>
-            </Box>
           </Box>
 
           <Divider sx={{ my: 2 }} />
@@ -950,6 +910,7 @@ export const AccountDetailPage: React.FC = () => {
           <Tab icon={<WorkOutlineIcon sx={{ fontSize: 16 }} />} iconPosition="start" label={`Negócios (${deals.length})`} />
           <Tab icon={<AccountBalanceIcon sx={{ fontSize: 16 }} />} iconPosition="start" label="Faturamento" />
           <Tab icon={<GroupIcon sx={{ fontSize: 16 }} />} iconPosition="start" label="Grupos" />
+          <Tab icon={<AccountTreeIcon sx={{ fontSize: 16 }} />} iconPosition="start" label="Organograma" />
           <Tab icon={<ContactPageIcon sx={{ fontSize: 16 }} />} iconPosition="start" label={`Contatos (${contacts.length})`} />
         </Tabs>
       </Box>
@@ -1011,7 +972,7 @@ export const AccountDetailPage: React.FC = () => {
           <Grid item xs={12} md={6}>
             <Card variant="outlined">
               <CardContent>
-                <SectionTitle>Responsável & Classificação</SectionTitle>
+                <SectionTitle>Responsável</SectionTitle>
                 <Box sx={{ mt: 1 }}>
                   {account.owner && (
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1.5 }}>
@@ -1031,33 +992,15 @@ export const AccountDetailPage: React.FC = () => {
                       </Box>
                     </Box>
                   )}
-                  <Box sx={{ mb: 1 }}>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
-                      <Typography variant="caption" color="text.secondary">ICP Score</Typography>
-                      <Typography variant="caption" sx={{ fontWeight: 700, color: `${icpColor}.main` }}>
-                        {account.icpScore}/100
-                      </Typography>
-                    </Box>
-                    <LinearProgress
-                      variant="determinate"
-                      value={account.icpScore}
-                      color={icpColor}
-                      sx={{ borderRadius: 4, height: 6 }}
-                    />
-                  </Box>
-                  <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap', mt: 1 }}>
-                    <Chip label={`Tier: ${account.tier}`} size="small" color={TIER_COLOR[account.tier]} />
-                    {account.accountStatus && (
+                  {account.accountStatus && (
+                    <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap', mt: 1 }}>
                       <Chip
                         label={ACCOUNT_STATUS_LABEL[account.accountStatus]}
                         size="small"
                         color={ACCOUNT_STATUS_COLOR[account.accountStatus]}
                       />
-                    )}
-                    {account.targetAccount && (
-                      <Chip label="Target Account" size="small" color="warning" icon={<StarIcon sx={{ fontSize: 14 }} />} />
-                    )}
-                  </Box>
+                    </Box>
+                  )}
                 </Box>
               </CardContent>
             </Card>
@@ -1488,8 +1431,148 @@ export const AccountDetailPage: React.FC = () => {
         </Stack>
       )}
 
-      {/* ── Tab 5 — Contatos ── */}
+      {/* ── Tab 5 — Organograma ── */}
       {activeTab === 5 && (
+        <Card variant="outlined">
+          <CardContent>
+            <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 2 }}>
+              Organograma da empresa
+            </Typography>
+
+            {contacts.length === 0 ? (
+              <Box sx={{ textAlign: 'center', py: 5 }}>
+                <BusinessIcon sx={{ fontSize: 44, color: 'text.disabled', mb: 1 }} />
+                <Typography color="text.secondary">
+                  Nenhum contato vinculado para exibir no organograma.
+                </Typography>
+              </Box>
+            ) : (
+              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3 }}>
+                <Paper
+                  elevation={0}
+                  sx={{
+                    p: 2,
+                    border: '2px solid',
+                    borderColor: 'primary.main',
+                    borderRadius: 3,
+                    textAlign: 'center',
+                    minWidth: 200,
+                    bgcolor: 'primary.50',
+                  }}
+                >
+                  <Avatar
+                    sx={{
+                      width: 48,
+                      height: 48,
+                      mx: 'auto',
+                      mb: 1,
+                      bgcolor: 'primary.main',
+                      fontSize: 20,
+                    }}
+                  >
+                    {account.name.charAt(0)}
+                  </Avatar>
+                  <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
+                    {account.name}
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary">
+                    {account.industry || 'Empresa'}
+                  </Typography>
+                </Paper>
+
+                <Box sx={{ width: 2, height: 24, bgcolor: 'divider' }} />
+
+                {(() => {
+                  const deptMap = new Map<string, typeof contacts>();
+                  contacts.forEach(c => {
+                    const dept = c.department || 'Outros';
+                    if (!deptMap.has(dept)) deptMap.set(dept, []);
+                    deptMap.get(dept)!.push(c);
+                  });
+                  const departments = Array.from(deptMap.entries());
+
+                  return (
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 3, justifyContent: 'center', width: '100%' }}>
+                      {departments.map(([dept, deptContacts]) => (
+                        <Box
+                          key={dept}
+                          sx={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            gap: 1.5,
+                            minWidth: 200,
+                            maxWidth: 280,
+                          }}
+                        >
+                          <Paper
+                            elevation={0}
+                            sx={{
+                              px: 2,
+                              py: 1,
+                              bgcolor: 'action.hover',
+                              borderRadius: 2,
+                              border: '1px solid',
+                              borderColor: 'divider',
+                              textAlign: 'center',
+                              width: '100%',
+                            }}
+                          >
+                            <Typography variant="caption" sx={{ fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5, color: 'text.secondary' }}>
+                              {dept}
+                            </Typography>
+                          </Paper>
+
+                          {deptContacts.map(contact => (
+                            <Paper
+                              key={contact.id}
+                              elevation={0}
+                              sx={{
+                                p: 1.5,
+                                border: '1px solid',
+                                borderColor: 'divider',
+                                borderRadius: 2,
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 1.5,
+                                width: '100%',
+                                cursor: 'pointer',
+                                transition: 'all 0.15s',
+                                '&:hover': { borderColor: 'primary.main', boxShadow: 1 },
+                              }}
+                              onClick={() => navigate(`/contacts/${contact.id}`)}
+                            >
+                              <Avatar src={contact.avatar} sx={{ width: 40, height: 40, fontSize: 14 }}>
+                                {contact.fullName?.charAt(0)}
+                              </Avatar>
+                              <Box sx={{ minWidth: 0 }}>
+                                <Typography variant="body2" sx={{ fontWeight: 600, lineHeight: 1.2 }} noWrap>
+                                  {contact.fullName}
+                                </Typography>
+                                <Typography variant="caption" color="text.secondary" noWrap>
+                                  {contact.jobTitle || 'Cargo não informado'}
+                                </Typography>
+                                {contact.phone && (
+                                  <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }} noWrap>
+                                    {contact.phone}
+                                  </Typography>
+                                )}
+                              </Box>
+                            </Paper>
+                          ))}
+                        </Box>
+                      ))}
+                    </Box>
+                  );
+                })()}
+              </Box>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
+      {/* ── Tab 6 — Contatos ── */}
+      {activeTab === 6 && (
         <Card variant="outlined">
           <CardContent>
             {/* Header da aba com botão de adicionar */}
@@ -1530,10 +1613,10 @@ export const AccountDetailPage: React.FC = () => {
                     }}
                   >
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                      <Avatar src={contact.avatar} sx={{ width: 38, height: 38, fontSize: 15 }}>
+                      <Avatar src={contact.avatar} sx={{ width: 48, height: 48, fontSize: 16 }}>
                         {contact.fullName?.charAt(0)}
                       </Avatar>
-                      <Box>
+                      <Box sx={{ minWidth: 0 }}>
                         <Typography variant="body2" sx={{ fontWeight: 600 }}>
                           {contact.fullName}
                         </Typography>
@@ -1541,6 +1624,19 @@ export const AccountDetailPage: React.FC = () => {
                           {contact.jobTitle || 'Cargo não informado'}
                           {contact.email && ` · ${contact.email}`}
                         </Typography>
+                        {contact.phone && (
+                          <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
+                            <PhoneIcon sx={{ fontSize: 12, mr: 0.5, verticalAlign: 'middle' }} />
+                            {contact.phone}
+                          </Typography>
+                        )}
+                        {contact.tags && contact.tags.length > 0 && (
+                          <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap', mt: 0.5 }}>
+                            {contact.tags.map((tag) => (
+                              <Chip key={tag} label={tag} size="small" variant="outlined" sx={{ height: 20, fontSize: 10 }} />
+                            ))}
+                          </Box>
+                        )}
                       </Box>
                     </Box>
                     <Button size="small" onClick={() => navigate(`/contacts/${contact.id}`)}>
