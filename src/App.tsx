@@ -76,6 +76,7 @@ import {
   CreditCardOutlined as CreditCardOutlinedIcon,
   MoreHoriz as MoreHorizIcon,
   Close as CloseIcon,
+  NewReleasesOutlined as NewReleasesOutlinedIcon,
 } from '@mui/icons-material';
 import { createAppTheme } from './styles/theme';
 import CommandPalette from './components/CommandPalette';
@@ -416,15 +417,24 @@ const SidebarContent: React.FC<SidebarContentProps> = ({
 }) => {
   const [financialAnchorEl, setFinancialAnchorEl] = useState<HTMLElement | null>(null);
   const financialOpen = Boolean(financialAnchorEl);
+  const [newFeaturesAnchorEl, setNewFeaturesAnchorEl] = useState<HTMLElement | null>(null);
+  const newFeaturesOpen = Boolean(newFeaturesAnchorEl);
 
   const close = (el: null) => { setSettingsAnchorEl(el); onNavClick?.(); };
   const closeFinancial = () => { setFinancialAnchorEl(null); onNavClick?.(); };
+  const closeNewFeatures = () => { setNewFeaturesAnchorEl(null); onNavClick?.(); };
 
   const isFinancialActive = ['/billing'].some((p) => isActiveRoute(p));
+  const isNewFeaturesActive = ['/leads', '/contracts', '/billing/collections/rules', '/billing/gateways'].some((p) => isActiveRoute(p));
 
   const financialItems = [
     { label: 'Faturas', sublabel: 'Emitir e gerenciar faturas', to: '/billing/invoices', icon: <ReceiptLongOutlinedIcon fontSize="small" />, prefetchKey: 'billing-invoices', importer: importInvoicesListPage },
     { label: 'Recebíveis', sublabel: 'Dashboard de recebimentos', to: '/billing/receivables', icon: <RequestQuoteIcon fontSize="small" />, prefetchKey: 'receivables-dashboard', importer: importReceivablesDashboardPage },
+  ];
+
+  const newFeaturesItems = [
+    { label: 'Leads', sublabel: 'Captação e qualificação', to: '/leads', icon: <TrackChangesOutlinedIcon fontSize="small" />, prefetchKey: 'leads', importer: importLeadsListPage },
+    { label: 'Contratos', sublabel: 'Gestão de contratos', to: '/contracts', icon: <ArticleOutlinedIcon fontSize="small" />, prefetchKey: 'contracts', importer: importContractsPage },
     { label: 'Régua de Cobrança', sublabel: 'Automação de cobranças', to: '/billing/collections/rules', icon: <GavelOutlinedIcon fontSize="small" />, prefetchKey: 'collections-rules', importer: importCollectionRulesPage },
     { label: 'Gateways de Pagamento', sublabel: 'Configurar meios de pagamento', to: '/billing/gateways', icon: <CreditCardOutlinedIcon fontSize="small" />, prefetchKey: 'payment-gateways', importer: importPaymentGatewaysPage },
   ];
@@ -449,12 +459,10 @@ const SidebarContent: React.FC<SidebarContentProps> = ({
       <Tooltip title="Empresas"><IconButton component={NavLink} to="/accounts" onClick={onNavClick} onMouseEnter={() => prefetchRoute('accounts', importAccountsListPage)} sx={{ color: 'inherit', bgcolor: isActiveRoute('/accounts') ? 'rgba(255,255,255,0.18)' : 'transparent' }}><BusinessOutlinedIcon /></IconButton></Tooltip>
       <Tooltip title="Contatos"><IconButton component={NavLink} to="/contacts" onClick={onNavClick} onMouseEnter={() => prefetchRoute('contacts', importContactsListPage)} sx={{ color: 'inherit', bgcolor: isActiveRoute('/contacts') ? 'rgba(255,255,255,0.18)' : 'transparent' }}><ContactsOutlinedIcon /></IconButton></Tooltip>
       <Tooltip title="Negócios"><IconButton component={NavLink} to="/deals" onClick={onNavClick} onMouseEnter={() => prefetchRoute('deals', importDealsPipelinePage)} sx={{ color: 'inherit', bgcolor: isActiveRoute('/deals') ? 'rgba(255,255,255,0.18)' : 'transparent' }}><WorkOutlineIcon /></IconButton></Tooltip>
-      <Tooltip title="Leads"><IconButton component={NavLink} to="/leads" onClick={onNavClick} onMouseEnter={() => prefetchRoute('leads', importLeadsListPage)} sx={{ color: 'inherit', bgcolor: isActiveRoute('/leads') ? 'rgba(255,255,255,0.18)' : 'transparent' }}><TrackChangesOutlinedIcon /></IconButton></Tooltip>
       <Tooltip title="Feed de Atividades"><IconButton component={NavLink} to="/activities" onClick={onNavClick} onMouseEnter={() => prefetchRoute('activities', importActivitiesTimelinePage)} sx={{ color: 'inherit', bgcolor: isActiveRoute('/activities') ? 'rgba(255,255,255,0.18)' : 'transparent' }}><TimelineOutlinedIcon /></IconButton></Tooltip>
       <Divider sx={{ width: 28, borderColor: 'rgba(255,255,255,0.4)' }} />
 
       <Tooltip title="Propostas"><IconButton component={NavLink} to="/proposals" onClick={onNavClick} onMouseEnter={() => prefetchRoute('proposals', importProposalsPage)} sx={{ color: 'inherit', bgcolor: isActiveRoute('/proposals') ? 'rgba(255,255,255,0.18)' : 'transparent' }}><DescriptionOutlinedIcon /></IconButton></Tooltip>
-      <Tooltip title="Contratos"><IconButton component={NavLink} to="/contracts" onClick={onNavClick} onMouseEnter={() => prefetchRoute('contracts', importContractsPage)} sx={{ color: 'inherit', bgcolor: isActiveRoute('/contracts') ? 'rgba(255,255,255,0.18)' : 'transparent' }}><ArticleOutlinedIcon /></IconButton></Tooltip>
 
       {/* 💰 Ícone Financeiro com flyout */}
       <Tooltip title="Financeiro" placement="right">
@@ -580,6 +588,78 @@ const SidebarContent: React.FC<SidebarContentProps> = ({
           <MenuItem component={NavLink} to="/settings/sso" onClick={() => close(null)} onMouseEnter={() => prefetchRoute('sso', importSsoConfigPage)}><ListItemIcon><LockOutlinedIcon fontSize="small" /></ListItemIcon>SSO / SAML</MenuItem>
         </MenuList>
       </Popover>
+
+      {/* 🆕 Ícone Novas Features com flyout */}
+      <Tooltip title="Novas Features" placement="right">
+        <IconButton
+          onClick={(e) => setNewFeaturesAnchorEl(e.currentTarget)}
+          sx={{
+            color: 'inherit',
+            mb: 0.5,
+            bgcolor: isNewFeaturesActive || newFeaturesOpen ? 'rgba(255,255,255,0.18)' : 'transparent',
+            border: isNewFeaturesActive ? '1px solid rgba(255,255,255,0.35)' : '1px solid transparent',
+            transition: 'all 0.15s',
+          }}
+        >
+          <NewReleasesOutlinedIcon />
+        </IconButton>
+      </Tooltip>
+
+      <Popover
+        open={newFeaturesOpen}
+        anchorEl={newFeaturesAnchorEl}
+        onClose={() => setNewFeaturesAnchorEl(null)}
+        anchorOrigin={{ vertical: 'center', horizontal: 'right' }}
+        transformOrigin={{ vertical: 'center', horizontal: 'left' }}
+        PaperProps={{
+          sx: {
+            ml: 1,
+            borderRadius: 2.5,
+            minWidth: 280,
+            boxShadow: '0 8px 32px rgba(0,0,0,0.18)',
+            overflow: 'hidden',
+          },
+        }}
+      >
+        <Box sx={{ px: 2, py: 1.5, background: 'linear-gradient(135deg, #065F46 0%, #10B981 100%)', color: '#fff' }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <NewReleasesOutlinedIcon sx={{ fontSize: 18 }} />
+            <Typography variant="subtitle2" sx={{ fontWeight: 700, fontSize: 13 }}>Novas Funcionalidades</Typography>
+          </Box>
+          <Typography variant="caption" sx={{ opacity: 0.75, fontSize: 11 }}>
+            Features em desenvolvimento e preview
+          </Typography>
+        </Box>
+
+        <MenuList dense sx={{ py: 0.5 }}>
+          {newFeaturesItems.map((item, idx) => (
+            <React.Fragment key={item.to}>
+              <MenuItem
+                component={NavLink}
+                to={item.to}
+                onClick={closeNewFeatures}
+                onMouseEnter={() => prefetchRoute(item.prefetchKey, item.importer)}
+                selected={isActiveRoute(item.to)}
+                sx={{
+                  py: 1.2,
+                  px: 2,
+                  '&.Mui-selected': { bgcolor: 'primary.50', color: 'primary.main' },
+                  '&:hover': { bgcolor: 'action.hover' },
+                }}
+              >
+                <ListItemIcon sx={{ color: isActiveRoute(item.to) ? 'primary.main' : 'text.secondary', minWidth: 36 }}>
+                  {item.icon}
+                </ListItemIcon>
+                <Box>
+                  <Typography variant="body2" sx={{ fontWeight: 600, lineHeight: 1.2 }}>{item.label}</Typography>
+                  <Typography variant="caption" color="text.secondary" sx={{ fontSize: 11 }}>{item.sublabel}</Typography>
+                </Box>
+              </MenuItem>
+              {idx < newFeaturesItems.length - 1 && <Divider sx={{ mx: 1.5 }} />}
+            </React.Fragment>
+          ))}
+        </MenuList>
+      </Popover>
     </Box>
   );
 };
@@ -621,7 +701,6 @@ const MobileNavDrawer: React.FC<MobileNavDrawerProps> = ({
         { label: 'Empresas', to: '/accounts', icon: <BusinessOutlinedIcon fontSize="small" /> },
         { label: 'Contatos', to: '/contacts', icon: <ContactsOutlinedIcon fontSize="small" /> },
         { label: 'Negócios', to: '/deals', icon: <WorkOutlineIcon fontSize="small" /> },
-        { label: 'Leads', to: '/leads', icon: <TrackChangesOutlinedIcon fontSize="small" /> },
         { label: 'Atividades', to: '/activities', icon: <TimelineOutlinedIcon fontSize="small" /> },
       ],
     },
@@ -629,7 +708,6 @@ const MobileNavDrawer: React.FC<MobileNavDrawerProps> = ({
       title: 'Vendas',
       items: [
         { label: 'Propostas', to: '/proposals', icon: <DescriptionOutlinedIcon fontSize="small" /> },
-        { label: 'Contratos', to: '/contracts', icon: <ArticleOutlinedIcon fontSize="small" /> },
         { label: 'Financeiro', to: '/billing/invoices', icon: <AccountBalanceOutlinedIcon fontSize="small" /> },
       ],
     },
@@ -648,6 +726,15 @@ const MobileNavDrawer: React.FC<MobileNavDrawerProps> = ({
         { label: 'Integrações', to: '/settings/integrations', icon: <ExtensionOutlinedIcon fontSize="small" /> },
         { label: 'SSO / SAML', to: '/settings/sso', icon: <LockOutlinedIcon fontSize="small" /> },
         { label: 'Auditoria', to: '/billing/audit', icon: <PolicyOutlinedIcon fontSize="small" /> },
+      ],
+    },
+    {
+      title: 'Novas Funcionalidades',
+      items: [
+        { label: 'Leads', to: '/leads', icon: <TrackChangesOutlinedIcon fontSize="small" /> },
+        { label: 'Contratos', to: '/contracts', icon: <ArticleOutlinedIcon fontSize="small" /> },
+        { label: 'Régua de Cobrança', to: '/billing/collections/rules', icon: <GavelOutlinedIcon fontSize="small" /> },
+        { label: 'Gateways de Pagamento', to: '/billing/gateways', icon: <CreditCardOutlinedIcon fontSize="small" /> },
       ],
     },
   ];
