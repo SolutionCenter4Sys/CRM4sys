@@ -425,7 +425,7 @@ const SidebarContent: React.FC<SidebarContentProps> = ({
   const closeNewFeatures = () => { setNewFeaturesAnchorEl(null); onNavClick?.(); };
 
   const isFinancialActive = ['/billing'].some((p) => isActiveRoute(p));
-  const isNewFeaturesActive = ['/leads', '/contracts', '/billing/collections/rules', '/billing/gateways'].some((p) => isActiveRoute(p));
+  const isNewFeaturesActive = ['/leads', '/contracts', '/billing/collections/rules', '/billing/gateways', '/products', '/projects', '/cs', '/nurture', '/reports/scheduled', '/exports', '/bi/connectors', '/settings/integrations', '/settings/sso'].some((p) => isActiveRoute(p));
 
   const financialItems = [
     { label: 'Faturas', sublabel: 'Emitir e gerenciar faturas', to: '/billing/invoices', icon: <ReceiptLongOutlinedIcon fontSize="small" />, prefetchKey: 'billing-invoices', importer: importInvoicesListPage },
@@ -548,26 +548,6 @@ const SidebarContent: React.FC<SidebarContentProps> = ({
       </Tooltip>
       <Popover open={settingsOpen} anchorEl={settingsAnchorEl} onClose={() => setSettingsAnchorEl(null)} anchorOrigin={{ vertical: 'top', horizontal: 'right' }} transformOrigin={{ vertical: 'bottom', horizontal: 'left' }} PaperProps={{ sx: { borderRadius: 2, minWidth: 220, boxShadow: 6 } }}>
         <MenuList dense sx={{ py: 1 }}>
-          <MenuItem component={NavLink} to="/products" onClick={() => close(null)} onMouseEnter={() => prefetchRoute('products', importProductCatalogPage)}><ListItemIcon><Inventory2OutlinedIcon fontSize="small" /></ListItemIcon>Produtos & Serviços</MenuItem>
-          <MenuItem component={NavLink} to="/projects" onClick={() => close(null)} onMouseEnter={() => prefetchRoute('projects', importProjectsPage)}><ListItemIcon><RocketLaunchOutlinedIcon fontSize="small" /></ListItemIcon>Projetos & Delivery</MenuItem>
-          <MenuItem component={NavLink} to="/cs" onClick={() => close(null)} onMouseEnter={() => prefetchRoute('customer-success', importCustomerSuccessPage)}><ListItemIcon><FavoriteBorderOutlinedIcon fontSize="small" /></ListItemIcon>Customer Success</MenuItem>
-          <Divider sx={{ my: 0.5 }} />
-          <Box component="li" sx={{ px: 2, pt: 0.5, pb: 0.2 }}>
-            <Typography sx={{ fontSize: 10, fontWeight: 700, letterSpacing: 0.8, color: 'text.disabled', textTransform: 'uppercase' }}>
-              Automações
-            </Typography>
-          </Box>
-          <MenuItem component={NavLink} to="/nurture" onClick={() => close(null)} onMouseEnter={() => prefetchRoute('nurture-sequences', importNurtureSequencesPage)}><ListItemIcon><AutoAwesomeMotionOutlinedIcon fontSize="small" /></ListItemIcon>Nurture Sequences</MenuItem>
-          <Divider sx={{ my: 0.5 }} />
-          <Box component="li" sx={{ px: 2, pt: 0.5, pb: 0.2 }}>
-            <Typography sx={{ fontSize: 10, fontWeight: 700, letterSpacing: 0.8, color: 'text.disabled', textTransform: 'uppercase' }}>
-              Analytics
-            </Typography>
-          </Box>
-          <MenuItem component={NavLink} to="/reports/scheduled" onClick={() => close(null)} onMouseEnter={() => prefetchRoute('scheduled-reports', importScheduledReportsPage)}><ListItemIcon><EventRepeatOutlinedIcon fontSize="small" /></ListItemIcon>Relatórios Agendados</MenuItem>
-          <MenuItem component={NavLink} to="/exports" onClick={() => close(null)} onMouseEnter={() => prefetchRoute('exports', importExportsPage)}><ListItemIcon><FileDownloadOutlinedIcon fontSize="small" /></ListItemIcon>Exportações</MenuItem>
-          <MenuItem component={NavLink} to="/bi/connectors" onClick={() => close(null)} onMouseEnter={() => prefetchRoute('bi-connectors', importBIConnectorsPage)}><ListItemIcon><HubOutlinedIcon fontSize="small" /></ListItemIcon>BI Connectors</MenuItem>
-          <Divider sx={{ my: 0.5 }} />
           <Box component="li" sx={{ px: 2, pt: 0.5, pb: 0.2 }}>
             <Typography sx={{ fontSize: 10, fontWeight: 700, letterSpacing: 0.8, color: 'text.disabled', textTransform: 'uppercase' }}>
               Acesso & Segurança
@@ -578,14 +558,6 @@ const SidebarContent: React.FC<SidebarContentProps> = ({
           <MenuItem component={NavLink} to="/access/approvals" onClick={() => close(null)} onMouseEnter={() => prefetchRoute('access-approvals', importAccessApprovalsPage)}><ListItemIcon><VerifiedUserOutlinedIcon fontSize="small" /></ListItemIcon>IAM – Aprovações</MenuItem>
           <MenuItem component={NavLink} to="/billing/permissions" onClick={() => close(null)} onMouseEnter={() => prefetchRoute('permissions-matrix', importPermissionsMatrixPage)}><ListItemIcon><AdminPanelSettingsOutlinedIcon fontSize="small" /></ListItemIcon>Permissões</MenuItem>
           <MenuItem component={NavLink} to="/billing/audit" onClick={() => close(null)} onMouseEnter={() => prefetchRoute('audit-trail', importAuditTrailPage)}><ListItemIcon><PolicyOutlinedIcon fontSize="small" /></ListItemIcon>Auditoria</MenuItem>
-          <Divider sx={{ my: 0.5 }} />
-          <Box component="li" sx={{ px: 2, pt: 0.5, pb: 0.2 }}>
-            <Typography sx={{ fontSize: 10, fontWeight: 700, letterSpacing: 0.8, color: 'text.disabled', textTransform: 'uppercase' }}>
-              Integrações
-            </Typography>
-          </Box>
-          <MenuItem component={NavLink} to="/settings/integrations" onClick={() => close(null)} onMouseEnter={() => prefetchRoute('integrations', importIntegrationsPage)}><ListItemIcon><ExtensionOutlinedIcon fontSize="small" /></ListItemIcon>Integrações & Plugins</MenuItem>
-          <MenuItem component={NavLink} to="/settings/sso" onClick={() => close(null)} onMouseEnter={() => prefetchRoute('sso', importSsoConfigPage)}><ListItemIcon><LockOutlinedIcon fontSize="small" /></ListItemIcon>SSO / SAML</MenuItem>
         </MenuList>
       </Popover>
 
@@ -631,7 +603,7 @@ const SidebarContent: React.FC<SidebarContentProps> = ({
           </Typography>
         </Box>
 
-        <MenuList dense sx={{ py: 0.5 }}>
+        <MenuList dense sx={{ py: 0.5, maxHeight: '70vh', overflowY: 'auto' }}>
           {newFeaturesItems.map((item, idx) => (
             <React.Fragment key={item.to}>
               <MenuItem
@@ -658,6 +630,71 @@ const SidebarContent: React.FC<SidebarContentProps> = ({
               {idx < newFeaturesItems.length - 1 && <Divider sx={{ mx: 1.5 }} />}
             </React.Fragment>
           ))}
+          <Divider sx={{ mx: 1.5, my: 0.5 }} />
+          <Box component="li" sx={{ px: 2, pt: 0.5, pb: 0.2 }}>
+            <Typography sx={{ fontSize: 10, fontWeight: 700, letterSpacing: 0.8, color: 'text.disabled', textTransform: 'uppercase' }}>
+              Produtos & Serviços
+            </Typography>
+          </Box>
+          <MenuItem component={NavLink} to="/products" onClick={closeNewFeatures} onMouseEnter={() => prefetchRoute('products', importProductCatalogPage)} selected={isActiveRoute('/products')} sx={{ py: 1.2, px: 2, '&.Mui-selected': { bgcolor: 'primary.50', color: 'primary.main' }, '&:hover': { bgcolor: 'action.hover' } }}>
+            <ListItemIcon sx={{ color: isActiveRoute('/products') ? 'primary.main' : 'text.secondary', minWidth: 36 }}><Inventory2OutlinedIcon fontSize="small" /></ListItemIcon>
+            <Box><Typography variant="body2" sx={{ fontWeight: 600, lineHeight: 1.2 }}>Produtos & Serviços</Typography><Typography variant="caption" color="text.secondary" sx={{ fontSize: 11 }}>Catálogo de produtos</Typography></Box>
+          </MenuItem>
+          <Divider sx={{ mx: 1.5 }} />
+          <MenuItem component={NavLink} to="/projects" onClick={closeNewFeatures} onMouseEnter={() => prefetchRoute('projects', importProjectsPage)} selected={isActiveRoute('/projects')} sx={{ py: 1.2, px: 2, '&.Mui-selected': { bgcolor: 'primary.50', color: 'primary.main' }, '&:hover': { bgcolor: 'action.hover' } }}>
+            <ListItemIcon sx={{ color: isActiveRoute('/projects') ? 'primary.main' : 'text.secondary', minWidth: 36 }}><RocketLaunchOutlinedIcon fontSize="small" /></ListItemIcon>
+            <Box><Typography variant="body2" sx={{ fontWeight: 600, lineHeight: 1.2 }}>Projetos & Delivery</Typography><Typography variant="caption" color="text.secondary" sx={{ fontSize: 11 }}>Gestão de projetos</Typography></Box>
+          </MenuItem>
+          <Divider sx={{ mx: 1.5 }} />
+          <MenuItem component={NavLink} to="/cs" onClick={closeNewFeatures} onMouseEnter={() => prefetchRoute('customer-success', importCustomerSuccessPage)} selected={isActiveRoute('/cs')} sx={{ py: 1.2, px: 2, '&.Mui-selected': { bgcolor: 'primary.50', color: 'primary.main' }, '&:hover': { bgcolor: 'action.hover' } }}>
+            <ListItemIcon sx={{ color: isActiveRoute('/cs') ? 'primary.main' : 'text.secondary', minWidth: 36 }}><FavoriteBorderOutlinedIcon fontSize="small" /></ListItemIcon>
+            <Box><Typography variant="body2" sx={{ fontWeight: 600, lineHeight: 1.2 }}>Customer Success</Typography><Typography variant="caption" color="text.secondary" sx={{ fontSize: 11 }}>Saúde de clientes</Typography></Box>
+          </MenuItem>
+          <Divider sx={{ mx: 1.5, my: 0.5 }} />
+          <Box component="li" sx={{ px: 2, pt: 0.5, pb: 0.2 }}>
+            <Typography sx={{ fontSize: 10, fontWeight: 700, letterSpacing: 0.8, color: 'text.disabled', textTransform: 'uppercase' }}>
+              Automações
+            </Typography>
+          </Box>
+          <MenuItem component={NavLink} to="/nurture" onClick={closeNewFeatures} onMouseEnter={() => prefetchRoute('nurture-sequences', importNurtureSequencesPage)} selected={isActiveRoute('/nurture')} sx={{ py: 1.2, px: 2, '&.Mui-selected': { bgcolor: 'primary.50', color: 'primary.main' }, '&:hover': { bgcolor: 'action.hover' } }}>
+            <ListItemIcon sx={{ color: isActiveRoute('/nurture') ? 'primary.main' : 'text.secondary', minWidth: 36 }}><AutoAwesomeMotionOutlinedIcon fontSize="small" /></ListItemIcon>
+            <Box><Typography variant="body2" sx={{ fontWeight: 600, lineHeight: 1.2 }}>Nurture Sequences</Typography><Typography variant="caption" color="text.secondary" sx={{ fontSize: 11 }}>Automação de nutrição</Typography></Box>
+          </MenuItem>
+          <Divider sx={{ mx: 1.5, my: 0.5 }} />
+          <Box component="li" sx={{ px: 2, pt: 0.5, pb: 0.2 }}>
+            <Typography sx={{ fontSize: 10, fontWeight: 700, letterSpacing: 0.8, color: 'text.disabled', textTransform: 'uppercase' }}>
+              Analytics
+            </Typography>
+          </Box>
+          <MenuItem component={NavLink} to="/reports/scheduled" onClick={closeNewFeatures} onMouseEnter={() => prefetchRoute('scheduled-reports', importScheduledReportsPage)} selected={isActiveRoute('/reports/scheduled')} sx={{ py: 1.2, px: 2, '&.Mui-selected': { bgcolor: 'primary.50', color: 'primary.main' }, '&:hover': { bgcolor: 'action.hover' } }}>
+            <ListItemIcon sx={{ color: isActiveRoute('/reports/scheduled') ? 'primary.main' : 'text.secondary', minWidth: 36 }}><EventRepeatOutlinedIcon fontSize="small" /></ListItemIcon>
+            <Box><Typography variant="body2" sx={{ fontWeight: 600, lineHeight: 1.2 }}>Relatórios Agendados</Typography><Typography variant="caption" color="text.secondary" sx={{ fontSize: 11 }}>Agendamento automático</Typography></Box>
+          </MenuItem>
+          <Divider sx={{ mx: 1.5 }} />
+          <MenuItem component={NavLink} to="/exports" onClick={closeNewFeatures} onMouseEnter={() => prefetchRoute('exports', importExportsPage)} selected={isActiveRoute('/exports')} sx={{ py: 1.2, px: 2, '&.Mui-selected': { bgcolor: 'primary.50', color: 'primary.main' }, '&:hover': { bgcolor: 'action.hover' } }}>
+            <ListItemIcon sx={{ color: isActiveRoute('/exports') ? 'primary.main' : 'text.secondary', minWidth: 36 }}><FileDownloadOutlinedIcon fontSize="small" /></ListItemIcon>
+            <Box><Typography variant="body2" sx={{ fontWeight: 600, lineHeight: 1.2 }}>Exportações</Typography><Typography variant="caption" color="text.secondary" sx={{ fontSize: 11 }}>Exportar dados</Typography></Box>
+          </MenuItem>
+          <Divider sx={{ mx: 1.5 }} />
+          <MenuItem component={NavLink} to="/bi/connectors" onClick={closeNewFeatures} onMouseEnter={() => prefetchRoute('bi-connectors', importBIConnectorsPage)} selected={isActiveRoute('/bi/connectors')} sx={{ py: 1.2, px: 2, '&.Mui-selected': { bgcolor: 'primary.50', color: 'primary.main' }, '&:hover': { bgcolor: 'action.hover' } }}>
+            <ListItemIcon sx={{ color: isActiveRoute('/bi/connectors') ? 'primary.main' : 'text.secondary', minWidth: 36 }}><HubOutlinedIcon fontSize="small" /></ListItemIcon>
+            <Box><Typography variant="body2" sx={{ fontWeight: 600, lineHeight: 1.2 }}>BI Connectors</Typography><Typography variant="caption" color="text.secondary" sx={{ fontSize: 11 }}>Conectores de BI</Typography></Box>
+          </MenuItem>
+          <Divider sx={{ mx: 1.5, my: 0.5 }} />
+          <Box component="li" sx={{ px: 2, pt: 0.5, pb: 0.2 }}>
+            <Typography sx={{ fontSize: 10, fontWeight: 700, letterSpacing: 0.8, color: 'text.disabled', textTransform: 'uppercase' }}>
+              Integrações
+            </Typography>
+          </Box>
+          <MenuItem component={NavLink} to="/settings/integrations" onClick={closeNewFeatures} onMouseEnter={() => prefetchRoute('integrations', importIntegrationsPage)} selected={isActiveRoute('/settings/integrations')} sx={{ py: 1.2, px: 2, '&.Mui-selected': { bgcolor: 'primary.50', color: 'primary.main' }, '&:hover': { bgcolor: 'action.hover' } }}>
+            <ListItemIcon sx={{ color: isActiveRoute('/settings/integrations') ? 'primary.main' : 'text.secondary', minWidth: 36 }}><ExtensionOutlinedIcon fontSize="small" /></ListItemIcon>
+            <Box><Typography variant="body2" sx={{ fontWeight: 600, lineHeight: 1.2 }}>Integrações & Plugins</Typography><Typography variant="caption" color="text.secondary" sx={{ fontSize: 11 }}>Conectar serviços externos</Typography></Box>
+          </MenuItem>
+          <Divider sx={{ mx: 1.5 }} />
+          <MenuItem component={NavLink} to="/settings/sso" onClick={closeNewFeatures} onMouseEnter={() => prefetchRoute('sso', importSsoConfigPage)} selected={isActiveRoute('/settings/sso')} sx={{ py: 1.2, px: 2, '&.Mui-selected': { bgcolor: 'primary.50', color: 'primary.main' }, '&:hover': { bgcolor: 'action.hover' } }}>
+            <ListItemIcon sx={{ color: isActiveRoute('/settings/sso') ? 'primary.main' : 'text.secondary', minWidth: 36 }}><LockOutlinedIcon fontSize="small" /></ListItemIcon>
+            <Box><Typography variant="body2" sx={{ fontWeight: 600, lineHeight: 1.2 }}>SSO / SAML</Typography><Typography variant="caption" color="text.secondary" sx={{ fontSize: 11 }}>Single sign-on</Typography></Box>
+          </MenuItem>
         </MenuList>
       </Popover>
     </Box>
@@ -721,10 +758,9 @@ const MobileNavDrawer: React.FC<MobileNavDrawerProps> = ({
     {
       title: 'Configurações',
       items: [
-        { label: 'Produtos & Serviços', to: '/products', icon: <Inventory2OutlinedIcon fontSize="small" /> },
         { label: 'IAM – Usuários', to: '/access/users', icon: <PeopleOutlinedIcon fontSize="small" /> },
-        { label: 'Integrações', to: '/settings/integrations', icon: <ExtensionOutlinedIcon fontSize="small" /> },
-        { label: 'SSO / SAML', to: '/settings/sso', icon: <LockOutlinedIcon fontSize="small" /> },
+        { label: 'IAM – Grupos', to: '/access/groups', icon: <GroupWorkOutlinedIcon fontSize="small" /> },
+        { label: 'Permissões', to: '/billing/permissions', icon: <AdminPanelSettingsOutlinedIcon fontSize="small" /> },
         { label: 'Auditoria', to: '/billing/audit', icon: <PolicyOutlinedIcon fontSize="small" /> },
       ],
     },
@@ -735,6 +771,15 @@ const MobileNavDrawer: React.FC<MobileNavDrawerProps> = ({
         { label: 'Contratos', to: '/contracts', icon: <ArticleOutlinedIcon fontSize="small" /> },
         { label: 'Régua de Cobrança', to: '/billing/collections/rules', icon: <GavelOutlinedIcon fontSize="small" /> },
         { label: 'Gateways de Pagamento', to: '/billing/gateways', icon: <CreditCardOutlinedIcon fontSize="small" /> },
+        { label: 'Produtos & Serviços', to: '/products', icon: <Inventory2OutlinedIcon fontSize="small" /> },
+        { label: 'Projetos & Delivery', to: '/projects', icon: <RocketLaunchOutlinedIcon fontSize="small" /> },
+        { label: 'Customer Success', to: '/cs', icon: <FavoriteBorderOutlinedIcon fontSize="small" /> },
+        { label: 'Nurture Sequences', to: '/nurture', icon: <AutoAwesomeMotionOutlinedIcon fontSize="small" /> },
+        { label: 'Relatórios Agendados', to: '/reports/scheduled', icon: <EventRepeatOutlinedIcon fontSize="small" /> },
+        { label: 'Exportações', to: '/exports', icon: <FileDownloadOutlinedIcon fontSize="small" /> },
+        { label: 'BI Connectors', to: '/bi/connectors', icon: <HubOutlinedIcon fontSize="small" /> },
+        { label: 'Integrações & Plugins', to: '/settings/integrations', icon: <ExtensionOutlinedIcon fontSize="small" /> },
+        { label: 'SSO / SAML', to: '/settings/sso', icon: <LockOutlinedIcon fontSize="small" /> },
       ],
     },
   ];
