@@ -2401,13 +2401,15 @@ const calcInvoiceTotals = (
   return { subtotal, discountTotal, taxTotal, total, amountPaid: nextAmountPaid, amountOpen };
 };
 
+const WORKFLOW_STATUSES = new Set<string>(['provisioned', 'approved', 'issued', 'paid', 'cancelled']);
+
 const computeInvoiceStatus = (invoice: Invoice): InvoiceStatus => {
-  if (invoice.status === 'cancelled' || invoice.status === 'draft' || invoice.status === 'paid') return invoice.status;
-  const today = toDateOnly(new Date().toISOString());
-  const isLate = invoice.dueDate < today && invoice.totals.amountOpen > 0;
+  // Novo sistema de workflow: respeita o status armazenado se for válido
+  if (WORKFLOW_STATUSES.has(invoice.status)) return invoice.status as InvoiceStatus;
+  // Fallback para invoices legadas sem status do novo sistema
   if (invoice.totals.amountOpen === 0) return 'paid';
-  if (invoice.totals.amountPaid > 0 && invoice.totals.amountOpen > 0) return isLate ? 'overdue' : 'partial';
-  return isLate ? 'overdue' : 'open';
+  if (invoice.status === 'cancelled') return 'cancelled';
+  return 'provisioned';
 };
 
 const pushAudit = (event: Omit<AuditEvent, 'auditId' | 'occurredAt'>) => {
