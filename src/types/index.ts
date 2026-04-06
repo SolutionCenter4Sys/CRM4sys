@@ -913,7 +913,7 @@ export interface DealFormData {
 // Invoices (F1)
 // -----------------------------
 
-export type InvoiceStatus = 'draft' | 'open' | 'partial' | 'paid' | 'overdue' | 'cancelled';
+export type InvoiceStatus = 'provisioned' | 'approved' | 'issued' | 'paid' | 'cancelled';
 
 export type PaymentMethod = 'pix' | 'boleto' | 'transfer' | 'card' | 'cash' | 'other';
 

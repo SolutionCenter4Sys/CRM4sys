@@ -48,33 +48,38 @@ import type { InvoiceListItem, InvoiceListFilters, InvoiceStatus } from '../type
 type ViewMode = 'kanban' | 'table';
 
 const statusColorMap: Record<InvoiceStatus, 'default' | 'info' | 'warning' | 'error' | 'success'> = {
-  draft: 'default',
-  open: 'info',
-  partial: 'warning',
+  provisioned: 'default',
+  approved: 'info',
+  issued: 'warning',
   paid: 'success',
-  overdue: 'error',
-  cancelled: 'default',
+  cancelled: 'error',
 };
 
 const statusLabelMap: Record<InvoiceStatus, string> = {
-  draft: 'Rascunho',
-  open: 'Em aberto',
-  partial: 'Parcial',
-  paid: 'Paga',
-  overdue: 'Vencida',
-  cancelled: 'Cancelada',
+  provisioned: 'Provisionada',
+  approved: 'Aprovada para Emissão',
+  issued: 'Fatura Emitida',
+  paid: 'Fatura Paga',
+  cancelled: 'Fatura Cancelada',
 };
 
 const STATUS_COLUMN_COLORS: Record<InvoiceStatus, string> = {
-  draft: '#9E9E9E',
-  open: '#2196F3',
-  partial: '#FF9800',
+  provisioned: '#9E9E9E',
+  approved: '#2196F3',
+  issued: '#FF9800',
   paid: '#4CAF50',
-  overdue: '#F44336',
   cancelled: '#757575',
 };
 
-const STATUS_COLUMN_ORDER: InvoiceStatus[] = ['draft', 'open', 'partial', 'paid', 'overdue', 'cancelled'];
+const STATUS_COLUMN_ORDER: InvoiceStatus[] = ['provisioned', 'approved', 'issued', 'paid', 'cancelled'];
+
+const isOverdue = (inv: { status: InvoiceStatus; dueDate: string }) => {
+  if (inv.status === 'paid' || inv.status === 'cancelled') return false;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const due = new Date(inv.dueDate + 'T00:00:00');
+  return due < today;
+};
 
 const formatCurrency = (value: number) =>
   `R$ ${value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
@@ -111,7 +116,7 @@ const InvoiceCard: React.FC<InvoiceCardProps> = ({
   onCancel,
   onDelete,
 }) => {
-  const isOverdue = invoice.status === 'overdue';
+  const overdue = isOverdue(invoice);
   const hasBalance = invoice.amountOpen > 0;
   const canAct = invoice.status !== 'paid' && invoice.status !== 'cancelled';
 
@@ -122,16 +127,16 @@ const InvoiceCard: React.FC<InvoiceCardProps> = ({
       sx={{
         cursor: 'pointer',
         border: '1px solid',
-        borderColor: isOverdue ? 'error.light' : 'divider',
+        borderColor: overdue ? 'error.light' : 'divider',
         borderRadius: 1.5,
         p: '10px 12px',
         transition: 'box-shadow 0.15s, transform 0.1s',
         '&:hover': { boxShadow: 2, transform: 'translateY(-1px)' },
-        bgcolor: isOverdue ? 'rgba(244,67,54,0.04)' : 'background.paper',
+        bgcolor: overdue ? 'rgba(244,67,54,0.04)' : 'background.paper',
         position: 'relative',
       }}
     >
-      {isOverdue && (
+      {overdue && (
         <Box
           sx={{
             position: 'absolute',
@@ -145,7 +150,7 @@ const InvoiceCard: React.FC<InvoiceCardProps> = ({
         />
       )}
 
-      <Box sx={{ pl: isOverdue ? 0.5 : 0 }}>
+      <Box sx={{ pl: overdue ? 0.5 : 0 }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 1, mb: 0.6 }}>
           <Box sx={{ flex: 1, minWidth: 0 }}>
             <Typography
@@ -181,16 +186,24 @@ const InvoiceCard: React.FC<InvoiceCardProps> = ({
 
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-            <Typography variant="caption" color="text.secondary" sx={{ fontSize: 10.5 }}>
+            <Typography variant="caption" sx={{ fontSize: 10.5, color: overdue ? 'error.main' : 'text.secondary', fontWeight: overdue ? 700 : 400 }}>
               Venc: {formatDate(invoice.dueDate)}
             </Typography>
-            {isOverdue && <WarningIcon sx={{ fontSize: 12, color: 'error.main' }} />}
+            {overdue && <WarningIcon sx={{ fontSize: 12, color: 'error.main' }} />}
+            {overdue && (
+              <Chip
+                label="Vencida"
+                size="small"
+                color="error"
+                sx={{ height: 16, fontSize: 9, fontWeight: 700, '& .MuiChip-label': { px: 0.5 } }}
+              />
+            )}
           </Box>
           {hasBalance && (
             <Chip
               label={formatCurrencyCompact(invoice.amountOpen)}
               size="small"
-              color={isOverdue ? 'error' : 'warning'}
+              color={overdue ? 'error' : 'warning'}
               variant="outlined"
               sx={{ height: 18, fontSize: 10, '& .MuiChip-label': { px: 0.6 } }}
             />
@@ -306,9 +319,6 @@ const InvoiceKanbanColumn: React.FC<KanbanColumnProps> = ({
             <Typography variant="subtitle2" sx={{ fontWeight: 700, fontSize: 12.5, whiteSpace: 'nowrap' }}>
               {label}
             </Typography>
-            {status === 'overdue' && invoices.length > 0 && (
-              <WarningIcon sx={{ fontSize: 14, color: 'error.main' }} />
-            )}
           </Box>
           <Chip
             label={invoices.length}
@@ -457,9 +467,9 @@ const InvoicesListPage: React.FC = () => {
   const kpis = useMemo(() => {
     const totalFaturas = invoices.length;
     const totalGeral = invoices.reduce((s, inv) => s + inv.amountTotal, 0);
-    const emAberto = invoices.filter((inv) => inv.status === 'open' || inv.status === 'partial');
+    const emAberto = invoices.filter((inv) => inv.status !== 'paid' && inv.status !== 'cancelled');
     const totalEmAberto = emAberto.reduce((s, inv) => s + inv.amountOpen, 0);
-    const vencidas = invoices.filter((inv) => inv.status === 'overdue');
+    const vencidas = invoices.filter((inv) => isOverdue(inv));
     const totalVencido = vencidas.reduce((s, inv) => s + inv.amountOpen, 0);
     const pagas = invoices.filter((inv) => inv.status === 'paid');
     const totalPago = pagas.reduce((s, inv) => s + inv.amountTotal, 0);
@@ -469,11 +479,10 @@ const InvoicesListPage: React.FC = () => {
   // ── Invoices grouped by status (for Kanban) ──
   const invoicesByStatus = useMemo(() => {
     const grouped: Record<InvoiceStatus, InvoiceListItem[]> = {
-      draft: [],
-      open: [],
-      partial: [],
+      provisioned: [],
+      approved: [],
+      issued: [],
       paid: [],
-      overdue: [],
       cancelled: [],
     };
     invoices.forEach((inv) => {
@@ -561,12 +570,11 @@ const InvoicesListPage: React.FC = () => {
               onChange={(e) => setFilters({ ...filters, status: (e.target.value as InvoiceStatus | 'all') || 'all' })}
             >
               <MenuItem value="all">Todos</MenuItem>
-              <MenuItem value="draft">Rascunho</MenuItem>
-              <MenuItem value="open">Em aberto</MenuItem>
-              <MenuItem value="partial">Parcial</MenuItem>
-              <MenuItem value="paid">Paga</MenuItem>
-              <MenuItem value="overdue">Vencida</MenuItem>
-              <MenuItem value="cancelled">Cancelada</MenuItem>
+              <MenuItem value="provisioned">Provisionada</MenuItem>
+              <MenuItem value="approved">Aprovada para Emissão</MenuItem>
+              <MenuItem value="issued">Fatura Emitida</MenuItem>
+              <MenuItem value="paid">Fatura Paga</MenuItem>
+              <MenuItem value="cancelled">Fatura Cancelada</MenuItem>
             </Select>
           </FormControl>
           <TextField
@@ -667,8 +675,10 @@ const InvoicesListPage: React.FC = () => {
                       </TableCell>
                     </TableRow>
                   ) : (
-                    invoices.map((inv) => (
-                      <TableRow key={inv.id} hover sx={{ cursor: 'pointer' }} onClick={() => navigate(`/billing/invoices/${inv.id}`)}>
+                    invoices.map((inv) => {
+                      const overdueRow = isOverdue(inv);
+                      return (
+                      <TableRow key={inv.id} hover sx={{ cursor: 'pointer', bgcolor: overdueRow ? 'rgba(244,67,54,0.04)' : undefined }} onClick={() => navigate(`/billing/invoices/${inv.id}`)}>
                         <TableCell>
                           <Typography variant="body2" fontWeight={600}>
                             {inv.invoiceNumber}
@@ -684,7 +694,12 @@ const InvoicesListPage: React.FC = () => {
                         </TableCell>
                         <TableCell>{inv.accountName}</TableCell>
                         <TableCell>
-                          <Chip label={statusLabelMap[inv.status]} color={statusColorMap[inv.status]} size="small" />
+                          <Stack direction="row" spacing={0.5} alignItems="center">
+                            <Chip label={statusLabelMap[inv.status]} color={statusColorMap[inv.status]} size="small" />
+                            {overdueRow && (
+                              <Chip label="Vencida" color="error" size="small" sx={{ fontWeight: 700 }} icon={<WarningIcon sx={{ fontSize: 14 }} />} />
+                            )}
+                          </Stack>
                         </TableCell>
                         <TableCell align="right">{formatCurrency(inv.amountTotal)}</TableCell>
                         <TableCell align="right">
@@ -700,8 +715,8 @@ const InvoicesListPage: React.FC = () => {
                         <TableCell>
                           <Typography
                             variant="body2"
-                            color={inv.status === 'overdue' ? 'error.main' : 'text.primary'}
-                            fontWeight={inv.status === 'overdue' ? 700 : 400}
+                            color={overdueRow ? 'error.main' : 'text.primary'}
+                            fontWeight={overdueRow ? 700 : 400}
                           >
                             {formatDate(inv.dueDate)}
                           </Typography>
@@ -744,7 +759,8 @@ const InvoicesListPage: React.FC = () => {
                           </Stack>
                         </TableCell>
                       </TableRow>
-                    ))
+                      );
+                    })
                   )}
                 </TableBody>
               </Table>
