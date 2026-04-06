@@ -72,7 +72,6 @@ import {
   LightModeOutlined as LightModeIcon,
   Menu as MenuIcon,
   AccountBalanceOutlined as AccountBalanceOutlinedIcon,
-  RequestQuote as RequestQuoteIcon,
   CreditCardOutlined as CreditCardOutlinedIcon,
   MoreHoriz as MoreHorizIcon,
   Close as CloseIcon,
@@ -117,7 +116,6 @@ const importInvoiceFormPage = () => import('./pages/InvoiceFormPage');
 const importCollectionRulesPage = () => import('./pages/CollectionRulesPage');
 const importCollectionTemplatesPage = () => import('./pages/CollectionTemplatesPage');
 const importCollectionJobsPage = () => import('./pages/CollectionJobsPage');
-const importReceivablesDashboardPage = () => import('./pages/ReceivablesDashboardPage');
 const importPaymentGatewaysPage = () => import('./pages/PaymentGatewaysPage');
 const importPaymentLinksPage = () => import('./pages/PaymentLinksPage');
 const importWebhookEventsPage = () => import('./pages/WebhookEventsPage');
@@ -168,7 +166,6 @@ const InvoiceFormPage = lazy(importInvoiceFormPage);
 const CollectionRulesPage = lazy(importCollectionRulesPage);
 const CollectionTemplatesPage = lazy(importCollectionTemplatesPage);
 const CollectionJobsPage = lazy(importCollectionJobsPage);
-const ReceivablesDashboardPage = lazy(importReceivablesDashboardPage);
 const PaymentGatewaysPage = lazy(importPaymentGatewaysPage);
 const PaymentLinksPage = lazy(importPaymentLinksPage);
 const WebhookEventsPage = lazy(importWebhookEventsPage);
@@ -245,7 +242,6 @@ const PREFETCH_PRIORITY_BY_ROUTE: Record<string, RoutePrefetchItem[]> = {
   '/billing/invoices': [
     { key: 'invoice-new', importer: importInvoiceFormPage },
     { key: 'collections-rules', importer: importCollectionRulesPage },
-    { key: 'receivables-dashboard', importer: importReceivablesDashboardPage },
   ],
   '/billing/collections/rules': [
     { key: 'collections-templates', importer: importCollectionTemplatesPage },
@@ -429,26 +425,18 @@ const SidebarContent: React.FC<SidebarContentProps> = ({
   setSettingsAnchorEl,
   onNavClick,
 }) => {
-  const [financialAnchorEl, setFinancialAnchorEl] = useState<HTMLElement | null>(null);
-  const financialOpen = Boolean(financialAnchorEl);
   const [marketingAnchorEl, setMarketingAnchorEl] = useState<HTMLElement | null>(null);
   const marketingOpen = Boolean(marketingAnchorEl);
   const [newFeaturesAnchorEl, setNewFeaturesAnchorEl] = useState<HTMLElement | null>(null);
   const newFeaturesOpen = Boolean(newFeaturesAnchorEl);
 
   const close = (el: null) => { setSettingsAnchorEl(el); onNavClick?.(); };
-  const closeFinancial = () => { setFinancialAnchorEl(null); onNavClick?.(); };
   const closeMarketing = () => { setMarketingAnchorEl(null); onNavClick?.(); };
   const closeNewFeatures = () => { setNewFeaturesAnchorEl(null); onNavClick?.(); };
 
   const isFinancialActive = ['/billing'].some((p) => isActiveRoute(p));
   const isMarketingActive = ['/marketing'].some((p) => isActiveRoute(p));
   const isNewFeaturesActive = ['/leads', '/contracts', '/billing/collections/rules', '/billing/gateways', '/products', '/projects', '/cs', '/nurture', '/reports/scheduled', '/exports', '/bi/connectors', '/settings/integrations', '/settings/sso'].some((p) => isActiveRoute(p));
-
-  const financialItems = [
-    { label: 'Faturas', sublabel: 'Emitir e gerenciar faturas', to: '/billing/invoices', icon: <ReceiptLongOutlinedIcon fontSize="small" />, prefetchKey: 'billing-invoices', importer: importInvoicesListPage },
-    { label: 'Recebíveis', sublabel: 'Dashboard de recebimentos', to: '/billing/receivables', icon: <RequestQuoteIcon fontSize="small" />, prefetchKey: 'receivables-dashboard', importer: importReceivablesDashboardPage },
-  ];
 
   const marketingItems = [
     { label: 'Campanhas', sublabel: 'Gerir campanhas multicanal', to: '/marketing/campaigns', icon: <CampaignOutlinedIcon fontSize="small" />, prefetchKey: 'marketing-campaigns', importer: importCampaignsListPage },
@@ -560,13 +548,15 @@ const SidebarContent: React.FC<SidebarContentProps> = ({
         </MenuList>
       </Popover>
 
-      {/* 💰 Ícone Financeiro com flyout */}
       <Tooltip title="Financeiro" placement="right">
         <IconButton
-          onClick={(e) => setFinancialAnchorEl(e.currentTarget)}
+          component={NavLink}
+          to="/billing/invoices"
+          onClick={onNavClick}
+          onMouseEnter={() => prefetchRoute('billing-invoices', importInvoicesListPage)}
           sx={{
             color: 'inherit',
-            bgcolor: isFinancialActive || financialOpen ? 'rgba(255,255,255,0.18)' : 'transparent',
+            bgcolor: isFinancialActive ? 'rgba(255,255,255,0.18)' : 'transparent',
             border: isFinancialActive ? '1px solid rgba(255,255,255,0.35)' : '1px solid transparent',
             transition: 'all 0.15s',
           }}
@@ -574,63 +564,6 @@ const SidebarContent: React.FC<SidebarContentProps> = ({
           <AccountBalanceOutlinedIcon />
         </IconButton>
       </Tooltip>
-
-      {/* Flyout financeiro */}
-      <Popover
-        open={financialOpen}
-        anchorEl={financialAnchorEl}
-        onClose={() => setFinancialAnchorEl(null)}
-        anchorOrigin={{ vertical: 'center', horizontal: 'right' }}
-        transformOrigin={{ vertical: 'center', horizontal: 'left' }}
-        PaperProps={{
-          sx: {
-            ml: 1,
-            borderRadius: 2.5,
-            minWidth: 280,
-            boxShadow: '0 8px 32px rgba(0,0,0,0.18)',
-            overflow: 'hidden',
-          },
-        }}
-      >
-        <Box sx={{ px: 2, py: 1.5, background: 'linear-gradient(135deg, #4C1D95 0%, #7C3AED 100%)', color: '#fff' }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <AccountBalanceOutlinedIcon sx={{ fontSize: 18 }} />
-            <Typography variant="subtitle2" sx={{ fontWeight: 700, fontSize: 13 }}>Financeiro</Typography>
-          </Box>
-          <Typography variant="caption" sx={{ opacity: 0.75, fontSize: 11 }}>
-            Faturas, cobranças e recebimentos
-          </Typography>
-        </Box>
-
-        <MenuList dense sx={{ py: 0.5 }}>
-          {financialItems.map((item, idx) => (
-            <React.Fragment key={item.to}>
-              <MenuItem
-                component={NavLink}
-                to={item.to}
-                onClick={closeFinancial}
-                onMouseEnter={() => prefetchRoute(item.prefetchKey, item.importer)}
-                selected={isActiveRoute(item.to)}
-                sx={{
-                  py: 1.2,
-                  px: 2,
-                  '&.Mui-selected': { bgcolor: 'primary.50', color: 'primary.main' },
-                  '&:hover': { bgcolor: 'action.hover' },
-                }}
-              >
-                <ListItemIcon sx={{ color: isActiveRoute(item.to) ? 'primary.main' : 'text.secondary', minWidth: 36 }}>
-                  {item.icon}
-                </ListItemIcon>
-                <Box>
-                  <Typography variant="body2" sx={{ fontWeight: 600, lineHeight: 1.2 }}>{item.label}</Typography>
-                  <Typography variant="caption" color="text.secondary" sx={{ fontSize: 11 }}>{item.sublabel}</Typography>
-                </Box>
-              </MenuItem>
-              {idx < financialItems.length - 1 && <Divider sx={{ mx: 1.5 }} />}
-            </React.Fragment>
-          ))}
-        </MenuList>
-      </Popover>
 
       <Divider sx={{ width: 28, borderColor: 'rgba(255,255,255,0.4)' }} />
       <Tooltip title="Relatórios"><IconButton component={NavLink} to="/reports" onClick={onNavClick} onMouseEnter={() => prefetchRoute('reports', importReportsPage)} sx={{ color: 'inherit', bgcolor: isActiveRoute('/reports') || isActiveRoute('/exports') ? 'rgba(255,255,255,0.18)' : 'transparent' }}><AssessmentOutlinedIcon /></IconButton></Tooltip>
@@ -1266,7 +1199,6 @@ const AppLayout: React.FC = () => {
                 <Route path="/billing/collections/rules" element={<CollectionRulesPage />} />
                 <Route path="/billing/collections/templates" element={<CollectionTemplatesPage />} />
                 <Route path="/billing/collections/jobs" element={<CollectionJobsPage />} />
-                <Route path="/billing/receivables" element={<ReceivablesDashboardPage />} />
                 <Route path="/billing/gateways" element={<PaymentGatewaysPage />} />
                 <Route path="/billing/payment-links" element={<PaymentLinksPage />} />
                 <Route path="/billing/webhooks" element={<WebhookEventsPage />} />

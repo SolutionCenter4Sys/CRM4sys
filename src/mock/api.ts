@@ -2436,6 +2436,9 @@ export const billingInvoicesApi = {
     if (filters.accountId) {
       invoices = invoices.filter((inv) => inv.accountId === filters.accountId);
     }
+    if (filters.dealId) {
+      invoices = invoices.filter((inv) => inv.dealId === filters.dealId);
+    }
     if (filters.issueFrom) invoices = invoices.filter((inv) => inv.issueDate >= filters.issueFrom!);
     if (filters.issueTo) invoices = invoices.filter((inv) => inv.issueDate <= filters.issueTo!);
     if (filters.dueFrom) invoices = invoices.filter((inv) => inv.dueDate >= filters.dueFrom!);

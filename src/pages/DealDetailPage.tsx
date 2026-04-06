@@ -22,6 +22,11 @@ import {
   Select,
   Stack,
   Tab,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
   Tabs,
   TextField,
   Tooltip,
@@ -49,7 +54,7 @@ import {
   WorkOutline as DeliveryIcon,
 } from '@mui/icons-material';
 import { mockApi } from '../mock/api';
-import type { Activity, Deal, DealFormData, LostReasonType, Stage } from '../types';
+import type { Activity, Deal, DealFormData, InvoiceListItem, InvoiceStatus, LostReasonType, Stage } from '../types';
 import DealFormModal from '../components/DealFormModal';
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -147,6 +152,10 @@ export const DealDetailPage: React.FC = () => {
   const [quickNote, setQuickNote] = useState('');
   const [savingNote, setSavingNote] = useState(false);
 
+  // Invoices (Faturamento)
+  const [dealInvoices, setDealInvoices] = useState<InvoiceListItem[]>([]);
+  const [invoicesLoading, setInvoicesLoading] = useState(false);
+
   const loadData = async (dealId: string) => {
     try {
       setLoading(true); setError(null); setActionError(null);
@@ -168,6 +177,16 @@ export const DealDetailPage: React.FC = () => {
   };
 
   useEffect(() => { if (id) loadData(id); }, [id]);
+
+  useEffect(() => {
+    if (deal?.id) {
+      setInvoicesLoading(true);
+      mockApi.billingInvoices.list({ dealId: deal.id }, 1, 100).then((res) => {
+        if (res.isSuccess && res.data) setDealInvoices(res.data.data);
+        setInvoicesLoading(false);
+      });
+    }
+  }, [deal?.id]);
 
   const stageHistory = useMemo(() => activities.filter((a) => a.type === 'stage_change'), [activities]);
   const nonStageActivities = useMemo(() => activities.filter((a) => a.type !== 'stage_change'), [activities]);
@@ -623,11 +642,85 @@ export const DealDetailPage: React.FC = () => {
 
             {/* ── Tab 3: Faturamento ── */}
             <TabPanel value={tab} index={3}>
-              <Box sx={{ px: 2, pb: 2, textAlign: 'center', py: 5 }}>
-                <Typography color="text.secondary">Informações de faturamento serão exibidas aqui.</Typography>
-                <Button sx={{ mt: 2 }} variant="outlined" onClick={() => navigate('/billing/invoices')}>
-                  Ver faturas
-                </Button>
+              <Box sx={{ px: 2, pb: 2 }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
+                    Faturas deste negócio
+                  </Typography>
+                  <Button
+                    variant="outlined"
+                    size="small"
+                    onClick={() => navigate(`/billing/invoices?dealId=${deal?.id}`)}
+                  >
+                    Editar faturamento
+                  </Button>
+                </Box>
+
+                {invoicesLoading ? (
+                  <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+                    <CircularProgress size={28} />
+                  </Box>
+                ) : dealInvoices.length === 0 ? (
+                  <Box sx={{ textAlign: 'center', py: 4 }}>
+                    <Typography color="text.secondary">Nenhuma fatura vinculada a este negócio.</Typography>
+                    <Button sx={{ mt: 2 }} variant="outlined" onClick={() => navigate(`/billing/invoices?dealId=${deal?.id}`)}>
+                      Editar faturamento
+                    </Button>
+                  </Box>
+                ) : (
+                  <Table size="small">
+                    <TableHead>
+                      <TableRow>
+                        <TableCell sx={{ fontWeight: 700 }}>Número</TableCell>
+                        <TableCell sx={{ fontWeight: 700 }}>Status</TableCell>
+                        <TableCell align="right" sx={{ fontWeight: 700 }}>Total</TableCell>
+                        <TableCell align="right" sx={{ fontWeight: 700 }}>Saldo</TableCell>
+                        <TableCell sx={{ fontWeight: 700 }}>Vencimento</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {dealInvoices.map((inv) => {
+                        const overdue = inv.status !== 'paid' && inv.status !== 'cancelled' && new Date(inv.dueDate + 'T00:00:00') < new Date(new Date().toISOString().slice(0, 10) + 'T00:00:00');
+                        return (
+                          <TableRow
+                            key={inv.id}
+                            hover
+                            sx={{ cursor: 'pointer', bgcolor: overdue ? 'rgba(244,67,54,0.04)' : undefined }}
+                            onClick={() => navigate(`/billing/invoices/${inv.id}`)}
+                          >
+                            <TableCell>
+                              <Typography variant="body2" sx={{ fontWeight: 600 }}>{inv.invoiceNumber}</Typography>
+                              <Typography variant="caption" color="text.secondary">{inv.installmentNumber}/{inv.installmentTotal}</Typography>
+                            </TableCell>
+                            <TableCell>
+                              <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center' }}>
+                                <Chip
+                                  label={inv.status === 'provisioned' ? 'Provisionada' : inv.status === 'approved' ? 'Aprovada' : inv.status === 'issued' ? 'Emitida' : inv.status === 'paid' ? 'Paga' : 'Cancelada'}
+                                  size="small"
+                                  color={inv.status === 'paid' ? 'success' : inv.status === 'cancelled' ? 'error' : inv.status === 'issued' ? 'warning' : inv.status === 'approved' ? 'info' : 'default'}
+                                />
+                                {overdue && <Chip label="Vencida" size="small" color="error" sx={{ fontWeight: 700 }} />}
+                              </Box>
+                            </TableCell>
+                            <TableCell align="right">
+                              R$ {inv.amountTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                            </TableCell>
+                            <TableCell align="right">
+                              <Typography variant="body2" color={inv.amountOpen > 0 ? 'error.main' : 'text.secondary'} fontWeight={inv.amountOpen > 0 ? 700 : 400}>
+                                R$ {inv.amountOpen.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                              </Typography>
+                            </TableCell>
+                            <TableCell>
+                              <Typography variant="body2" color={overdue ? 'error.main' : 'text.primary'} fontWeight={overdue ? 700 : 400}>
+                                {inv.dueDate.split('-').reverse().join('/')}
+                              </Typography>
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
+                    </TableBody>
+                  </Table>
+                )}
               </Box>
             </TabPanel>
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
   Box,
   Typography,
@@ -407,9 +407,10 @@ const InvoiceKanbanColumn: React.FC<KanbanColumnProps> = ({
 
 const InvoicesListPage: React.FC = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [loading, setLoading] = useState(true);
   const [invoices, setInvoices] = useState<InvoiceListItem[]>([]);
-  const [filters, setFilters] = useState<InvoiceListFilters>({ status: 'all' });
+  const [filters, setFilters] = useState<InvoiceListFilters>({ status: 'all', dealId: searchParams.get('dealId') || null });
   const [viewMode, setViewMode] = useState<ViewMode>('table');
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' as 'success' | 'error' });
 
@@ -612,6 +613,13 @@ const InvoicesListPage: React.FC = () => {
           </ButtonGroup>
         </Box>
       </Paper>
+
+      {filters.dealId && (
+        <Alert severity="info" icon={false} sx={{ py: 0.5 }}
+          action={<Button size="small" onClick={() => setFilters({ ...filters, dealId: null })}>Limpar filtro</Button>}>
+          Exibindo faturas do negócio selecionado
+        </Alert>
+      )}
 
       {/* ── Alerta de vencidas ─────────────────────────────────────────── */}
       {kpis.vencidasCount > 0 && (

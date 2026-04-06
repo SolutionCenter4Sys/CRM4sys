@@ -989,6 +989,7 @@ export interface InvoiceListFilters {
   search?: string;
   status?: InvoiceStatus | 'all';
   accountId?: string | null;
+  dealId?: string | null;
   issueFrom?: string | null;
   issueTo?: string | null;
   dueFrom?: string | null;
