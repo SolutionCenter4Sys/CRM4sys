@@ -55,6 +55,15 @@ const statusColorMap: Record<InvoiceStatus, 'default' | 'info' | 'warning' | 'er
   cancelled: 'error',
 };
 
+// Status que usam variant='outlined' para maior visibilidade (fundo claro)
+const statusVariantMap: Record<InvoiceStatus, 'filled' | 'outlined'> = {
+  provisioned: 'outlined',
+  approved: 'outlined',
+  issued: 'filled',
+  paid: 'filled',
+  cancelled: 'filled',
+};
+
 const statusLabelMap: Record<InvoiceStatus, string> = {
   provisioned: 'Provisionada',
   approved: 'Aprovada para Emissão',
@@ -703,7 +712,12 @@ const InvoicesListPage: React.FC = () => {
                         <TableCell>{inv.accountName}</TableCell>
                         <TableCell>
                           <Stack direction="row" spacing={0.5} alignItems="center">
-                            <Chip label={statusLabelMap[inv.status]} color={statusColorMap[inv.status]} size="small" />
+                            <Chip
+                              label={statusLabelMap[inv.status] ?? inv.status}
+                              color={statusColorMap[inv.status] ?? 'default'}
+                              variant={statusVariantMap[inv.status] ?? 'outlined'}
+                              size="small"
+                            />
                             {overdueRow && (
                               <Chip label="Vencida" color="error" size="small" sx={{ fontWeight: 700 }} icon={<WarningIcon sx={{ fontSize: 14 }} />} />
                             )}

@@ -139,7 +139,7 @@ const shouldSimulateError = (errorRate: number = 0.05): boolean => {
 class MockStorage {
   // Incrementar esta versão sempre que o mock de faturas for atualizado.
   // Isso força o browser a descartar o localStorage antigo e usar os dados frescos.
-  private static MOCK_INVOICE_VERSION = 'v5-100inv-abr2026';
+  private static MOCK_INVOICE_VERSION = 'v6-explicit-status-mai2026';
   private static VERSION_KEY = 'crm_mock_invoice_version';
 
   private static KEYS = {
@@ -342,14 +342,29 @@ class MockStorage {
   }
 
   static getInvoices(): Invoice[] {
-    // Se a versão do mock mudou, descarta o cache do localStorage e usa dados frescos
+    const VALID_STATUSES = new Set(['provisioned', 'approved', 'issued', 'paid', 'cancelled']);
+    // Descarta cache se versão mudou
     const storedVersion = localStorage.getItem(this.VERSION_KEY);
     if (storedVersion !== this.MOCK_INVOICE_VERSION) {
       localStorage.removeItem(this.KEYS.INVOICES);
       localStorage.setItem(this.VERSION_KEY, this.MOCK_INVOICE_VERSION);
+      return (mockData as any).invoices;
     }
     const stored = localStorage.getItem(this.KEYS.INVOICES);
-    return stored ? JSON.parse(stored) : (mockData as any).invoices;
+    if (stored) {
+      try {
+        const parsed: Invoice[] = JSON.parse(stored);
+        // Valida se há status inválidos (dados legados) → força reload dos dados frescos
+        if (parsed.some((inv) => !VALID_STATUSES.has(inv.status))) {
+          localStorage.removeItem(this.KEYS.INVOICES);
+          return (mockData as any).invoices;
+        }
+        return parsed;
+      } catch {
+        localStorage.removeItem(this.KEYS.INVOICES);
+      }
+    }
+    return (mockData as any).invoices;
   }
 
   static setInvoices(invoices: Invoice[]): void {

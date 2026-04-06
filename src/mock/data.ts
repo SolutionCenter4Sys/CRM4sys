@@ -1351,34 +1351,48 @@ function _generateInvoices(): Invoice[] {
 
   // ═══════════════════════════════════════════════════════════════════
   // DEALS 'Vencido' (stage Fechamento/Vencido) — idx 100-109 → mockDeals[104..113]
-  // Negócios vencidos → mix de paid + issued (vencidas) + provisioned
+  // Status explícitos (sem lógica de data): paid | issued | approved | provisioned
   // ═══════════════════════════════════════════════════════════════════
   const vDescs = [
     'Serviços profissionais', 'Desenvolvimento customizado', 'Consultoria técnica',
     'Implementação de sistema', 'Suporte especializado', 'Licenças de software',
     'Migração de dados', 'Treinamento corporativo', 'Auditoria de segurança', 'Integração de sistemas',
   ];
+  // Padrão explícito: [total_parcelas, [status_p0, status_p1, ...]]
+  // issued c/ dueDate no passado → aparece como "Fatura Vencida" (tag dinâmica)
+  const vencidoPatterns: Array<{ n: number; sts: InvoiceStatus[] }> = [
+    { n: 2, sts: ['paid', 'issued'] },
+    { n: 3, sts: ['paid', 'paid', 'issued'] },
+    { n: 4, sts: ['paid', 'paid', 'approved', 'provisioned'] },
+    { n: 2, sts: ['issued', 'approved'] },
+    { n: 3, sts: ['paid', 'approved', 'provisioned'] },
+    { n: 4, sts: ['paid', 'paid', 'issued', 'provisioned'] },
+    { n: 2, sts: ['issued', 'provisioned'] },
+    { n: 3, sts: ['paid', 'approved', 'provisioned'] },
+    { n: 4, sts: ['paid', 'paid', 'approved', 'provisioned'] },
+    { n: 2, sts: ['approved', 'provisioned'] },
+  ];
+  // Datas pré-calculadas por status para manter coerência visual
+  // paid → passado/passado | issued → passado/passado (overdue) | approved/provisioned → passado/futuro
+  const stDates: Record<InvoiceStatus, (i: number, p: number) => [string, string]> = {
+    paid:        (i, p) => [_d(2025, 8 + (i % 4),     5 + p * 5), _d(2025, 9 + (i % 4),  5 + p * 5)],
+    issued:      (i, p) => [_d(2025, 11 + (i % 2),    10 + i),    _d(2026, 1 + (i % 3),  10 + i)],
+    approved:    (i, p) => [_d(2026, 2 + (i % 2),     5 + i),     _d(2026, 5 + (i % 2),  5 + i)],
+    provisioned: (i, p) => [_d(2026, 3 + (i % 2),     10 + i),    _d(2026, 6 + (i % 2),  10 + i)],
+    cancelled:   (i, p) => [_d(2026, 1, 15),                       _d(2026, 2, 15)],
+  };
   for (let i = 0; i < 10; i++) {
+    const pat = vencidoPatterns[i];
     const dIdx = 104 + i;
-    const parcelas = 2 + (i % 3);
     const deal = mockDeals[dIdx];
     if (!deal) continue;
-    const baseAmt = Math.round(deal.amount / parcelas);
-    for (let p = 0; p < parcelas; p++) {
-      const issM = Math.max(1, Math.min(12, (11 + p + i) % 12 + 1));
-      const issY = issM <= 10 && p === 0 ? 2025 : 2026;
-      const dueM = issM === 12 ? 1 : issM + 1;
-      const dueY = issM === 12 ? issY + 1 : issY;
-      const issDate = _d(issY, issM, 5 + (i * 3) % 20);
-      const dueDate = _d(dueY, dueM, 5 + (i * 3) % 20);
-      const isPast = new Date(dueDate) < new Date('2026-04-05');
-      let st: InvoiceStatus;
-      if (p < parcelas - 2) st = 'paid';
-      else if (p === parcelas - 2) st = isPast ? 'issued' : 'approved';
-      else st = isPast ? 'issued' : 'provisioned';
+    const baseAmt = Math.round(deal.amount / pat.n);
+    for (let p = 0; p < pat.n; p++) {
+      const st = pat.sts[p];
+      const [issDate, dueDate] = stDates[st](i, p);
       const pd = st === 'paid' ? baseAmt : 0;
-      const nfNum = (st === 'paid' || st === 'issued') ? `NF-${issY}-${String(300 + seq).padStart(5, '0')}` : null;
-      push(dIdx, st, issDate, dueDate, baseAmt, pd, `${vDescs[i]} - Parcela ${p + 1}`, nfNum, p + 1, parcelas);
+      const nfNum = (st === 'paid' || st === 'issued') ? `NF-${issDate.slice(0, 4)}-${String(300 + seq).padStart(5, '0')}` : null;
+      push(dIdx, st, issDate, dueDate, baseAmt, pd, `${vDescs[i]} - Parcela ${p + 1}`, nfNum, p + 1, pat.n);
     }
   }
 
@@ -1421,14 +1435,20 @@ function _generateInvoices(): Invoice[] {
   const fupD = ['Serviços sob demanda', 'Consultoria mensal', 'Desenvolvimento ágil',
     'Manutenção corretiva', 'Suporte premium'];
   const fupIdxs = [89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103];
+  // Ciclo de status: provisioned, approved, issued, provisioned, approved …
+  const fupStatusCycle: InvoiceStatus[] = ['provisioned', 'approved', 'issued', 'provisioned', 'approved'];
   for (let i = 0; i < fupIdxs.length; i++) {
     const dIdx = fupIdxs[i];
     const deal = mockDeals[dIdx];
     if (!deal) continue;
     const amt = Math.round(deal.amount / 2);
-    const st: InvoiceStatus = i % 3 === 0 ? 'approved' : 'provisioned';
-    push(dIdx, st, _d(2026, 3 + (i % 3), 10 + i), _d(2026, 4 + (i % 3), 10 + i), amt, 0,
-      fupD[i % 5] + ' - Previsão', null, 1, 2);
+    const st = fupStatusCycle[i % fupStatusCycle.length];
+    const issM = 2 + (i % 3); const issY = 2026;
+    const dueM = st === 'issued' ? issM : issM + 2;
+    const issDate = _d(issY, issM, 10 + (i % 15));
+    const dueDate = st === 'issued' ? _d(2026, issM, 14 + (i % 10)) : _d(2026, dueM, 10 + (i % 15));
+    const nfNum = st === 'issued' ? `NF-2026-${String(400 + seq).padStart(5, '0')}` : null;
+    push(dIdx, st, issDate, dueDate, amt, 0, fupD[i % 5] + ' - Previsão', nfNum, 1, 2);
   }
 
   // ═══════════════════════════════════════════════════════════════════
@@ -1436,13 +1456,16 @@ function _generateInvoices(): Invoice[] {
   // Negócios em proposta → faturas provisionadas / aprovadas
   // ═══════════════════════════════════════════════════════════════════
   const propIdxs = [72, 73, 75, 76, 78, 79, 81, 82, 84, 85, 87, 88];
+  // Ciclo: provisioned, provisioned, approved, provisioned, approved, provisioned …
+  const propStatusCycle: InvoiceStatus[] = ['provisioned', 'approved', 'provisioned', 'provisioned'];
   for (let i = 0; i < propIdxs.length; i++) {
     const dIdx = propIdxs[i];
     const deal = mockDeals[dIdx];
     if (!deal) continue;
     const amt = Math.round(deal.amount / 3);
-    const st: InvoiceStatus = i % 4 === 0 ? 'approved' : 'provisioned';
-    push(dIdx, st, _d(2026, 4 + (i % 2), 15 + (i % 10)), _d(2026, 5 + (i % 2), 15 + (i % 10)), amt, 0,
+    const st = propStatusCycle[i % propStatusCycle.length];
+    const issM = 3 + (i % 3);
+    push(dIdx, st, _d(2026, issM, 15 + (i % 10)), _d(2026, issM + 2, 15 + (i % 10)), amt, 0,
       'Serviços profissionais - Provisão', null, 1, 3);
   }
 
