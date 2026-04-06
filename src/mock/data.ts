@@ -1260,325 +1260,210 @@ export const mockBiConnectors: BiConnectorStatus[] = [
 // MOCK BILLING (EP07)
 // ============================================================================
 
-export const mockInvoices: Invoice[] = [
-  // ── DEAL 0: Implementação Sistema CRM (Foursys) — 3 parcelas ──
-  {
-    id: 'inv-2026-0001',
-    invoiceNumber: 'INV20260001-01',
-    invoiceCode: 'INV20260001',
-    installmentNumber: 1,
-    installmentTotal: 3,
-    dealId: mockDeals[0].id,
-    dealTitle: mockDeals[0].title,
-    accountId: mockAccounts[0].id,
-    accountName: mockAccounts[0].name,
-    contactId: mockContacts[0].id,
-    contactName: mockContacts[0].fullName,
-    status: 'issued',
-    currency: 'BRL',
-    issueDate: '2026-01-15',
-    dueDate: '2026-02-15',
-    originalIssueDate: '2026-01-15',
-    issuePostponementReason: null,
-    originalDueDate: '2026-02-15',
-    duePostponementReason: null,
-    nfNumber: 'NF-2026-00142',
-    cancelledNfNumber: null,
-    billingAddressSnapshot: { ...mockAccounts[0].address },
-    invoiceDescription: mockAccounts[0].billingConditions?.invoiceDescription || null,
-    items: [
-      { id: 'inv-0001-it-1', description: 'Serviços de desenvolvimento - Sprint 1 a 3', quantity: 1, unitPrice: 166666, taxRatePct: 0, discountValue: 0 },
-    ],
-    totals: { subtotal: 166666, discountTotal: 0, taxTotal: 0, total: 166666, amountPaid: 166666, amountOpen: 0 },
-    createdAt: '2026-01-15T10:00:00Z',
-    updatedAt: '2026-02-15T14:00:00Z',
-  },
-  {
-    id: 'inv-2026-0002',
-    invoiceNumber: 'INV20260001-02',
-    invoiceCode: 'INV20260001',
-    installmentNumber: 2,
-    installmentTotal: 3,
-    dealId: mockDeals[0].id,
-    dealTitle: mockDeals[0].title,
-    accountId: mockAccounts[0].id,
-    accountName: mockAccounts[0].name,
-    contactId: mockContacts[0].id,
-    contactName: mockContacts[0].fullName,
-    status: 'issued',
-    currency: 'BRL',
-    issueDate: '2026-02-15',
-    dueDate: '2026-03-15',
-    originalIssueDate: '2026-02-15',
-    issuePostponementReason: null,
-    originalDueDate: '2026-03-15',
-    duePostponementReason: null,
-    nfNumber: 'NF-2026-00198',
-    cancelledNfNumber: null,
-    billingAddressSnapshot: { ...mockAccounts[0].address },
-    invoiceDescription: mockAccounts[0].billingConditions?.invoiceDescription || null,
-    items: [
-      { id: 'inv-0002-it-1', description: 'Serviços de desenvolvimento - Sprint 4 a 6', quantity: 1, unitPrice: 166667, taxRatePct: 0, discountValue: 0 },
-    ],
-    totals: { subtotal: 166667, discountTotal: 0, taxTotal: 0, total: 166667, amountPaid: 0, amountOpen: 166667 },
-    createdAt: '2026-02-15T10:00:00Z',
-    updatedAt: '2026-02-15T10:00:00Z',
-  },
-  {
-    id: 'inv-2026-0003',
-    invoiceNumber: 'INV20260001-03',
-    invoiceCode: 'INV20260001',
-    installmentNumber: 3,
-    installmentTotal: 3,
-    dealId: mockDeals[0].id,
-    dealTitle: mockDeals[0].title,
-    accountId: mockAccounts[0].id,
-    accountName: mockAccounts[0].name,
-    contactId: mockContacts[0].id,
-    contactName: mockContacts[0].fullName,
-    status: 'provisioned',
-    currency: 'BRL',
-    issueDate: '2026-03-15',
-    dueDate: '2026-04-15',
-    originalIssueDate: '2026-03-15',
-    issuePostponementReason: null,
-    originalDueDate: '2026-04-15',
-    duePostponementReason: null,
-    nfNumber: null,
-    cancelledNfNumber: null,
-    billingAddressSnapshot: { ...mockAccounts[0].address },
-    invoiceDescription: mockAccounts[0].billingConditions?.invoiceDescription || null,
-    items: [
-      { id: 'inv-0003-it-1', description: 'Serviços de desenvolvimento - Sprint 7 a 9', quantity: 1, unitPrice: 166667, taxRatePct: 0, discountValue: 0 },
-    ],
-    totals: { subtotal: 166667, discountTotal: 0, taxTotal: 0, total: 166667, amountPaid: 0, amountOpen: 166667 },
-    createdAt: '2026-03-15T10:00:00Z',
-    updatedAt: '2026-03-15T10:00:00Z',
-  },
+// ── Invoice generator: 100 faturas coerentes com negócios ──────────────────────
+// Status possíveis: provisioned | approved | issued | paid | cancelled
+// 'Vencida' NÃO é status — é indicador dinâmico (dueDate < hoje E status ≠ paid/cancelled)
+function _generateInvoices(): Invoice[] {
+  const inv: Invoice[] = [];
+  let seq = 0;
 
-  // ── DEAL 1: Consultoria Azure (TechCorp) — 2 faturas, VENCIDAS (atrasadas) ──
-  {
-    id: 'inv-2026-0004',
-    invoiceNumber: 'INV20260004-01',
-    invoiceCode: 'INV20260004',
-    installmentNumber: 1,
-    installmentTotal: 2,
-    dealId: mockDeals[1].id,
-    dealTitle: mockDeals[1].title,
-    accountId: mockAccounts[1].id,
-    accountName: mockAccounts[1].name,
-    contactId: mockContacts[1].id,
-    contactName: mockContacts[1].fullName,
-    status: 'issued',
-    currency: 'BRL',
-    issueDate: '2026-01-10',
-    dueDate: '2026-02-10',
-    originalIssueDate: '2026-01-10',
-    issuePostponementReason: null,
-    originalDueDate: '2026-02-10',
-    duePostponementReason: null,
-    nfNumber: 'NF-2026-00089',
-    cancelledNfNumber: null,
-    billingAddressSnapshot: { ...mockAccounts[1].address },
-    invoiceDescription: mockAccounts[1].billingConditions?.invoiceDescription || null,
-    items: [
-      { id: 'inv-0004-it-1', description: 'Consultoria Cloud Migration - Fase 1', quantity: 1, unitPrice: 45000, taxRatePct: 0, discountValue: 0 },
-    ],
-    totals: { subtotal: 45000, discountTotal: 0, taxTotal: 0, total: 45000, amountPaid: 0, amountOpen: 45000 },
-    createdAt: '2026-01-10T10:00:00Z',
-    updatedAt: '2026-01-10T10:00:00Z',
-  },
-  {
-    id: 'inv-2026-0005',
-    invoiceNumber: 'INV20260004-02',
-    invoiceCode: 'INV20260004',
-    installmentNumber: 2,
-    installmentTotal: 2,
-    dealId: mockDeals[1].id,
-    dealTitle: mockDeals[1].title,
-    accountId: mockAccounts[1].id,
-    accountName: mockAccounts[1].name,
-    contactId: mockContacts[1].id,
-    contactName: mockContacts[1].fullName,
-    status: 'approved',
-    currency: 'BRL',
-    issueDate: '2026-02-10',
-    dueDate: '2026-03-10',
-    originalIssueDate: '2026-02-10',
-    issuePostponementReason: null,
-    originalDueDate: '2026-03-10',
-    duePostponementReason: null,
-    nfNumber: null,
-    cancelledNfNumber: null,
-    billingAddressSnapshot: { ...mockAccounts[1].address },
-    invoiceDescription: mockAccounts[1].billingConditions?.invoiceDescription || null,
-    items: [
-      { id: 'inv-0005-it-1', description: 'Consultoria Cloud Migration - Fase 2', quantity: 1, unitPrice: 45000, taxRatePct: 0, discountValue: 0 },
-    ],
-    totals: { subtotal: 45000, discountTotal: 0, taxTotal: 0, total: 45000, amountPaid: 0, amountOpen: 45000 },
-    createdAt: '2026-02-10T10:00:00Z',
-    updatedAt: '2026-02-10T10:00:00Z',
-  },
+  const _d = (y: number, m: number, d: number) =>
+    `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
 
-  // ── DEAL 2: Licenças SaaS (StartupX) — 1 fatura paga ──
-  {
-    id: 'inv-2026-0006',
-    invoiceNumber: 'INV20260006-01',
-    invoiceCode: 'INV20260006',
-    installmentNumber: 1,
-    installmentTotal: 1,
-    dealId: mockDeals[2].id,
-    dealTitle: mockDeals[2].title,
-    accountId: mockAccounts[2].id,
-    accountName: mockAccounts[2].name,
-    contactId: mockContacts[2].id,
-    contactName: mockContacts[2].fullName,
-    status: 'paid',
-    currency: 'BRL',
-    issueDate: '2026-01-05',
-    dueDate: '2026-01-20',
-    originalIssueDate: '2026-01-05',
-    issuePostponementReason: null,
-    originalDueDate: '2026-01-20',
-    duePostponementReason: null,
-    nfNumber: 'NF-2026-00045',
-    cancelledNfNumber: null,
-    billingAddressSnapshot: { ...mockAccounts[2].address },
-    invoiceDescription: mockAccounts[2].billingConditions?.invoiceDescription || null,
-    items: [
-      { id: 'inv-0006-it-1', description: 'Licenças SaaS Enterprise - Setup + 1º mês', quantity: 1, unitPrice: 6000, taxRatePct: 0, discountValue: 0 },
-    ],
-    totals: { subtotal: 6000, discountTotal: 0, taxTotal: 0, total: 6000, amountPaid: 6000, amountOpen: 0 },
-    createdAt: '2026-01-05T08:00:00Z',
-    updatedAt: '2026-01-18T15:20:00Z',
-  },
+  function push(
+    dealIdx: number, status: InvoiceStatus, issueDate: string, dueDate: string,
+    amount: number, paid: number, desc: string, nf: string | null, inst: number, instTotal: number,
+  ) {
+    seq++;
+    const deal = mockDeals[dealIdx];
+    if (!deal) return;
+    const accIdx = dealIdx < 4 ? dealIdx : (dealIdx - 4) % 4;
+    const account = mockAccounts[accIdx < 4 ? accIdx : 0];
+    const contact = mockContacts[accIdx < 4 ? accIdx : 0];
+    const invNum = `INV2026${String(seq).padStart(4, '0')}`;
+    inv.push({
+      id: `inv-2026-${String(seq).padStart(4, '0')}`,
+      invoiceNumber: `${invNum}-${String(inst).padStart(2, '0')}`,
+      invoiceCode: invNum,
+      installmentNumber: inst,
+      installmentTotal: instTotal,
+      dealId: deal.id,
+      dealTitle: deal.title,
+      accountId: account.id,
+      accountName: account.name,
+      contactId: contact.id,
+      contactName: contact.fullName,
+      status,
+      currency: 'BRL',
+      issueDate,
+      dueDate,
+      originalIssueDate: issueDate,
+      issuePostponementReason: null,
+      originalDueDate: dueDate,
+      duePostponementReason: null,
+      nfNumber: nf,
+      cancelledNfNumber: null,
+      billingAddressSnapshot: { ...account.address },
+      invoiceDescription: account.billingConditions?.invoiceDescription || null,
+      items: [{ id: `inv-${seq}-it-1`, description: desc, quantity: 1, unitPrice: amount, taxRatePct: 0, discountValue: 0 }],
+      totals: { subtotal: amount, discountTotal: 0, taxTotal: 0, total: amount, amountPaid: paid, amountOpen: amount - paid },
+      createdAt: issueDate + 'T10:00:00Z',
+      updatedAt: dueDate + 'T10:00:00Z',
+    });
+  }
 
-  // ── DEAL 3: Modernização Sistema Legado (BigCo) — 4 faturas, VENCIDAS ──
-  {
-    id: 'inv-2026-0007',
-    invoiceNumber: 'INV20260007-01',
-    invoiceCode: 'INV20260007',
-    installmentNumber: 1,
-    installmentTotal: 4,
-    dealId: mockDeals[3].id,
-    dealTitle: mockDeals[3].title,
-    accountId: mockAccounts[3].id,
-    accountName: mockAccounts[3].name,
-    contactId: mockContacts[3].id,
-    contactName: mockContacts[3].fullName,
-    status: 'paid',
-    currency: 'BRL',
-    issueDate: '2025-11-20',
-    dueDate: '2025-12-20',
-    originalIssueDate: '2025-11-20',
-    issuePostponementReason: null,
-    originalDueDate: '2025-12-20',
-    duePostponementReason: null,
-    nfNumber: 'NF-2025-01102',
-    cancelledNfNumber: null,
-    billingAddressSnapshot: { ...mockAccounts[3].address },
-    invoiceDescription: mockAccounts[3].billingConditions?.invoiceDescription || null,
-    items: [
-      { id: 'inv-0007-it-1', description: 'Modernização Legado - Fase 1 (Discovery)', quantity: 1, unitPrice: 67500, taxRatePct: 0, discountValue: 0 },
-    ],
-    totals: { subtotal: 67500, discountTotal: 0, taxTotal: 0, total: 67500, amountPaid: 67500, amountOpen: 0 },
-    createdAt: '2025-11-20T10:00:00Z',
-    updatedAt: '2025-12-18T16:00:00Z',
-  },
-  {
-    id: 'inv-2026-0008',
-    invoiceNumber: 'INV20260007-02',
-    invoiceCode: 'INV20260007',
-    installmentNumber: 2,
-    installmentTotal: 4,
-    dealId: mockDeals[3].id,
-    dealTitle: mockDeals[3].title,
-    accountId: mockAccounts[3].id,
-    accountName: mockAccounts[3].name,
-    contactId: mockContacts[3].id,
-    contactName: mockContacts[3].fullName,
-    status: 'issued',
-    currency: 'BRL',
-    issueDate: '2025-12-20',
-    dueDate: '2026-01-20',
-    originalIssueDate: '2025-12-20',
-    issuePostponementReason: null,
-    originalDueDate: '2026-01-20',
-    duePostponementReason: null,
-    nfNumber: 'NF-2026-00012',
-    cancelledNfNumber: null,
-    billingAddressSnapshot: { ...mockAccounts[3].address },
-    invoiceDescription: mockAccounts[3].billingConditions?.invoiceDescription || null,
-    items: [
-      { id: 'inv-0008-it-1', description: 'Modernização Legado - Fase 2 (Refactoring)', quantity: 1, unitPrice: 67500, taxRatePct: 0, discountValue: 0 },
-    ],
-    totals: { subtotal: 67500, discountTotal: 0, taxTotal: 0, total: 67500, amountPaid: 0, amountOpen: 67500 },
-    createdAt: '2025-12-20T10:00:00Z',
-    updatedAt: '2025-12-20T10:00:00Z',
-  },
-  {
-    id: 'inv-2026-0009',
-    invoiceNumber: 'INV20260007-03',
-    invoiceCode: 'INV20260007',
-    installmentNumber: 3,
-    installmentTotal: 4,
-    dealId: mockDeals[3].id,
-    dealTitle: mockDeals[3].title,
-    accountId: mockAccounts[3].id,
-    accountName: mockAccounts[3].name,
-    contactId: mockContacts[3].id,
-    contactName: mockContacts[3].fullName,
-    status: 'issued',
-    currency: 'BRL',
-    issueDate: '2026-01-20',
-    dueDate: '2026-02-20',
-    originalIssueDate: '2026-01-20',
-    issuePostponementReason: null,
-    originalDueDate: '2026-02-20',
-    duePostponementReason: null,
-    nfNumber: 'NF-2026-00078',
-    cancelledNfNumber: null,
-    billingAddressSnapshot: { ...mockAccounts[3].address },
-    invoiceDescription: mockAccounts[3].billingConditions?.invoiceDescription || null,
-    items: [
-      { id: 'inv-0009-it-1', description: 'Modernização Legado - Fase 3 (Migration)', quantity: 1, unitPrice: 67500, taxRatePct: 0, discountValue: 0 },
-    ],
-    totals: { subtotal: 67500, discountTotal: 0, taxTotal: 0, total: 67500, amountPaid: 0, amountOpen: 67500 },
-    createdAt: '2026-01-20T10:00:00Z',
-    updatedAt: '2026-01-20T10:00:00Z',
-  },
-  {
-    id: 'inv-2026-0010',
-    invoiceNumber: 'INV20260007-04',
-    invoiceCode: 'INV20260007',
-    installmentNumber: 4,
-    installmentTotal: 4,
-    dealId: mockDeals[3].id,
-    dealTitle: mockDeals[3].title,
-    accountId: mockAccounts[3].id,
-    accountName: mockAccounts[3].name,
-    contactId: mockContacts[3].id,
-    contactName: mockContacts[3].fullName,
-    status: 'provisioned',
-    currency: 'BRL',
-    issueDate: '2026-02-20',
-    dueDate: '2026-03-20',
-    originalIssueDate: '2026-02-20',
-    issuePostponementReason: null,
-    originalDueDate: '2026-03-20',
-    duePostponementReason: null,
-    nfNumber: null,
-    cancelledNfNumber: null,
-    billingAddressSnapshot: { ...mockAccounts[3].address },
-    invoiceDescription: mockAccounts[3].billingConditions?.invoiceDescription || null,
-    items: [
-      { id: 'inv-0010-it-1', description: 'Modernização Legado - Fase 4 (Go-live)', quantity: 1, unitPrice: 67500, taxRatePct: 0, discountValue: 0 },
-    ],
-    totals: { subtotal: 67500, discountTotal: 0, taxTotal: 0, total: 67500, amountPaid: 0, amountOpen: 67500 },
-    createdAt: '2026-02-20T10:00:00Z',
-    updatedAt: '2026-02-20T10:00:00Z',
-  },
-];
+  // ═══════════════════════════════════════════════════════════════════
+  // DEAL 0 — Implementação CRM (Foursys, R$500k) — 5 parcelas
+  // Stage: Proposta (open) — 2 pagas, 1 emitida vencida, 1 aprovada vencida, 1 provisionada
+  // ═══════════════════════════════════════════════════════════════════
+  push(0, 'paid',        _d(2025,11,15), _d(2025,12,15), 100000, 100000, 'CRM Customizado - Sprint 1-2',  'NF-2025-01088', 1, 5);
+  push(0, 'paid',        _d(2025,12,15), _d(2026,1,15),  100000, 100000, 'CRM Customizado - Sprint 3-4',  'NF-2026-00015', 2, 5);
+  push(0, 'issued',      _d(2026,1,15),  _d(2026,2,15),  100000, 0,      'CRM Customizado - Sprint 5-6',  'NF-2026-00142', 3, 5);
+  push(0, 'approved',    _d(2026,2,15),  _d(2026,3,15),  100000, 0,      'CRM Customizado - Sprint 7-8',  null,             4, 5);
+  push(0, 'provisioned', _d(2026,3,15),  _d(2026,4,15),  100000, 0,      'CRM Customizado - Sprint 9-10', null,             5, 5);
+
+  // ═══════════════════════════════════════════════════════════════════
+  // DEAL 1 — Consultoria Azure (TechCorp, R$300k) — 4 parcelas
+  // Stage: FUP (open) — 1 paga, 2 emitidas vencidas, 1 provisionada
+  // ═══════════════════════════════════════════════════════════════════
+  push(1, 'paid',        _d(2025,12,10), _d(2026,1,10), 75000, 75000, 'Cloud Migration - Fase 1 Discovery',  'NF-2026-00022', 1, 4);
+  push(1, 'issued',      _d(2026,1,10),  _d(2026,2,10), 75000, 0,     'Cloud Migration - Fase 2 Planning',   'NF-2026-00089', 2, 4);
+  push(1, 'issued',      _d(2026,2,10),  _d(2026,3,10), 75000, 0,     'Cloud Migration - Fase 3 Execution',  'NF-2026-00198', 3, 4);
+  push(1, 'provisioned', _d(2026,3,10),  _d(2026,4,10), 75000, 0,     'Cloud Migration - Fase 4 Go-live',    null,             4, 4);
+
+  // ═══════════════════════════════════════════════════════════════════
+  // DEAL 2 — Licenças SaaS (StartupX, R$100k) — 2 parcelas
+  // Stage: Qualificação (open) — 1 paga, 1 provisionada futura
+  // ═══════════════════════════════════════════════════════════════════
+  push(2, 'paid',        _d(2026,1,5),  _d(2026,1,20), 50000, 50000, 'SaaS Enterprise - Setup + Licenças',  'NF-2026-00045', 1, 2);
+  push(2, 'provisioned', _d(2026,4,5),  _d(2026,4,20), 50000, 0,     'SaaS Enterprise - Renovação anual',   null,             2, 2);
+
+  // ═══════════════════════════════════════════════════════════════════
+  // DEAL 3 — Modernização Legado (BigCo, R$800k) — 6 parcelas
+  // Stage: Vencido — 3 pagas, 2 emitidas vencidas, 1 aprovada
+  // ═══════════════════════════════════════════════════════════════════
+  push(3, 'paid',     _d(2025,10,20), _d(2025,11,20), 133000, 133000, 'Legado - Fase 1 Discovery',   'NF-2025-00988', 1, 6);
+  push(3, 'paid',     _d(2025,11,20), _d(2025,12,20), 133000, 133000, 'Legado - Fase 2 Refactoring', 'NF-2025-01102', 2, 6);
+  push(3, 'paid',     _d(2025,12,20), _d(2026,1,20),  133000, 133000, 'Legado - Fase 3 Migration',   'NF-2026-00012', 3, 6);
+  push(3, 'issued',   _d(2026,1,20),  _d(2026,2,20),  133000, 0,      'Legado - Fase 4 Integration', 'NF-2026-00078', 4, 6);
+  push(3, 'issued',   _d(2026,2,20),  _d(2026,3,20),  134000, 0,      'Legado - Fase 5 Testing',     'NF-2026-00205', 5, 6);
+  push(3, 'approved', _d(2026,3,20),  _d(2026,4,20),  134000, 0,      'Legado - Fase 6 Go-live',     null,             6, 6);
+
+  // ═══════════════════════════════════════════════════════════════════
+  // DEALS 'Vencido' (stage Fechamento/Vencido) — idx 100-109 → mockDeals[104..113]
+  // Negócios vencidos → mix de paid + issued (vencidas) + provisioned
+  // ═══════════════════════════════════════════════════════════════════
+  const vDescs = [
+    'Serviços profissionais', 'Desenvolvimento customizado', 'Consultoria técnica',
+    'Implementação de sistema', 'Suporte especializado', 'Licenças de software',
+    'Migração de dados', 'Treinamento corporativo', 'Auditoria de segurança', 'Integração de sistemas',
+  ];
+  for (let i = 0; i < 10; i++) {
+    const dIdx = 104 + i;
+    const parcelas = 2 + (i % 3);
+    const deal = mockDeals[dIdx];
+    if (!deal) continue;
+    const baseAmt = Math.round(deal.amount / parcelas);
+    for (let p = 0; p < parcelas; p++) {
+      const issM = Math.max(1, Math.min(12, (11 + p + i) % 12 + 1));
+      const issY = issM <= 10 && p === 0 ? 2025 : 2026;
+      const dueM = issM === 12 ? 1 : issM + 1;
+      const dueY = issM === 12 ? issY + 1 : issY;
+      const issDate = _d(issY, issM, 5 + (i * 3) % 20);
+      const dueDate = _d(dueY, dueM, 5 + (i * 3) % 20);
+      const isPast = new Date(dueDate) < new Date('2026-04-05');
+      let st: InvoiceStatus;
+      if (p < parcelas - 2) st = 'paid';
+      else if (p === parcelas - 2) st = isPast ? 'issued' : 'approved';
+      else st = isPast ? 'issued' : 'provisioned';
+      const pd = st === 'paid' ? baseAmt : 0;
+      const nfNum = (st === 'paid' || st === 'issued') ? `NF-${issY}-${String(300 + seq).padStart(5, '0')}` : null;
+      push(dIdx, st, issDate, dueDate, baseAmt, pd, `${vDescs[i]} - Parcela ${p + 1}`, nfNum, p + 1, parcelas);
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════════════════
+  // DEALS 'won' (idx 110-115) → mockDeals[114..119]
+  // Negócios ganhos → faturas 100% pagas
+  // ═══════════════════════════════════════════════════════════════════
+  const wonD = ['Projeto concluído', 'Entrega final', 'Contrato executado',
+    'Serviço entregue', 'Implantação concluída', 'Consultoria finalizada'];
+  for (let i = 0; i < 6; i++) {
+    const dIdx = 114 + i;
+    const deal = mockDeals[dIdx];
+    if (!deal) continue;
+    const parcelas = 1 + (i % 2);
+    const baseAmt = Math.round(deal.amount / parcelas);
+    for (let p = 0; p < parcelas; p++) {
+      const issM = 10 + (i % 3);
+      push(dIdx, 'paid', _d(2025, issM, 10 + i), _d(2025, issM + 1, 10 + i), baseAmt, baseAmt,
+        `${wonD[i]} - Parcela ${p + 1}`, `NF-2025-${String(800 + seq).padStart(5, '0')}`, p + 1, parcelas);
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════════════════
+  // DEALS 'lost' (idx 116-119) → mockDeals[120..123]
+  // Negócios perdidos → faturas canceladas
+  // ═══════════════════════════════════════════════════════════════════
+  for (let i = 0; i < 4; i++) {
+    const dIdx = 120 + i;
+    const deal = mockDeals[dIdx];
+    if (!deal) continue;
+    const amt = Math.round(deal.amount / 2);
+    push(dIdx, 'cancelled', _d(2026, 1 + i, 1), _d(2026, 2 + i, 1), amt, 0, 'Serviços cancelados - Negócio perdido', null, 1, 2);
+    push(dIdx, 'cancelled', _d(2026, 2 + i, 1), _d(2026, 3 + i, 1), amt, 0, 'Serviços cancelados - Parcela 2', null, 2, 2);
+  }
+
+  // ═══════════════════════════════════════════════════════════════════
+  // DEALS Stage 'FUP' — idx 85-99 → mockDeals[89..103]
+  // Negócios em negociação avançada → faturas provisionadas / aprovadas
+  // ═══════════════════════════════════════════════════════════════════
+  const fupD = ['Serviços sob demanda', 'Consultoria mensal', 'Desenvolvimento ágil',
+    'Manutenção corretiva', 'Suporte premium'];
+  const fupIdxs = [89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103];
+  for (let i = 0; i < fupIdxs.length; i++) {
+    const dIdx = fupIdxs[i];
+    const deal = mockDeals[dIdx];
+    if (!deal) continue;
+    const amt = Math.round(deal.amount / 2);
+    const st: InvoiceStatus = i % 3 === 0 ? 'approved' : 'provisioned';
+    push(dIdx, st, _d(2026, 3 + (i % 3), 10 + i), _d(2026, 4 + (i % 3), 10 + i), amt, 0,
+      fupD[i % 5] + ' - Previsão', null, 1, 2);
+  }
+
+  // ═══════════════════════════════════════════════════════════════════
+  // DEALS Stage 'Proposta' — idx 68-84 → mockDeals[72..88]
+  // Negócios em proposta → faturas provisionadas / aprovadas
+  // ═══════════════════════════════════════════════════════════════════
+  const propIdxs = [72, 73, 75, 76, 78, 79, 81, 82, 84, 85, 87, 88];
+  for (let i = 0; i < propIdxs.length; i++) {
+    const dIdx = propIdxs[i];
+    const deal = mockDeals[dIdx];
+    if (!deal) continue;
+    const amt = Math.round(deal.amount / 3);
+    const st: InvoiceStatus = i % 4 === 0 ? 'approved' : 'provisioned';
+    push(dIdx, st, _d(2026, 4 + (i % 2), 15 + (i % 10)), _d(2026, 5 + (i % 2), 15 + (i % 10)), amt, 0,
+      'Serviços profissionais - Provisão', null, 1, 3);
+  }
+
+  // ═══════════════════════════════════════════════════════════════════
+  // DEALS Stage 'Viabilidade' — idx 48-67 → mockDeals[52..71]
+  // Negócios em validação → faturas provisionadas iniciais
+  // ═══════════════════════════════════════════════════════════════════
+  const viabIdxs = [52, 54, 56, 58, 60, 62, 64, 66, 68, 70];
+  for (let i = 0; i < viabIdxs.length; i++) {
+    const dIdx = viabIdxs[i];
+    const deal = mockDeals[dIdx];
+    if (!deal) continue;
+    const amt = Math.round(deal.amount / 4);
+    push(dIdx, 'provisioned', _d(2026, 5 + (i % 3), 1 + i * 2), _d(2026, 6 + (i % 3), 1 + i * 2), amt, 0,
+      'Análise e planejamento - Provisão', null, 1, 4);
+  }
+
+  return inv;
+}
+
+export const mockInvoices: Invoice[] = _generateInvoices();
 
 export const mockPaymentConnectors: ConnectorViewModel[] = [
   {
